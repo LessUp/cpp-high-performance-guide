@@ -1,0 +1,134 @@
+name: Benchmark
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build gcc-12 g++-12 libomp-dev python3
+
+    - name: Configure CMake
+      env:
+        CC: gcc-12
+        CXX: g++-12
+      run: |
+        cmake -B build \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+          -DCMAKE_CXX_FLAGS="-O3 -march=native"
+
+    - name: Build
+      run: cmake --build build --config ${{ env.BUILD_TYPE }}
+
+    - name: Run Memory Benchmarks
+      run: |
+        if [ -f build/examples/02-memory-cache/aos_soa_bench ]; then
+          build/examples/02-memory-cache/aos_soa_bench \
+            --benchmark_format=json \
+            --benchmark_out=memory_bench.json || true
+        fi
+
+    - name: Run SIMD Benchmarks
+      run: |
+        if [ -f build/examples/04-simd-vectorization/simd_bench ]; then
+          build/examples/04-simd-vectorization/simd_bench \
+            --benchmark_format=json \
+            --benchmark_out=simd_bench.json || true
+        fi
+
+    - name: Upload Benchmark Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results
+        path: |
+          *_bench.json
+        if-no-files-found: ignore
+
+    - name: Download Baseline (if exists)
+      uses: dawidd6/action-download-artifact@v3
+      with:
+        workflow: benchmark.yml
+        branch: main
+        name: benchmark-results
+        path: baseline/
+      continue-on-error: true
+
+    - name: Compare Benchmarks
+      if: github.event_name == 'pull_request'
+      run: |
+        if [ -f baseline/memory_bench.json ] && [ -f memory_bench.json ]; then
+          python3 tools/analysis/benchmark_compare.py \
+            baseline/memory_bench.json \
+            memory_bench.json \
+            --report memory_comparison.md \
+            --threshold 0.15 || true
+          
+          if [ -f memory_comparison.md ]; then
+            echo "## Memory Benchmark Comparison" >> $GITHUB_STEP_SUMMARY
+            cat memory_comparison.md >> $GITHUB_STEP_SUMMARY
+          fi
+        fi
+
+  benchmark-matrix:
+    name: Benchmark on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build gcc-12 g++-12 libomp-dev
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install ninja libomp
+
+    - name: Configure and Build
+      env:
+        CC: ${{ runner.os == 'Linux' && 'gcc-12' || 'clang' }}
+        CXX: ${{ runner.os == 'Linux' && 'g++-12' || 'clang++' }}
+      run: |
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
+
+    - name: Run All Benchmarks
+      run: |
+        mkdir -p results
+        for bench in build/examples/*/bench/*_bench build/examples/*/*_bench; do
+          if [ -x "$bench" ]; then
+            name=$(basename "$bench" _bench)
+            echo "Running $name..."
+            "$bench" --benchmark_format=json --benchmark_out="results/${name}.json" || true
+          fi
+        done
+
+    - name: Upload Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-${{ matrix.os }}
+        path: results/
+        if-no-files-found: ignore
