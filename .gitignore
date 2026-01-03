@@ -1,0 +1,196 @@
+# Build directories
+build/
+build-*/
+out/
+cmake-build-*/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+!cmake/*.cmake
+!**/CMakeLists.txt
+
+# Ninja build files
+.ninja_deps
+.ninja_log
+build.ninja
+rules.ninja
+
+# Compiled binaries
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# Object files
+*.o
+*.obj
+*.lo
+*.slo
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Profiling and performance data
+perf.data*
+*.prof
+*.trace
+callgrind.out.*
+cachegrind.out.*
+massif.out.*
+*.svg
+flamegraph*.svg
+
+# Benchmark results
+*_bench.json
+benchmark_*.json
+results/
+baseline/
+
+# Test results
+Testing/
+test_results/
+*.xml
+*.junit
+
+# Coverage files
+*.gcov
+*.gcda
+*.gcno
+coverage/
+*.info
+
+# Sanitizer logs
+*.log
+asan.log*
+tsan.log*
+ubsan.log*
+msan.log*
+
+# IDE files
+.vscode/
+.vs/
+*.vcxproj*
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# CLion
+.idea/
+cmake-build-*/
+
+# Qt Creator
+CMakeLists.txt.user*
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Package managers
+node_modules/
+.npm
+.yarn/
+yarn-error.log
+
+# Documentation build
+docs/_build/
+docs/html/
+docs/latex/
+site/
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Archive files
+*.tar
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# Local configuration
+.env
+.env.local
+config.local.*
+
+# FlameGraph tools (if cloned locally)
+FlameGraph/
+
+# Conan
+conandata.yml
+conanfile.txt
+conanbuildinfo.*
+conan.lock
+
+# vcpkg
+vcpkg_installed/
+.vcpkg-root
+
+# FetchContent downloads
+_deps/
+
+# Custom benchmark data
+benchmark_data/
+perf_data/
+
+# Temporary test files
+/tmp/
+temp_*
+test_*
+*_test_*
+
+# Editor backup files
+.#*
+\#*#
+
+# macOS
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
