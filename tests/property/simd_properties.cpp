@@ -10,7 +10,12 @@
 #include <gtest/gtest.h>
 #include <rapidcheck.h>
 #include <rapidcheck/gtest.h>
+#include <algorithm>
+#include <benchmark/benchmark.h>
 #include <cmath>
+#include <chrono>
+#include <iostream>
+#include <random>
 #include <vector>
 #include <numeric>
 
@@ -75,8 +80,8 @@ RC_GTEST_PROP(SIMDWrapperProperties, AddArraysCorrectness, ()) {
     std::vector<float> a(size), b(size), c_simd(size), c_ref(size);
     
     for (size_t i = 0; i < size; ++i) {
-        a[i] = *rc::gen::apply(gen_float);
-        b[i] = *rc::gen::apply(gen_float);
+        a[i] = *gen_float;
+        b[i] = *gen_float;
     }
     
     // Run SIMD implementation
@@ -110,8 +115,8 @@ RC_GTEST_PROP(SIMDWrapperProperties, DotProductCorrectness, ()) {
     std::vector<float> a(size), b(size);
     
     for (size_t i = 0; i < size; ++i) {
-        a[i] = *rc::gen::apply(gen_float);
-        b[i] = *rc::gen::apply(gen_float);
+        a[i] = *gen_float;
+        b[i] = *gen_float;
     }
     
     float simd_result = hpc::simd::dot_product_wrapped(a.data(), b.data(), size);
@@ -143,7 +148,7 @@ RC_GTEST_PROP(SIMDWrapperProperties, ScaleArrayCorrectness, ()) {
     std::vector<float> arr_simd(size), arr_ref(size);
     
     for (size_t i = 0; i < size; ++i) {
-        float val = *rc::gen::apply(gen_float);
+        float val = *gen_float;
         arr_simd[i] = val;
         arr_ref[i] = val;
     }
@@ -180,7 +185,7 @@ RC_GTEST_PROP(SIMDWrapperProperties, ClampArrayCorrectness, ()) {
     std::vector<float> arr_simd(size), arr_ref(size);
     
     for (size_t i = 0; i < size; ++i) {
-        float val = *rc::gen::apply(gen_float);
+        float val = *gen_float;
         arr_simd[i] = val;
         arr_ref[i] = val;
     }
@@ -210,8 +215,8 @@ RC_GTEST_PROP(SIMDWrapperProperties, FloatVecArithmeticCorrectness, ()) {
     alignas(64) float a_data[WIDTH], b_data[WIDTH];
     
     for (size_t i = 0; i < WIDTH; ++i) {
-        a_data[i] = *rc::gen::apply(gen_float);
-        b_data[i] = *rc::gen::apply(gen_float);
+        a_data[i] = *gen_float;
+        b_data[i] = *gen_float;
     }
     
     hpc::simd::FloatVec va(a_data);
@@ -261,7 +266,7 @@ RC_GTEST_PROP(SIMDWrapperProperties, HorizontalSumCorrectness, ()) {
     float expected_sum = 0.0f;
     
     for (size_t i = 0; i < WIDTH; ++i) {
-        data[i] = *rc::gen::apply(gen_float);
+        data[i] = *gen_float;
         expected_sum += data[i];
     }
     
@@ -329,7 +334,7 @@ int main(int argc, char** argv) {
  */
 TEST(SIMDSpeedupTests, VectorizedFasterThanScalar) {
     // Only run this test if we have SIMD support
-    if (hpc::simd::detect_simd_level() == hpc::simd::SIMDLevel::None) {
+    if (hpc::simd::detect_simd_level() == hpc::simd::SIMDLevel::Scalar) {
         GTEST_SKIP() << "No SIMD support detected";
     }
     
@@ -396,7 +401,7 @@ TEST(SIMDSpeedupTests, VectorizedFasterThanScalar) {
 }
 
 TEST(SIMDSpeedupTests, DotProductSpeedup) {
-    if (hpc::simd::detect_simd_level() == hpc::simd::SIMDLevel::None) {
+    if (hpc::simd::detect_simd_level() == hpc::simd::SIMDLevel::Scalar) {
         GTEST_SKIP() << "No SIMD support detected";
     }
     

@@ -102,6 +102,12 @@ inline void export_to_json(const std::string& filename,
     }
     
     file << "{\n";
+    if (results.empty()) {
+        file << "  \"benchmarks\": []\n";
+        file << "}\n";
+        return;
+    }
+ 
     file << "  \"benchmarks\": [\n";
     
     for (size_t i = 0; i < results.size(); ++i) {
