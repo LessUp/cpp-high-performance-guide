@@ -4,6 +4,29 @@
 
 本项目是一个模块化的高性能计算优化案例库，采用现代 CMake 构建系统，提供可独立运行的优化示例、基准测试和详细文档。项目结构遵循"教学优先"原则，每个模块都是自包含的学习单元。
 
+## Design Goals and Non-Goals
+
+### Goals
+
+- 通过可运行示例与基准测试展示性能优化的可度量收益。
+- 为学习者提供渐进式路径与可复现的实验流程。
+- 通过统一结构与模板降低新增模块成本。
+- 保持跨平台可移植性与代码可维护性。
+
+### Non-Goals
+
+- 不构建生产级 HPC 框架或完整性能分析平台。
+- 不包含 GPU、分布式计算或硬件专用优化的完整体系。
+- 不追求覆盖所有编译器与平台的极限兼容。
+
+## Scope and Constraints
+
+- 目标语言标准为 C++20，构建工具为 CMake 3.20+。
+- 基准测试依赖 Google Benchmark，单元测试依赖 Google Test，属性测试依赖 RapidCheck。
+- 默认以 Linux 为主要验证平台，macOS/Windows 为尽力支持。
+- 性能分析工具（perf、FlameGraph、VTune）允许缺失并提供降级路径。
+- SIMD 示例需要根据 CPU 能力进行编译期或运行期的指令集选择。
+
 ## Architecture
 
 ### 高层架构图
@@ -96,6 +119,38 @@ hpc-optimization-guide/
         ├── build.yml
         └── benchmark.yml
 ```
+
+## Key Workflows
+
+### 构建与测试流程
+
+1. 使用 CMake Preset 选择构建类型与 sanitizer。
+2. CMake 生成目标并拉取依赖。
+3. 构建示例与测试，运行单元/属性测试。
+4. 输出构建与测试报告，失败则阻断后续步骤。
+
+### 基准测试与分析流程
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant CMake as CMake
+    participant Bench as Benchmark Runner
+    participant Analysis as Analysis Tools
+    participant Docs as Documentation
+
+    Dev->>CMake: configure/build preset
+    CMake->>Bench: build benchmark targets
+    Dev->>Bench: run benchmarks
+    Bench->>Analysis: export JSON results
+    Analysis->>Docs: generate charts & reports
+```
+
+### 文档生成流程
+
+- 文档来源：模块 README、示例代码注释、基准测试 JSON 与分析报告。
+- 通过 CI 校验文档与示例同步（例如 README 与目录一致性检查）。
+- 学习路径与模块索引由 docs/learning-path.md 维护。
 
 ## Components and Interfaces
 
@@ -335,6 +390,20 @@ enum class DifficultyLevel {
 }
 ```
 
+## Extension Points and Conventions
+
+- **新增模块**: 在 examples/ 下创建按序号命名的目录，复用 hpc_add_example() 注册。
+- **命名规范**: 示例源文件采用 snake_case；基准测试以 *_bench.cpp 命名。
+- **模块文档**: 每个模块包含 README.md，说明目标、前置知识、运行方式与性能结论。
+- **复用工具**: 通用工具放在 benchmarks/common 或模块 include/ 中。
+
+## Documentation Strategy
+
+- 主 README 提供快速开始与模块索引。
+- docs/learning-path.md 作为推荐学习路线的唯一来源。
+- docs/profiling-guide.md 覆盖常用性能分析工具的最小集合。
+- 模块 README 包含：背景、优化原理、运行命令、关键结果与常见误区。
+
 ## Correctness Properties
 
 *A property is a characteristic or behavior that should hold true across all valid executions of a system—essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
@@ -485,6 +554,21 @@ bool is_outlier(double value, const std::vector<double>& samples) {
 
 } // namespace hpc::bench
 ```
+
+## Operational Considerations
+
+- **可复现性**: 基准测试输出包含编译器版本、CPU 信息、构建类型与提交版本。
+- **性能波动**: 默认提供 warm-up 轮次与多次重复，输出均值与标准差。
+- **资源隔离**: 建议在低负载环境运行基准测试，必要时固定 CPU 亲和性。
+
+## Risks and Mitigations
+
+| 风险 | 影响 | 缓解策略 |
+|------|------|----------|
+| 不同硬件导致结果差异 | 结果不可比 | 记录环境信息并提供基线对比工具 |
+| 编译器优化差异 | 示例结论偏差 | 明确推荐编译器与版本区间 |
+| 基准测试不稳定 | 误判优化收益 | 重复测量与异常值检测 |
+| 性能工具缺失 | 文档体验降低 | 提供降级流程与替代说明 |
 
 ## Testing Strategy
 
