@@ -16,6 +16,8 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <algorithm>
+#include <cmath>
 
 namespace {
 

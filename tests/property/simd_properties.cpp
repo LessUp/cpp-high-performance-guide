@@ -12,12 +12,12 @@
 #include <rapidcheck/gtest.h>
 #include <algorithm>
 #include <benchmark/benchmark.h>
-#include <cmath>
 #include <chrono>
+#include <cmath>
 #include <iostream>
+#include <numeric>
 #include <random>
 #include <vector>
-#include <numeric>
 
 // Include SIMD wrapper
 #include "../../examples/04-simd-vectorization/include/simd_wrapper.hpp"
