@@ -21,7 +21,7 @@
 
 ## Scope and Constraints
 
-- 目标语言标准为 C++20，构建工具为 CMake 3.20+。
+- 目标语言标准为 C++20，编译器要求 GCC 11+、Clang 14+（MSVC 为尽力支持），构建工具为 CMake 3.20+。
 - 基准测试依赖 Google Benchmark，单元测试依赖 Google Test，属性测试依赖 RapidCheck。
 - 默认以 Linux 为主要验证平台，macOS/Windows 为尽力支持。
 - 性能分析工具（perf、FlameGraph、VTune）允许缺失并提供降级路径。
@@ -48,10 +48,16 @@ graph TB
             CMakeExamples[CMake Examples]
         end
         
+        subgraph "Testing"
+            UnitTest[Unit Tests - GTest]
+            PropTest[Property Tests - RapidCheck]
+            IntegTest[Integration Tests]
+        end
+        
         subgraph "Infrastructure"
             Benchmark[Benchmark Framework]
             Profiling[Profiling Tools]
-            Docs[Documentation]
+            Docs[Documentation zh/en]
         end
         
         subgraph "CI/CD"
@@ -67,16 +73,24 @@ graph TB
     CMake --> CMakeExamples
     
     FetchContent --> Benchmark
+    FetchContent --> UnitTest
+    FetchContent --> PropTest
     Memory --> Benchmark
     CPP --> Benchmark
     SIMD --> Benchmark
     Concurrency --> Benchmark
+    
+    Memory --> UnitTest
+    Memory --> PropTest
+    SIMD --> PropTest
+    Concurrency --> PropTest
     
     Benchmark --> Profiling
     Profiling --> Docs
     
     GHA --> CMake
     GHA --> Sanitizers
+    GHA --> UnitTest
 ```
 
 ### 项目目录结构
@@ -84,8 +98,10 @@ graph TB
 ```
 hpc-optimization-guide/
 ├── CMakeLists.txt                 # 根 CMake 配置
-├── CMakePresets.json              # 构建预设
-├── README.md                      # 项目主文档
+├── CMakePresets.json              # 构建预设（debug/release/relwithdebinfo/asan/tsan/ubsan/coverage）
+├── README.md                      # 项目主文档（English）
+├── README.zh.md                   # 项目主文档（中文）
+├── CLAUDE.md                      # AI 助手上下文文档
 ├── LICENSE
 │
 ├── cmake/                         # CMake 模块和工具
@@ -95,11 +111,18 @@ hpc-optimization-guide/
 │   └── ExampleTemplate.cmake      # 示例模块模板
 │
 ├── examples/                      # 优化示例模块
+│   ├── CMakeLists.txt             # 示例统一入口
 │   ├── 01-cmake-modern/           # 现代 CMake 示例
 │   ├── 02-memory-cache/           # 内存与缓存优化
 │   ├── 03-modern-cpp/             # 现代 C++ 特性
 │   ├── 04-simd-vectorization/     # SIMD 向量化
 │   └── 05-concurrency/            # 并发与多线程
+│
+├── tests/                         # 测试
+│   ├── CMakeLists.txt
+│   ├── unit/                      # 单元测试 (GTest)
+│   ├── property/                  # 属性测试 (RapidCheck)
+│   └── integration/               # 集成测试
 │
 ├── benchmarks/                    # 基准测试
 │   ├── CMakeLists.txt
@@ -109,15 +132,21 @@ hpc-optimization-guide/
 │   ├── flamegraph/                # FlameGraph 生成脚本
 │   └── analysis/                  # 性能分析脚本
 │
-├── docs/                          # 文档
-│   ├── learning-path.md           # 学习路径
-│   ├── profiling-guide.md         # 性能分析指南
-│   └── images/                    # 文档图片
+├── docs/                          # 文档（双语）
+│   ├── zh/                        # 中文文档
+│   │   ├── learning-path.md       # 学习路径
+│   │   └── profiling-guide.md     # 性能分析指南
+│   └── en/                        # English docs
+│       ├── learning-path.md       # Learning path
+│       └── profiling-guide.md     # Profiling guide
+│
+├── changelog/                     # 变更日志
 │
 └── .github/
     └── workflows/                 # CI/CD 配置
-        ├── build.yml
-        └── benchmark.yml
+        ├── build.yml              # 构建工作流
+        ├── benchmark.yml          # 基准测试工作流
+        └── sanitizers.yml         # Sanitizer 工作流
 ```
 
 ## Key Workflows
@@ -345,29 +374,57 @@ enum class DifficultyLevel {
 
 ### CMake 预设模型
 
+项目提供 7 个配置预设，含构建预设与测试预设：
+
+| 预设名 | 构建类型 | 用途 | 测试 | 基准测试 |
+|---------|---------|------|------|----------|
+| `debug` | Debug | 开发调试 | ON | ON |
+| `release` | Release | 性能测量 | ON | ON |
+| `relwithdebinfo` | RelWithDebInfo | 性能分析（带符号） | ON | ON |
+| `asan` | Debug | 内存错误检测 | ON | OFF |
+| `tsan` | Debug | 数据竞争检测 | ON | OFF |
+| `ubsan` | Debug | 未定义行为检测 | ON | OFF |
+| `coverage` | Debug | 代码覆盖率 | ON | OFF |
+
+关键 CMake 选项：
+
+| 选项 | 默认值 | 说明 |
+|------|--------|------|
+| `HPC_BUILD_TESTS` | ON | 构建单元测试和属性测试 |
+| `HPC_BUILD_BENCHMARKS` | ON | 构建基准测试 |
+| `HPC_ENABLE_OPENMP` | ON | 启用 OpenMP 支持 |
+| `ENABLE_ASAN` | OFF | 启用 AddressSanitizer |
+| `ENABLE_TSAN` | OFF | 启用 ThreadSanitizer |
+| `ENABLE_UBSAN` | OFF | 启用 UndefinedBehaviorSanitizer |
+
 ```json
 {
   "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 20, "patch": 0 },
   "configurePresets": [
     {
       "name": "base",
       "hidden": true,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}"
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": { "CMAKE_EXPORT_COMPILE_COMMANDS": "ON" }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HPC_BUILD_TESTS": "ON",
+        "HPC_BUILD_BENCHMARKS": "ON"
+      }
     },
     {
       "name": "release",
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "-O3 -march=native"
-      }
-    },
-    {
-      "name": "debug",
-      "inherits": "base",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "HPC_BUILD_TESTS": "ON",
+        "HPC_BUILD_BENCHMARKS": "ON"
       }
     },
     {
@@ -375,20 +432,29 @@ enum class DifficultyLevel {
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "ENABLE_ASAN": "ON"
+        "ENABLE_ASAN": "ON",
+        "HPC_BUILD_BENCHMARKS": "OFF"
       }
+    }
+  ],
+  "buildPresets": [ { "name": "release", "configurePreset": "release" } ],
+  "testPresets": [
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "output": { "outputOnFailure": true }
     },
     {
-      "name": "tsan",
-      "inherits": "base",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "ENABLE_TSAN": "ON"
-      }
+      "name": "asan",
+      "configurePreset": "asan",
+      "output": { "outputOnFailure": true },
+      "environment": { "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1" }
     }
   ]
 }
 ```
+
+> 注：以上为简化示例，完整版本请参考项目根目录的 `CMakePresets.json`。
 
 ## Extension Points and Conventions
 
@@ -399,10 +465,11 @@ enum class DifficultyLevel {
 
 ## Documentation Strategy
 
-- 主 README 提供快速开始与模块索引。
-- docs/learning-path.md 作为推荐学习路线的唯一来源。
-- docs/profiling-guide.md 覆盖常用性能分析工具的最小集合。
+- 主 README 提供快速开始与模块索引，分为 `README.md`（English）和 `README.zh.md`（中文）。
+- `docs/zh/learning-path.md` 和 `docs/en/learning-path.md` 作为推荐学习路线的唯一来源。
+- `docs/zh/profiling-guide.md` 和 `docs/en/profiling-guide.md` 覆盖常用性能分析工具的最小集合。
 - 模块 README 包含：背景、优化原理、运行命令、关键结果与常见误区。
+- 文档变更通过 CI 校验同步性（README 与目录一致性检查）。
 
 ## Correctness Properties
 
@@ -514,9 +581,9 @@ enum class SIMDLevel {
 
 SIMDLevel detect_simd_level();
 
-// 运行时分发
-template<typename Func>
-auto dispatch_simd(Func&& scalar, Func&& sse, Func&& avx, Func&& avx512) {
+// 运行时分发（模板参数区分不同实现）
+template<typename ScalarFn, typename SseFn, typename AvxFn, typename Avx512Fn>
+auto dispatch_simd(ScalarFn&& scalar, SseFn&& sse, AvxFn&& avx, Avx512Fn&& avx512) {
     switch (detect_simd_level()) {
         case SIMDLevel::AVX512: return avx512;
         case SIMDLevel::AVX2:

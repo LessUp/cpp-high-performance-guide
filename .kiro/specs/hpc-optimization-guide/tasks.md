@@ -13,7 +13,7 @@
 
 ## Dependencies and Environment
 
-- 编译器：GCC 12+/Clang 15+（MSVC 为尽力支持）。
+- 编译器：GCC 11+、Clang 14+（MSVC 为尽力支持）。
 - 构建工具：CMake 3.20+、Ninja（推荐）。
 - 依赖库：Google Benchmark、Google Test、RapidCheck。
 - 可选工具：perf、FlameGraph、Valgrind、VTune。
@@ -24,7 +24,7 @@
 1. **构建系统里程碑**：CMake Preset + 依赖管理 + Sanitizer 完整可用。
 2. **模块里程碑**：内存、现代 C++、SIMD、并发模块全部示例可运行。
 3. **性能里程碑**：基准测试框架输出 JSON，分析工具可生成对比结果。
-4. **文档里程碑**：主 README、学习路径、模块 README、性能分析指南齐全。
+4. **文档里程碑**：主 README（中/英）、学习路径（中/英）、模块 README、性能分析指南（中/英）齐全。
 5. **质量里程碑**：CI 通过，测试覆盖率达标，基准回归可检测。
 
 ## Tasks
@@ -65,8 +65,9 @@
     - **Validates: Requirements 1.6**
 
 - [x] 2. Checkpoint - 验证构建系统
-  - 确保 cmake --preset=release 能成功配置
-  - 确保所有预设都能正常工作
+  - 确保 `cmake --preset=release` 和 `cmake --preset=debug` 能成功配置
+  - 确保所有 7 个预设（debug/release/relwithdebinfo/asan/tsan/ubsan/coverage）均可配置
+  - 确保 FetchContent 能成功拉取 Google Benchmark、Google Test、RapidCheck
   - 如有问题请询问用户
 
 - [x] 3. 实现内存与缓存优化模块 (02-memory-cache)
@@ -109,9 +110,9 @@
     - _Requirements: 2.4_
 
 - [x] 4. Checkpoint - 验证内存模块
-  - 运行所有内存模块基准测试
-  - 确保 SOA 比 AOS 快
-  - 确保对齐计数器比未对齐快
+  - 运行所有内存模块基准测试，确保输出 JSON 格式结果
+  - 确保 SOA 在 N > 1000 时顺序访问性能优于 AOS（Property 3）
+  - 确保 alignas(64) 对齐计数器在多线程场景下吸量至少为未对齐版本的 2 倍（Property 4）
   - 如有问题请询问用户
 
 - [x] 5. 实现现代 C++ 特性优化模块 (03-modern-cpp)
@@ -149,7 +150,8 @@
 
 - [x] 6. Checkpoint - 验证现代 C++ 模块
   - 运行所有现代 C++ 模块基准测试
-  - 确保移动比拷贝快
+  - 确保移动构造对 > 1KB 对象至少比拷贝构造快 10 倍（Property 6）
+  - 确保 reserve(N) 后 push_back N 次零重分配（Property 7）
   - 如有问题请询问用户
 
 - [x] 7. 实现 SIMD 向量化模块 (04-simd-vectorization)
@@ -189,7 +191,8 @@
 
 - [x] 8. Checkpoint - 验证 SIMD 模块
   - 运行所有 SIMD 基准测试
-  - 确保向量化版本比标量快
+  - 确保向量化实现在 N > 1024 时至少达到 2 倍加速比（Property 9）
+  - 确保 SIMD 封装结果与标量实现在浮点容差内一致（Property 8）
   - 如有问题请询问用户
 
 - [x] 9. 实现并发与多线程模块 (05-concurrency)
@@ -225,7 +228,9 @@
 
 - [x] 10. Checkpoint - 验证并发模块
   - 运行所有并发模块测试
-  - 使用 TSan 检查数据竞争
+  - 使用 `cmake --preset=tsan` 构建并运行，确保无数据竞争
+  - 确保原子计数器最终值等于 T * N（Property 10）
+  - 确保无锁队列保持 FIFO 顺序且无元素丢失（Property 11）
   - 如有问题请询问用户
 
 - [x] 11. 实现基准测试框架和工具
@@ -301,10 +306,29 @@
     - 解释优化原理和使用场景
     - _Requirements: 7.3_
 
-- [x] 15. Final Checkpoint - 完整验证
-  - 运行所有测试和基准测试
-  - 验证 CI 工作流正常
-  - 验证文档完整性
+- [x] 15. 实现多语言文档支持
+  - [x] 15.1 创建中文主 README
+    - 创建 README.zh.md，与 README.md 内容对应
+    - _Requirements: 9.1_
+
+  - [x] 15.2 创建双语学习路径文档
+    - 创建 docs/zh/learning-path.md 和 docs/en/learning-path.md
+    - _Requirements: 9.2_
+
+  - [x] 15.3 创建双语性能分析指南
+    - 创建 docs/zh/profiling-guide.md 和 docs/en/profiling-guide.md
+    - _Requirements: 9.3_
+
+- [x] 16. 初始化变更日志
+  - [x] 16.1 创建 changelog/ 目录结构
+    - 记录重要变更和版本信息
+
+- [x] 17. Final Checkpoint - 完整验证
+  - 运行所有测试（单元 + 属性 + 集成）和基准测试
+  - 使用 asan/tsan/ubsan 预设构建并运行，确保无报错
+  - 验证 CI 工作流（build.yml、benchmark.yml、sanitizers.yml）正常
+  - 验证文档完整性：中英文 README、学习路径、性能分析指南、所有模块 README 均存在
+  - 确保全链路运行（构建 + 测试 + 基准）不超过 10 分钟
   - 如有问题请询问用户
 
 ## Definition of Done
@@ -312,6 +336,7 @@
 - 所有示例模块可编译运行，基准测试生成 JSON 输出。
 - 单元测试、属性测试与 Sanitizer 在主要平台通过。
 - 文档与示例一致，学习路径与模块索引更新完成。
+- 中英文文档均存在且内容同步（README、学习路径、性能分析指南）。
 - CI 绿灯且性能回归检测流程可用。
 - 关键优化示例具备可解释的性能差异与结论。
 
