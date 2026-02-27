@@ -1,8 +1,8 @@
 # C++ 高性能计算优化指南
 
-[![Build](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/build.yml)
-[![Benchmarks](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/benchmark.yml/badge.svg)](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/benchmark.yml)
-[![Sanitizers](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/sanitizers.yml/badge.svg)](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
+[![Build](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml)
+[![Benchmarks](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml)
+[![Sanitizers](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
 
 面向现代 C++20 的高性能计算优化示例与最佳实践合集。
 
@@ -27,7 +27,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/YOUR_USERNAME/cpp-high-performance-guide.git
+git clone https://github.com/LessUp/cpp-high-performance-guide.git
 cd cpp-high-performance-guide
 
 # 配置并构建（Release 模式）
