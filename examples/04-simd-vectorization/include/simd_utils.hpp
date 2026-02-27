@@ -96,14 +96,25 @@ public:
         const size_t size = n * sizeof(T);
         
         void* ptr = nullptr;
+#if defined(_MSC_VER)
+        ptr = _aligned_malloc(size, alignment);
+#else
         if (posix_memalign(&ptr, alignment, size) != 0) {
+            ptr = nullptr;
+        }
+#endif
+        if (!ptr) {
             throw std::bad_alloc();
         }
         return static_cast<pointer>(ptr);
     }
 
     void deallocate(pointer p, size_type) {
+#if defined(_MSC_VER)
+        _aligned_free(p);
+#else
         free(p);
+#endif
     }
 
     template<typename U>
