@@ -1,8 +1,8 @@
 # C++ High Performance Computing Optimization Guide
 
-[![Build](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/build.yml)
-[![Benchmarks](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/benchmark.yml/badge.svg)](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/benchmark.yml)
-[![Sanitizers](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/sanitizers.yml/badge.svg)](https://github.com/YOUR_USERNAME/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
+[![Build](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml)
+[![Benchmarks](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml)
+[![Sanitizers](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
 
 A comprehensive collection of high-performance computing optimization examples and best practices for modern C++20.
 
@@ -27,7 +27,7 @@ A comprehensive collection of high-performance computing optimization examples a
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/cpp-high-performance-guide.git
+git clone https://github.com/LessUp/cpp-high-performance-guide.git
 cd cpp-high-performance-guide
 
 # Configure and build (Release mode)
@@ -136,8 +136,8 @@ firefox flamegraph.svg
 
 ## Documentation
 
-- [Learning Path](docs/learning-path.md) - Recommended order for studying examples
-- [Profiling Guide](docs/profiling-guide.md) - How to profile and analyze performance
+- [Learning Path](docs/en/learning-path.md) - Recommended order for studying examples
+- [Profiling Guide](docs/en/profiling-guide.md) - How to profile and analyze performance
 
 ## Contributing
 
