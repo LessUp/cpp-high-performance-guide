@@ -21,12 +21,12 @@ hpc_add_example(
 )
 
 # SIMD benchmark
-add_executable(simd_bench bench/simd_bench.cpp)
-target_include_directories(simd_bench PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(simd_bench PRIVATE benchmark::benchmark simd_utils)
-hpc_set_compiler_options(simd_bench)
+hpc_add_benchmark(
+    NAME simd_bench
+    SOURCES bench/simd_bench.cpp
+    INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+    LIBRARIES simd_utils
+)
 
 # Enable SIMD for benchmark
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(simd_bench PRIVATE -mavx2 -mfma)
-endif()
+hpc_enable_simd(simd_bench AVX2)
