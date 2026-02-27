@@ -14,6 +14,7 @@
  * - SIMD alignment requirements (16 for SSE, 32 for AVX, 64 for AVX-512)
  */
 
+#include "memory_utils.hpp"
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -28,36 +29,6 @@
 namespace hpc::memory {
 
 constexpr size_t SIMD_ALIGNMENT = 32;  // AVX alignment
-
-//------------------------------------------------------------------------------
-// Aligned memory allocation
-//------------------------------------------------------------------------------
-
-/**
- * @brief Allocate aligned memory
- */
-inline void* aligned_alloc(size_t size, size_t alignment) {
-#if defined(_MSC_VER)
-    return _aligned_malloc(size, alignment);
-#else
-    void* ptr = nullptr;
-    if (posix_memalign(&ptr, alignment, size) != 0) {
-        return nullptr;
-    }
-    return ptr;
-#endif
-}
-
-/**
- * @brief Free aligned memory
- */
-inline void aligned_free(void* ptr) {
-#if defined(_MSC_VER)
-    _aligned_free(ptr);
-#else
-    free(ptr);
-#endif
-}
 
 /**
  * @brief RAII wrapper for aligned memory
