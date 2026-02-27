@@ -13,6 +13,7 @@
  * - alignas() for cache line alignment
  */
 
+#include "memory_utils.hpp"
 #include <atomic>
 #include <chrono>
 #include <iostream>
@@ -20,8 +21,6 @@
 #include <vector>
 
 namespace hpc::memory {
-
-constexpr size_t CACHE_LINE_SIZE = 64;
 
 //------------------------------------------------------------------------------
 // Bad: Counters packed together (false sharing)
