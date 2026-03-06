@@ -19,6 +19,11 @@
 
 namespace {
 
+std::filesystem::path make_temp_benchmark_file(const std::string& prefix) {
+    const auto temp_dir = std::filesystem::temp_directory_path();
+    return temp_dir / (prefix + std::to_string(rand()) + ".json");
+}
+
 // Simple JSON validation (checks basic structure)
 bool is_valid_json_structure(const std::string& json) {
     // Check for opening and closing braces
@@ -102,10 +107,10 @@ RC_GTEST_PROP(BenchmarkJSONProperties, ValidJSONStructure, ()) {
     }
     
     // Export to temporary file
-    std::string temp_file = "/tmp/benchmark_test_" + std::to_string(rand()) + ".json";
+    const auto temp_file = make_temp_benchmark_file("benchmark_test_");
     
     try {
-        hpc::bench::export_to_json(temp_file, results);
+        hpc::bench::export_to_json(temp_file.string(), results);
         
         // Read back the file
         std::ifstream file(temp_file);
@@ -150,10 +155,10 @@ RC_GTEST_PROP(BenchmarkJSONProperties, ContainsAllResults, ()) {
         names.push_back(result.name);
     }
     
-    std::string temp_file = "/tmp/benchmark_test_" + std::to_string(rand()) + ".json";
+    const auto temp_file = make_temp_benchmark_file("benchmark_test_");
     
     try {
-        hpc::bench::export_to_json(temp_file, results);
+        hpc::bench::export_to_json(temp_file.string(), results);
         
         std::ifstream file(temp_file);
         std::stringstream buffer;
@@ -187,10 +192,10 @@ RC_GTEST_PROP(BenchmarkJSONProperties, NumericValuesValid, ()) {
     result.cpu_time_ns = *rc::gen::inRange(1, 1000000) * 0.456;
     
     std::vector<hpc::bench::BenchmarkResult> results = {result};
-    std::string temp_file = "/tmp/benchmark_test_" + std::to_string(rand()) + ".json";
+    const auto temp_file = make_temp_benchmark_file("benchmark_test_");
     
     try {
-        hpc::bench::export_to_json(temp_file, results);
+        hpc::bench::export_to_json(temp_file.string(), results);
         
         std::ifstream file(temp_file);
         std::stringstream buffer;
@@ -252,9 +257,9 @@ RC_GTEST_PROP(BenchmarkJSONProperties, ResultValidation, ()) {
 // Standard GTest for edge cases
 TEST(BenchmarkUtilsTests, EmptyResultsExport) {
     std::vector<hpc::bench::BenchmarkResult> empty_results;
-    std::string temp_file = "/tmp/benchmark_empty_test.json";
+    const auto temp_file = make_temp_benchmark_file("benchmark_empty_test_");
     
-    EXPECT_NO_THROW(hpc::bench::export_to_json(temp_file, empty_results));
+    EXPECT_NO_THROW(hpc::bench::export_to_json(temp_file.string(), empty_results));
     
     std::ifstream file(temp_file);
     std::stringstream buffer;

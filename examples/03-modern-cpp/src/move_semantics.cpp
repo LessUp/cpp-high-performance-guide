@@ -281,6 +281,7 @@ void demonstrate_return_value() {
 
 } // namespace hpc::move_semantics
 
+#ifndef HPC_TEST_MODE
 int main() {
     std::cout << "=== Move Semantics Performance Demo ===\n";
     
@@ -296,3 +297,4 @@ int main() {
     
     return 0;
 }
+#endif

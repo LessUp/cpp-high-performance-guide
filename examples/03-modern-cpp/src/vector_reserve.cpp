@@ -212,6 +212,7 @@ void demonstrate_clear_vs_shrink() {
 
 } // namespace hpc::vector_reserve
 
+#ifndef HPC_TEST_MODE
 int main() {
     std::cout << "=== Vector Capacity Management Demo ===\n\n";
     
@@ -229,3 +230,4 @@ int main() {
     
     return 0;
 }
+#endif
