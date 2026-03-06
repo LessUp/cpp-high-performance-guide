@@ -1,8 +1,10 @@
 # C++ High Performance Computing Optimization Guide
 
-[![Build](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml)
-[![Benchmarks](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml)
-[![Sanitizers](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
+[中文版本](README.zh.md) | [GitBook Sync Guide](docs/en/gitbook-sync.md)
+
+[![Build](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/build.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml)
+[![Benchmarks](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/benchmark.yml?branch=main&style=for-the-badge&logo=speedtest&logoColor=white&label=Benchmarks)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml)
+[![Sanitizers](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/sanitizers.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Sanitizers)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
 
 A comprehensive collection of high-performance computing optimization examples and best practices for modern C++20.
 
@@ -138,6 +140,7 @@ firefox flamegraph.svg
 
 - [Learning Path](docs/en/learning-path.md) - Recommended order for studying examples
 - [Profiling Guide](docs/en/profiling-guide.md) - How to profile and analyze performance
+- [GitBook Sync Guide](docs/en/gitbook-sync.md) - Connect this repository to GitBook for online reading
 
 ## Contributing
 

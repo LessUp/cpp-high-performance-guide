@@ -95,7 +95,45 @@ def test_cmake_best_practices():
             all_passed = False
         else:
             print(f"PASS: {rel_path} - no directory-based commands")
+
+        if not check_target_based_commands_used(cmake_file):
+            print(f"FAIL: {rel_path} does not appear to use target-based commands")
+            all_passed = False
     
+    return all_passed
+
+
+def test_example_module_structure():
+    """Test that each example module follows the expected structure."""
+    examples_dir = PROJECT_ROOT / "examples"
+    if not examples_dir.exists():
+        print("FAIL: examples directory not found")
+        return False
+
+    example_dirs = sorted(
+        path for path in examples_dir.iterdir()
+        if path.is_dir() and re.match(r"^\d{2}-", path.name)
+    )
+
+    if not example_dirs:
+        print("FAIL: no example module directories found")
+        return False
+
+    all_passed = True
+    for example_dir in example_dirs:
+        required_paths = [
+            example_dir / "CMakeLists.txt",
+            example_dir / "README.md",
+            example_dir / "src",
+        ]
+
+        missing = [str(path.relative_to(PROJECT_ROOT)) for path in required_paths if not path.exists()]
+        if missing:
+            print(f"FAIL: {example_dir.relative_to(PROJECT_ROOT)} missing {missing}")
+            all_passed = False
+        else:
+            print(f"PASS: {example_dir.relative_to(PROJECT_ROOT)} structure is complete")
+
     return all_passed
 
 
@@ -145,7 +183,12 @@ def main():
     results.append(test_cmake_best_practices())
     print()
     
-    print("Test 2: CMake Configure")
+    print("Test 2: Example Module Structure")
+    print("-" * 40)
+    results.append(test_example_module_structure())
+    print()
+
+    print("Test 3: CMake Configure")
     print("-" * 40)
     results.append(test_cmake_configure())
     print()

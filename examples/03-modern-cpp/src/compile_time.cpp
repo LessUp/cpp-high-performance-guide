@@ -297,6 +297,7 @@ void demonstrate_primes() {
 
 } // namespace hpc::compile_time
 
+#ifndef HPC_TEST_MODE
 int main() {
     std::cout << "=== Compile-Time Computation Demo ===\n\n";
     
@@ -307,3 +308,4 @@ int main() {
     
     return 0;
 }
+#endif

@@ -306,12 +306,6 @@ TEST(SIMDWrapperTests, AlignedVsUnalignedAccess) {
     }
 }
 
-int main(int argc, char** argv) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
-
-
 // ============================================================================
 // Property 9: Vectorized vs Scalar Speedup
 // ============================================================================
@@ -461,4 +455,9 @@ TEST(SIMDSpeedupTests, DotProductSpeedup) {
     std::cout << "Dot Product Speedup: " << speedup << "x" << std::endl;
     
     EXPECT_GE(speedup, 1.0) << "SIMD dot product should not be slower than scalar";
+}
+
+int main(int argc, char** argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

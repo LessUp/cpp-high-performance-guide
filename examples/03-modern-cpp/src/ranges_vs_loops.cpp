@@ -319,6 +319,7 @@ void benchmark_chain() {
 
 } // namespace hpc::ranges
 
+#ifndef HPC_TEST_MODE
 int main() {
     std::cout << "=== C++20 Ranges vs Raw Loops ===\n\n";
     
@@ -334,3 +335,4 @@ int main() {
     
     return 0;
 }
+#endif

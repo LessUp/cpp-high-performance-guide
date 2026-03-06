@@ -1,8 +1,10 @@
 # C++ 高性能计算优化指南
 
-[![Build](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml)
-[![Benchmarks](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml)
-[![Sanitizers](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml/badge.svg)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
+[English Version](README.md) | [GitBook 接入指南](docs/zh/gitbook-sync.md)
+
+[![Build](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/build.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml)
+[![Benchmarks](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/benchmark.yml?branch=main&style=for-the-badge&logo=speedtest&logoColor=white&label=Benchmarks)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml)
+[![Sanitizers](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/sanitizers.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Sanitizers)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
 
 面向现代 C++20 的高性能计算优化示例与最佳实践合集。
 
@@ -138,6 +140,7 @@ firefox flamegraph.svg
 
 - [学习路径](docs/zh/learning-path.md) - 推荐的学习顺序
 - [性能分析指南](docs/zh/profiling-guide.md) - 如何进行性能剖析与分析
+- [GitBook 接入指南](docs/zh/gitbook-sync.md) - 将当前仓库同步到 GitBook 以供在线阅读
 
 ## 贡献
 

@@ -264,12 +264,6 @@ TEST(AtomicTests, AtomicFlagTest) {
     EXPECT_FALSE(flag.test_and_set());
 }
 
-int main(int argc, char** argv) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
-
-
 // ============================================================================
 // Property 11: Lock-Free Queue Invariants
 // ============================================================================
@@ -674,4 +668,9 @@ RC_GTEST_PROP(OpenMPProperties, ParallelArrayOperations, ()) {
         RC_ASSERT(std::abs(c_seq[i] - c_par[i]) < 1e-10);
     }
 #endif
+}
+
+int main(int argc, char** argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
