@@ -194,3 +194,7 @@ $RECYCLE.BIN/
 .directory
 .Trash-*
 .nfs*
+# Embedded git repos
+docs/chatroom/
+# Build error logs
+build_errors.txt
