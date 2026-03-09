@@ -12,6 +12,7 @@
  * - When prefetching helps (and when it doesn't)
  */
 
+#include "memory_utils.hpp"
 #include <chrono>
 #include <cstdint>
 #include <iostream>
@@ -19,32 +20,6 @@
 #include <vector>
 
 namespace hpc::memory {
-
-//------------------------------------------------------------------------------
-// Prefetch intrinsics
-//------------------------------------------------------------------------------
-
-/**
- * @brief Prefetch for read with high temporal locality
- */
-template<typename T>
-inline void prefetch_read(const T* ptr) {
-#if defined(__GNUC__) || defined(__clang__)
-    __builtin_prefetch(ptr, 0, 3);  // Read, high temporal locality
-#elif defined(_MSC_VER)
-    _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T0);
-#endif
-}
-
-/**
- * @brief Prefetch for write
- */
-template<typename T>
-inline void prefetch_write(T* ptr) {
-#if defined(__GNUC__) || defined(__clang__)
-    __builtin_prefetch(ptr, 1, 3);  // Write, high temporal locality
-#endif
-}
 
 //------------------------------------------------------------------------------
 // Array traversal implementations

@@ -15,6 +15,7 @@
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <iostream>
 
 namespace hpc::compile_time {
@@ -104,9 +105,9 @@ double fast_sin(double angle) {
     constexpr double TWO_PI = 2.0 * PI;
     constexpr size_t TABLE_SIZE = SIN_TABLE.size();
     
-    // Normalize angle to [0, 2*PI)
-    while (angle < 0) angle += TWO_PI;
-    while (angle >= TWO_PI) angle -= TWO_PI;
+    // Normalize angle to [0, 2*PI) in O(1) using fmod
+    angle = std::fmod(angle, TWO_PI);
+    if (angle < 0) angle += TWO_PI;
     
     // Convert to table index
     size_t index = static_cast<size_t>((angle / TWO_PI) * TABLE_SIZE) % TABLE_SIZE;

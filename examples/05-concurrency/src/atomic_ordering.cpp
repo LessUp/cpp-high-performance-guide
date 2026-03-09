@@ -11,7 +11,7 @@
  * 6. memory_order_seq_cst - Sequential consistency (default, strongest)
  */
 
-#include "../include/concurrency_utils.hpp"
+#include "concurrency_utils.hpp"
 #include <iostream>
 #include <cassert>
 #include <array>

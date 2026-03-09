@@ -11,7 +11,7 @@
  * Compile with: -fopenmp (GCC/Clang) or /openmp (MSVC)
  */
 
-#include "../include/concurrency_utils.hpp"
+#include "concurrency_utils.hpp"
 #include <iostream>
 #include <vector>
 #include <numeric>

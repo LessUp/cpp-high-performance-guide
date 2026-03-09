@@ -15,7 +15,7 @@
 #include <filesystem>
 #include <regex>
 
-#include "../../benchmarks/common/benchmark_utils.hpp"
+#include "benchmark_utils.hpp"
 
 namespace {
 

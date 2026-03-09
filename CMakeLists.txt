@@ -27,6 +27,7 @@ include(ExampleTemplate)
 option(HPC_BUILD_TESTS "Build tests" ON)
 option(HPC_BUILD_BENCHMARKS "Build benchmarks" ON)
 option(HPC_ENABLE_OPENMP "Enable OpenMP support" ON)
+option(HPC_VECTORIZE_REPORT "Enable compiler vectorization reports (noisy)" OFF)
 
 # Find OpenMP if enabled
 if(HPC_ENABLE_OPENMP)

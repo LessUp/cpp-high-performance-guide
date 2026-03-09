@@ -8,7 +8,7 @@
  * 3. Cache-friendly queue design
  */
 
-#include "../include/concurrency_utils.hpp"
+#include "concurrency_utils.hpp"
 #include <iostream>
 #include <vector>
 #include <optional>
