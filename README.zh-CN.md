@@ -5,7 +5,7 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/build.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml)
 [![Benchmarks](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/benchmark.yml?branch=main&style=for-the-badge&logo=speedtest&logoColor=white&label=Benchmarks)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml)
 [![Sanitizers](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/sanitizers.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Sanitizers)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
-[![Docs](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/docs.yml?branch=main&style=for-the-badge&logo=githubpages&logoColor=white&label=Docs)](https://lessup.github.io/cpp-high-performance-guide/)
+[![Docs](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/pages.yml?branch=main&style=for-the-badge&logo=githubpages&logoColor=white&label=Docs)](https://lessup.github.io/cpp-high-performance-guide/)
 
 面向现代 C++20 的高性能计算优化示例与最佳实践合集。
 

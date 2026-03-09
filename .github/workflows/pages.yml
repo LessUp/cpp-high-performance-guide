@@ -12,7 +12,10 @@ on:
       - "CONTRIBUTING.md"
       - "CONTRIBUTING.zh.md"
       - "book.json"
-      - ".github/workflows/docs.yml"
+      - ".gitbook.yaml"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -29,13 +32,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docs/en
+            docs/zh
+            examples/01-cmake-modern/README.md
+            examples/02-memory-cache/README.md
+            examples/03-modern-cpp/README.md
+            examples/04-simd-vectorization/README.md
+            examples/05-concurrency/README.md
+            README.md
+            README.zh-CN.md
+            SUMMARY.md
+            CONTRIBUTING.md
+            CONTRIBUTING.zh.md
+            book.json
+            .gitbook.yaml
+            package.json
+            package-lock.json
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: npm
 
       - name: Install honkit
-        run: npm install honkit
+        run: npm ci
 
       - name: Build docs
         run: npx honkit build . _site
