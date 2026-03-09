@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "cpp-high-performance-guide",
+  "description": "HonKit docs build for GitHub Pages",
+  "scripts": {
+    "docs:build": "honkit build . _site",
+    "docs:serve": "honkit serve"
+  },
+  "devDependencies": {
+    "honkit": "^3.7.1"
+  }
+}
