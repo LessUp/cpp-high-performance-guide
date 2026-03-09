@@ -131,6 +131,8 @@ docs/_build/
 docs/html/
 docs/latex/
 site/
+_site/
+_book/
 
 # Backup files
 *.bak
