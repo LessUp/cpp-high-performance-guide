@@ -7,7 +7,7 @@ on:
       - "docs/**"
       - "examples/*/README.md"
       - "README.md"
-      - "README.zh.md"
+      - "README.zh-CN.md"
       - "SUMMARY.md"
       - "CONTRIBUTING.md"
       - "CONTRIBUTING.zh.md"

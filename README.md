@@ -1,6 +1,6 @@
 # C++ High Performance Computing Optimization Guide
 
-[中文版本](README.zh.md) | [GitBook Sync Guide](docs/en/gitbook-sync.md)
+English | [简体中文](README.zh-CN.md) | [GitBook Sync Guide](docs/en/gitbook-sync.md)
 
 [![Build](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/build.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml)
 [![Benchmarks](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/benchmark.yml?branch=main&style=for-the-badge&logo=speedtest&logoColor=white&label=Benchmarks)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml)
