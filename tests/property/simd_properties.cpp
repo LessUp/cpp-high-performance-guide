@@ -20,7 +20,7 @@
 #include <vector>
 
 // Include SIMD wrapper
-#include "../../examples/04-simd-vectorization/include/simd_wrapper.hpp"
+#include "simd_wrapper.hpp"
 
 namespace {
 

@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <numeric>
 
-#include "../../examples/05-concurrency/include/concurrency_utils.hpp"
+#include "concurrency_utils.hpp"
 
 namespace {
 

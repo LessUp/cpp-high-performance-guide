@@ -69,6 +69,10 @@ inline size_t get_simd_alignment() {
 
 /**
  * @brief Aligned memory allocator for SIMD operations
+ *
+ * Note: This is intentionally separate from memory_utils.hpp's AlignedAllocator
+ * to keep the SIMD module self-contained. This allocator uses runtime SIMD
+ * detection for alignment, whereas AlignedAllocator uses a compile-time parameter.
  */
 template<typename T>
 class aligned_allocator {
@@ -207,25 +211,5 @@ inline size_t simd_vector_width(SIMDLevel level) {
         default:                return sizeof(float);
     }
 }
-
-/**
- * @brief Add two arrays using SIMD wrapper
- */
-void add_arrays_wrapped(const float* a, const float* b, float* c, size_t n);
-
-/**
- * @brief Compute dot product using SIMD wrapper
- */
-float dot_product_wrapped(const float* a, const float* b, size_t n);
-
-/**
- * @brief Scale array using SIMD wrapper
- */
-void scale_array_wrapped(float* arr, float scalar, size_t n);
-
-/**
- * @brief Clamp array values using SIMD wrapper
- */
-void clamp_array_wrapped(float* arr, float min_val, float max_val, size_t n);
 
 } // namespace hpc::simd

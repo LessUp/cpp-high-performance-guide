@@ -9,8 +9,8 @@
  */
 
 #include <benchmark/benchmark.h>
-#include "../include/simd_utils.hpp"
-#include "../include/simd_wrapper.hpp"
+#include "simd_utils.hpp"
+#include "simd_wrapper.hpp"
 #include <vector>
 #include <random>
 #include <cmath>

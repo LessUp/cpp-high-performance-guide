@@ -69,6 +69,7 @@ function(hpc_add_example)
         add_executable(${bench_name} ${ARG_BENCHMARK_SOURCES})
         
         hpc_set_compiler_options(${bench_name})
+        hpc_enable_sanitizers(${bench_name})
         
         target_link_libraries(${bench_name} PRIVATE
             benchmark::benchmark

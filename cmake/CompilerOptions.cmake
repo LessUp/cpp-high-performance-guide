@@ -67,16 +67,18 @@ function(hpc_set_compiler_options target)
             )
         endif()
         
-        # Enable vectorization reports
-        if(HPC_IS_GCC)
-            target_compile_options(${target} PRIVATE
-                $<$<CONFIG:Release>:-fopt-info-vec-optimized>
-            )
-        elseif(HPC_IS_CLANG)
-            target_compile_options(${target} PRIVATE
-                $<$<CONFIG:Release>:-Rpass=loop-vectorize>
-                $<$<CONFIG:Release>:-Rpass-missed=loop-vectorize>
-            )
+        # Enable vectorization reports (opt-in to avoid noisy builds)
+        if(HPC_VECTORIZE_REPORT)
+            if(HPC_IS_GCC)
+                target_compile_options(${target} PRIVATE
+                    $<$<CONFIG:Release>:-fopt-info-vec-optimized>
+                )
+            elseif(HPC_IS_CLANG)
+                target_compile_options(${target} PRIVATE
+                    $<$<CONFIG:Release>:-Rpass=loop-vectorize>
+                    $<$<CONFIG:Release>:-Rpass-missed=loop-vectorize>
+                )
+            endif()
         endif()
         
     elseif(HPC_IS_MSVC)

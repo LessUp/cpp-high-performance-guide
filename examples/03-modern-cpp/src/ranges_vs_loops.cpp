@@ -151,12 +151,14 @@ int64_t sum_algorithm(const std::vector<int>& input) {
 }
 
 /**
- * @brief Sum using ranges fold
+ * @brief Sum using ranges
+ *
+ * C++23 introduces std::ranges::fold_left for this purpose.
+ * In C++20 we iterate over a ranges::subrange to stay within the ranges API.
  */
 int64_t sum_ranges(const std::vector<int>& input) {
-    // C++23 has std::ranges::fold_left, for C++20 we use a workaround
     int64_t sum = 0;
-    for (int x : input) {
+    for (int x : std::ranges::subrange(input)) {
         sum += x;
     }
     return sum;
