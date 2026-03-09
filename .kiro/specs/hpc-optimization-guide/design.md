@@ -100,7 +100,7 @@ hpc-optimization-guide/
 ├── CMakeLists.txt                 # 根 CMake 配置
 ├── CMakePresets.json              # 构建预设（debug/release/relwithdebinfo/asan/tsan/ubsan/coverage）
 ├── README.md                      # 项目主文档（English）
-├── README.zh.md                   # 项目主文档（中文）
+├── README.zh-CN.md                   # 项目主文档（中文）
 ├── CLAUDE.md                      # AI 助手上下文文档
 ├── LICENSE
 │
@@ -465,7 +465,7 @@ enum class DifficultyLevel {
 
 ## Documentation Strategy
 
-- 主 README 提供快速开始与模块索引，分为 `README.md`（English）和 `README.zh.md`（中文）。
+- 主 README 提供快速开始与模块索引，分为 `README.md`（English）和 `README.zh-CN.md`（中文）。
 - `docs/zh/learning-path.md` 和 `docs/en/learning-path.md` 作为推荐学习路线的唯一来源。
 - `docs/zh/profiling-guide.md` 和 `docs/en/profiling-guide.md` 覆盖常用性能分析工具的最小集合。
 - 模块 README 包含：背景、优化原理、运行命令、关键结果与常见误区。

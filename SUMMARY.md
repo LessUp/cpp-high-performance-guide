@@ -1,7 +1,7 @@
 # Table of contents
 
 * [C++ High Performance Computing Optimization Guide](README.md)
-* [中文版本](README.zh.md)
+* [中文版本](README.zh-CN.md)
 * [Contributing](CONTRIBUTING.md)
 * [参与贡献](CONTRIBUTING.zh.md)
 * [Learning Path](docs/en/learning-path.md)

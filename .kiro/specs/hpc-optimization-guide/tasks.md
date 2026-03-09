@@ -308,7 +308,7 @@
 
 - [x] 15. 实现多语言文档支持
   - [x] 15.1 创建中文主 README
-    - 创建 README.zh.md，与 README.md 内容对应
+    - 创建 README.zh-CN.md，与 README.md 内容对应
     - _Requirements: 9.1_
 
   - [x] 15.2 创建双语学习路径文档
