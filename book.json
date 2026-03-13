@@ -13,5 +13,9 @@
     "-fontsettings",
     "theme-default"
   ],
+  "structure": {
+    "readme": "DOCS.md",
+    "summary": "SUMMARY.md"
+  },
   "pluginsConfig": {}
 }

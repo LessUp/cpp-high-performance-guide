@@ -10,7 +10,7 @@
 4. 完成 GitHub 账户授权。
 5. 为当前仓库所属账号或组织安装 GitBook GitHub App。
 6. 选择仓库 `LessUp/cpp-high-performance-guide`。
-7. 选择需要同步的分支，通常是 `main`。
+7. 选择需要同步的分支，本仓库通常使用 `master`。
 8. 如果仓库里已经有 Markdown 文档，首次同步建议选择 `GitHub -> GitBook`。
 
 ## 仓库内已准备的文件
@@ -19,20 +19,20 @@
 
 - `.gitbook.yaml`
 - `SUMMARY.md`
-- `README.md`
+- `DOCS.md`
 - `docs/` 下的 Markdown 文档
 
 ## 内容结构
 
 GitBook 将使用：
 
-- `README.md` 作为首页
+- `DOCS.md` 作为首页
 - `SUMMARY.md` 作为目录导航
 
 这些入口已经在 `.gitbook.yaml` 中显式声明。
 
 ## 注意事项
 
-- 启用 Git Sync 后，不要优先在 GitBook UI 中修改首页 readme，避免与仓库内的 `README.md` 冲突。
+- 启用 Git Sync 后，不要优先在 GitBook UI 中修改文档首页，避免与仓库内的 `DOCS.md` 冲突。
 - 如果你没有在 GitBook 中手工调整目录，`SUMMARY.md` 会直接作为目录来源。
 - 如果你后续把文档迁移到其他根目录，需要同步更新 `.gitbook.yaml`。
