@@ -1,162 +1,33 @@
 # C++ High Performance Computing Optimization Guide
 
-English | [简体中文](README.zh-CN.md) | [GitBook Sync Guide](docs/en/gitbook-sync.md)
+English | [简体中文](README.zh-CN.md) | [Documentation Home](https://lessup.github.io/cpp-high-performance-guide/)
 
-[![Build](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/build.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/build.yml)
-[![Benchmarks](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/benchmark.yml?branch=main&style=for-the-badge&logo=speedtest&logoColor=white&label=Benchmarks)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/benchmark.yml)
-[![Sanitizers](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/sanitizers.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Sanitizers)](https://github.com/LessUp/cpp-high-performance-guide/actions/workflows/sanitizers.yml)
-[![Docs](https://img.shields.io/github/actions/workflow/status/LessUp/cpp-high-performance-guide/pages.yml?branch=main&style=for-the-badge&logo=githubpages&logoColor=white&label=Docs)](https://lessup.github.io/cpp-high-performance-guide/)
+A modern C++20 example collection for learning performance engineering across build systems, memory and cache behavior, SIMD, concurrency, benchmarking, and profiling.
 
-A comprehensive collection of high-performance computing optimization examples and best practices for modern C++20.
+## Repository Overview
 
-## Features
-
-- **Modern CMake Build System** - Target-based CMake with presets, FetchContent dependencies
-- **Memory & Cache Optimization** - AOS vs SOA, false sharing, alignment, prefetching
-- **Modern C++ Features** - constexpr, move semantics, vector reserve, C++20 ranges
-- **SIMD Vectorization** - Auto-vectorization, SSE/AVX2/AVX-512 intrinsics, wrapper library
-- **Concurrency** - Atomic operations, lock-free queues, OpenMP integration
-- **Benchmarking Framework** - Google Benchmark integration, FlameGraph generation
+- `examples/`: five themed modules covering modern CMake, memory and cache optimization, modern C++ features, SIMD, and concurrency.
+- `benchmarks/` and `tools/`: benchmark runners, FlameGraph helpers, and analysis scripts.
+- `docs/`: bilingual learning path, profiling guide, and HonKit or GitBook synchronization notes.
+- `tests/`: unit, integration, and property-style checks for the example collection.
 
 ## Quick Start
 
-### Prerequisites
-
-- C++20 compatible compiler (GCC 11+, Clang 14+)
-- CMake 3.20+
-- Ninja (recommended) or Make
-
-### Build
-
 ```bash
-# Clone the repository
-git clone https://github.com/LessUp/cpp-high-performance-guide.git
-cd cpp-high-performance-guide
-
-# Configure and build (Release mode)
 cmake --preset=release
 cmake --build build/release
-
-# Run all benchmarks
-cd build/release && ctest --output-on-failure
-```
-
-### Available Presets
-
-| Preset | Description |
-|--------|-------------|
-| `debug` | Debug build with symbols |
-| `release` | Optimized release build (-O3, -march=native) |
-| `asan` | AddressSanitizer enabled |
-| `tsan` | ThreadSanitizer enabled |
-
-```bash
-# Build with sanitizers
-cmake --preset=asan
-cmake --build build/asan
-```
-
-## Project Structure
-
-```
-cpp-high-performance-guide/
-├── cmake/                      # CMake modules
-│   ├── CompilerOptions.cmake   # Compiler flags management
-│   ├── Dependencies.cmake      # FetchContent dependencies
-│   ├── Sanitizers.cmake        # Sanitizer configuration
-│   └── ExampleTemplate.cmake   # Example module template
-├── examples/
-│   ├── 01-cmake-modern/        # CMake best practices vs anti-patterns
-│   ├── 02-memory-cache/        # Memory and cache optimization
-│   ├── 03-modern-cpp/          # Modern C++ features
-│   ├── 04-simd-vectorization/  # SIMD and vectorization
-│   └── 05-concurrency/         # Concurrent programming
-├── benchmarks/                 # Benchmark utilities
-├── tests/                      # Unit and property tests
-├── tools/                      # Analysis and profiling tools
-└── docs/                       # Documentation
-```
-
-## Example Modules
-
-### 01 - Modern CMake
-Learn CMake best practices through anti-pattern vs best-practice comparisons.
-- Target-based vs directory-based commands
-- FetchContent dependency management
-- Compiler options management
-
-### 02 - Memory & Cache Optimization
-Master cache-friendly programming techniques.
-- **AOS vs SOA**: Data layout impact on performance
-- **False Sharing**: Multi-threaded cache line contention
-- **Alignment**: SIMD-friendly memory alignment
-- **Prefetching**: Manual prefetch hints
-
-### 03 - Modern C++ Features
-Leverage modern C++ for performance.
-- **constexpr/consteval**: Compile-time computation
-- **Move Semantics**: Avoid unnecessary copies
-- **Vector Reserve**: Reduce allocations
-- **C++20 Ranges**: Modern iteration patterns
-
-### 04 - SIMD Vectorization
-Maximize CPU throughput with SIMD.
-- **Auto-vectorization**: Compiler-friendly patterns
-- **Intrinsics**: SSE, AVX2, AVX-512 examples
-- **SIMD Wrapper**: Readable SIMD abstractions
-
-### 05 - Concurrency
-Write efficient multi-threaded code.
-- **Atomic Operations**: Memory ordering explained
-- **Lock-Free Queue**: SPSC queue implementation
-- **OpenMP**: Simple parallelization patterns
-
-## Running Benchmarks
-
-```bash
-# Run all benchmarks
-cd build/release
-ctest --output-on-failure
-
-# Run specific benchmark
-./examples/02-memory-cache/bench/aos_soa_bench
-
-# Export benchmark results to JSON
-./examples/02-memory-cache/bench/aos_soa_bench --benchmark_format=json > results.json
-```
-
-## Profiling
-
-Generate FlameGraph visualizations:
-
-```bash
-# Record performance data
-./tools/flamegraph/generate_flamegraph.sh ./build/release/examples/02-memory-cache/bench/aos_soa_bench
-
-# View the generated SVG
-firefox flamegraph.svg
+ctest --preset=release
 ```
 
 ## Documentation
 
-- [Learning Path](docs/en/learning-path.md) - Recommended order for studying examples
-- [Profiling Guide](docs/en/profiling-guide.md) - How to profile and analyze performance
-- [GitBook Sync Guide](docs/en/gitbook-sync.md) - Connect this repository to GitBook for online reading
+- Docs site: https://lessup.github.io/cpp-high-performance-guide/
+- Learning path: `docs/en/learning-path.md` and `docs/zh/learning-path.md`
+- Profiling guide: `docs/en/profiling-guide.md` and `docs/zh/profiling-guide.md`
+- HonKit or GitBook sync notes: `docs/en/gitbook-sync.md` and `docs/zh/gitbook-sync.md`
 
-## Contributing
+## Development
 
-1. Fork the repository
-2. Create a feature branch
-3. Ensure all tests pass with sanitizers
-4. Submit a pull request
-
-## License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
-## Acknowledgments
-
-- [Google Benchmark](https://github.com/google/benchmark)
-- [Google Test](https://github.com/google/googletest)
-- [RapidCheck](https://github.com/emil-e/rapidcheck)
-- [FlameGraph](https://github.com/brendangregg/FlameGraph)
+- Contribution guide: `CONTRIBUTING.md` and `CONTRIBUTING.zh.md`
+- Changelog: `changelog/`
+- License: `LICENSE`
