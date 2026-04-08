@@ -42,6 +42,7 @@ jobs:
             examples/03-modern-cpp/README.md
             examples/04-simd-vectorization/README.md
             examples/05-concurrency/README.md
+            changelog
             README.md
             README.zh-CN.md
             DOCS.md
