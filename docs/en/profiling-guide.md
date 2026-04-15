@@ -63,7 +63,7 @@ FlameGraphs provide intuitive visualization of where time is spent.
 
 ```bash
 # Generate FlameGraph for a benchmark
-./tools/flamegraph/generate_flamegraph.sh ./build/release/examples/02-memory-cache/bench/aos_soa_bench
+./tools/performance/generate_flamegraph.sh ./build/release/examples/02-memory-cache/bench/aos_soa_bench
 
 # View the result
 firefox flamegraph.svg
@@ -290,7 +290,7 @@ echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 |------|------|---------|
 | CPU hotspots | perf | `perf record -g ./bench && perf report` |
 | Cache misses | perf | `perf stat -e cache-misses ./bench` |
-| Visual profile | FlameGraph | `./tools/flamegraph/generate_flamegraph.sh ./bench` |
+| Visual profile | FlameGraph | `./tools/performance/generate_flamegraph.sh ./bench` |
 | Detailed cache | Valgrind | `valgrind --tool=cachegrind ./bench` |
 | Call graph | Valgrind | `valgrind --tool=callgrind ./bench` |
 | Vectorization | GCC | `-fopt-info-vec-optimized` |

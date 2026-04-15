@@ -8,14 +8,10 @@ on:
       - "examples/*/README.md"
       - "README.md"
       - "README.zh-CN.md"
-      - "DOCS.md"
       - "SUMMARY.md"
       - "CONTRIBUTING.md"
       - "CONTRIBUTING.zh.md"
-      - "book.json"
       - ".gitbook.yaml"
-      - "package.json"
-      - "package-lock.json"
       - ".github/workflows/pages.yml"
       - "changelog/**"
   workflow_dispatch:
@@ -45,14 +41,10 @@ jobs:
             changelog
             README.md
             README.zh-CN.md
-            DOCS.md
             SUMMARY.md
             CONTRIBUTING.md
             CONTRIBUTING.zh.md
-            book.json
             .gitbook.yaml
-            package.json
-            package-lock.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -60,13 +52,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: 'npm'
+          cache-dependency-path: docs/package-lock.json
 
       - name: Install honkit
+        working-directory: docs
         run: npm ci
 
       - name: Build docs
-        run: npx honkit build . _site
+        working-directory: docs
+        run: npx honkit build . ../_site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

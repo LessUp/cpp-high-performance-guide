@@ -1,6 +1,11 @@
 # Contributing to C++ High Performance Guide
 
+[![Contributors](https://img.shields.io/badge/Contributors-Welcome-brightgreen.svg)](https://github.com/LessUp/cpp-high-performance-guide/blob/master/CONTRIBUTING.md)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Thank you for your interest in contributing! This document provides guidelines for contributing to this project.
+
+> 💡 **New to contributing?** Check out our [Good First Issues](https://github.com/LessUp/cpp-high-performance-guide/labels/good%20first%20issue) to get started!
 
 ## Getting Started
 
@@ -92,6 +97,35 @@ Use clear, descriptive commit messages:
 2. All CI checks must pass
 3. Include a clear description of what your PR adds or fixes
 4. Reference any related issues
+
+## Issue and PR Templates
+
+We provide templates to help you submit effective issues and pull requests:
+
+- **Bug Report**: Use when reporting bugs in code, build, or documentation
+- **Feature Request**: Use when suggesting new examples or enhancements  
+- **Documentation**: Use when reporting documentation issues
+
+Please select the appropriate template when creating a new issue.
+
+## Code of Conduct
+
+This project adheres to a code of conduct that we expect all contributors to follow:
+
+- Be respectful and constructive in all interactions
+- Welcome newcomers and help them get started
+- Focus on what's best for the community and learners
+- Show empathy towards others
+
+## Documentation Sync
+
+When making changes that affect documentation:
+
+1. **Code changes**: Update relevant README files in affected examples
+2. **New examples**: Both English and Chinese README files are preferred
+3. **API changes**: Document in the relevant module's README
+
+While perfect bilingual sync is ideal, English-only contributions are also welcome — the maintainers will help with Chinese translations.
 
 ## License
 

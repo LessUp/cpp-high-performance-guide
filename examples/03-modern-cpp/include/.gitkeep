@@ -1,0 +1,4 @@
+# Headers Directory
+
+This directory is reserved for header files of the modern-cpp module.
+Currently, this module focuses on language features and doesn't require custom headers.

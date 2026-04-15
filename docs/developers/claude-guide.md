@@ -87,7 +87,7 @@ perf stat -e cache-references,cache-misses,L1-dcache-load-misses ./bench
 perf stat -e branches,branch-misses ./bench
 
 # 生成FlameGraph可视化
-./tools/flamegraph/generate_flamegraph.sh ./build/release/examples/02-memory-cache/bench/aos_soa_bench
+./tools/performance/generate_flamegraph.sh ./build/release/examples/02-memory-cache/bench/aos_soa_bench
 
 # 使用Valgrind Cachegrind分析缓存
 valgrind --tool=cachegrind ./build/release/examples/02-memory-cache/bench/aos_soa_bench
@@ -194,7 +194,7 @@ examples/XX-category/
 
 ### 性能分析工具集成
 
-- **FlameGraph**：`./tools/flamegraph/generate_flamegraph.sh`脚本自动生成火焰图
+- **FlameGraph**：`./tools/performance/generate_flamegraph.sh`脚本自动生成火焰图
 - **benchmark_compare.py**：自动比较基准测试结果
 - **perf支持**：文档包含完整的perf使用指南
 - **Valgrind集成**：支持Cachegrind和Callgrind

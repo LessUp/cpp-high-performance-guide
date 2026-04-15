@@ -1,6 +1,10 @@
-# Memory & Cache Optimization
+# 02 - Memory & Cache Optimization
 
-This module demonstrates memory and cache optimization techniques critical for high-performance computing.
+[![C++](https://img.shields.io/badge/Language-C%2B%2B20-blue.svg)](https://isocpp.org/)
+
+> Master memory and cache optimization techniques critical for high-performance computing.
+
+Learn how data layout, alignment, and prefetching can deliver **2-20x performance improvements**.
 
 ## Contents
 
