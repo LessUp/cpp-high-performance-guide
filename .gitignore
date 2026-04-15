@@ -196,7 +196,12 @@ $RECYCLE.BIN/
 .directory
 .Trash-*
 .nfs*
+
 # Embedded git repos
 docs/chatroom/
 # Build error logs
 build_errors.txt
+
+# VS Code user-specific settings (keep workspace settings in .vscode/ only if needed)
+.vscode/settings.json.user
+.vscode/launch.json.user

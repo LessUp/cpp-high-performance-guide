@@ -1,6 +1,11 @@
 # 参与贡献到 C++ 高性能指南
 
+[![Contributors](https://img.shields.io/badge/Contributors-Welcome-brightgreen.svg)](https://github.com/LessUp/cpp-high-performance-guide/blob/master/CONTRIBUTING.zh.md)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 感谢你对本项目的关注！本文档介绍如何为本项目贡献内容。
+
+> 💡 **第一次贡献？** 查看我们的 [Good First Issues](https://github.com/LessUp/cpp-high-performance-guide/labels/good%20first%20issue) 来开始吧！
 
 ## 开始之前
 
@@ -92,6 +97,35 @@ ctest --preset=release
 2. 确保所有 CI 检查通过
 3. 在 PR 描述中清楚说明本次修改的内容和原因
 4. 如有相关 issue，请在 PR 中引用
+
+## Issue 和 PR 模板
+
+我们提供了模板来帮助你提交有效的问题和 Pull Request：
+
+- **Bug Report（错误报告）**：用于报告代码、构建或文档中的错误
+- **Feature Request（功能请求）**：用于建议新的示例或增强功能
+- **Documentation（文档）**：用于报告文档问题
+
+创建新 Issue 时请选择恰当的模板。
+
+## 行为准则
+
+本项目遵循行为准则，我们期望所有贡献者遵守：
+
+- 在所有互动中保持尊重和建设性
+- 欢迎新人并帮助他们入门
+- 专注于对社区和学习者最有利的事情
+- 对他人保持同理心
+
+## 文档同步
+
+当进行影响文档的更改时：
+
+1. **代码更改**：更新受影响示例的相关 README 文件
+2. **新示例**：建议同时提供英文和中文 README 文件
+3. **API 更改**：在相关模块的 README 中记录
+
+虽然理想的 bilingual 同步是完美的，但仅英文的贡献也是受欢迎的 —— 维护者将协助中文翻译。
 
 ## License
 

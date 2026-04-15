@@ -1,6 +1,10 @@
-# Concurrency & Multi-threading
+# 05 - Concurrency & Multi-threading
 
-This module demonstrates concurrent programming patterns and pitfalls.
+[![Concurrency](https://img.shields.io/badge/Concurrency-Lock--Free-red.svg)](https://en.cppreference.com/w/cpp/atomic)
+
+> Write efficient multi-threaded code with atomics, lock-free structures, and OpenMP.
+
+Master `std::atomic` memory orderings, build lock-free queues, and parallelize with OpenMP for **linear thread scaling**.
 
 ## Contents
 

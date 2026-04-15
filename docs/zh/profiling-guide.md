@@ -63,7 +63,7 @@ FlameGraph 以直观方式展示时间花费。
 
 ```bash
 # 为某个基准生成 FlameGraph
-./tools/flamegraph/generate_flamegraph.sh ./build/release/examples/02-memory-cache/bench/aos_soa_bench
+./tools/performance/generate_flamegraph.sh ./build/release/examples/02-memory-cache/bench/aos_soa_bench
 
 # 查看结果
 firefox flamegraph.svg
@@ -290,7 +290,7 @@ echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 |------|------|------|
 | CPU 热点 | perf | `perf record -g ./bench && perf report` |
 | 缓存未命中 | perf | `perf stat -e cache-misses ./bench` |
-| 可视化分析 | FlameGraph | `./tools/flamegraph/generate_flamegraph.sh ./bench` |
+| 可视化分析 | FlameGraph | `./tools/performance/generate_flamegraph.sh ./bench` |
 | 详细缓存 | Valgrind | `valgrind --tool=cachegrind ./bench` |
 | 调用图 | Valgrind | `valgrind --tool=callgrind ./bench` |
 | 向量化 | GCC | `-fopt-info-vec-optimized` |

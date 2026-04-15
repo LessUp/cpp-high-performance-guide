@@ -19,20 +19,20 @@
 
 - `.gitbook.yaml`
 - `SUMMARY.md`
-- `DOCS.md`
+- `README.md`（首页）
 - `docs/` 下的 Markdown 文档
 
 ## 内容结构
 
 GitBook 将使用：
 
-- `DOCS.md` 作为首页
+- `README.md` 作为首页（在 `.gitbook.yaml` 中配置）
 - `SUMMARY.md` 作为目录导航
 
 这些入口已经在 `.gitbook.yaml` 中显式声明。
 
 ## 注意事项
 
-- 启用 Git Sync 后，不要优先在 GitBook UI 中修改文档首页，避免与仓库内的 `DOCS.md` 冲突。
+- 入口页面通过仓库中的 `README.md` 管理。
 - 如果你没有在 GitBook 中手工调整目录，`SUMMARY.md` 会直接作为目录来源。
 - 如果你后续把文档迁移到其他根目录，需要同步更新 `.gitbook.yaml`。

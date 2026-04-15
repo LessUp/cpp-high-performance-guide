@@ -1,6 +1,10 @@
-# Modern C++ Performance Features
+# 03 - Modern C++ Performance Features
 
-This module demonstrates how modern C++ features can improve performance.
+[![C++20](https://img.shields.io/badge/Standard-C%2B%2B20-blue.svg)](https://isocpp.org/)
+
+> Leverage C++20 features for zero-cost abstractions and significant performance gains.
+
+Discover how `constexpr`, move semantics, container optimizations, and C++20 Ranges can deliver **2-1000x speedups**.
 
 ## Contents
 

@@ -2,9 +2,9 @@ name: Benchmark
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 permissions:
   contents: read
@@ -70,7 +70,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v3
       with:
         workflow: benchmark.yml
-        branch: main
+        branch: master
         name: benchmark-results
         path: baseline/
       continue-on-error: true
@@ -79,7 +79,7 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         if [ -f baseline/memory_bench.json ] && [ -f memory_bench.json ]; then
-          python3 tools/analysis/benchmark_compare.py \
+          python3 tools/performance/benchmark_compare.py \
             baseline/memory_bench.json \
             memory_bench.json \
             --report memory_comparison.md \
@@ -94,7 +94,7 @@ jobs:
   benchmark-matrix:
     name: Benchmark on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     
     strategy:
       matrix:

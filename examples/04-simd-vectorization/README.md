@@ -1,6 +1,10 @@
-# SIMD Vectorization
+# 04 - SIMD Vectorization
 
-This module demonstrates SIMD (Single Instruction, Multiple Data) programming techniques.
+[![SIMD](https://img.shields.io/badge/SIMD-SSE%2FAVX2%2FAVX--512-orange.svg)](https://www.intel.com/content/www/us/en/docs/intrinsics-guide/)
+
+> Unlock CPU vector units for massive data parallelism with SIMD programming.
+
+Learn auto-vectorization, SSE/AVX2/AVX-512 intrinsics, and write readable SIMD wrappers for **3-16x speedups**.
 
 ## Contents
 

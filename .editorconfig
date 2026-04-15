@@ -1,0 +1,40 @@
+# EditorConfig for C++ High Performance Guide
+# https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C++ source files
+[*.{cpp,hpp,h}]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# CMake files
+[{CMakeLists.txt,*.cmake}]
+indent_style = space
+indent_size = 4
+
+# YAML and JSON files
+[*.{yml,yaml,json}]
+indent_style = space
+indent_size = 2
+
+# Python and shell scripts
+[*.{py,sh}]
+indent_style = space
+indent_size = 4
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = 80
+
+# Makefile
+[Makefile]
+indent_style = tab

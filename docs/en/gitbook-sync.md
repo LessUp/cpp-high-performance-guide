@@ -19,20 +19,20 @@ This repository already includes the following files for GitBook:
 
 - `.gitbook.yaml`
 - `SUMMARY.md`
-- `DOCS.md`
+- `README.md` (entry page)
 - Markdown documentation under `docs/`
 
 ## Content Structure
 
 GitBook will use:
 
-- `DOCS.md` as the first page
+- `README.md` as the first page (configured in `.gitbook.yaml`)
 - `SUMMARY.md` as the table of contents
 
 The `.gitbook.yaml` file explicitly defines this structure.
 
 ## Notes
 
-- Do not edit the docs entry page from the GitBook UI when Git Sync is enabled. Keep `DOCS.md` managed from the repository.
+- The entry page is managed from the repository via `README.md`.
 - If you do not manually customize the table of contents in GitBook, `SUMMARY.md` will be used directly.
 - If you later move your docs under another root folder, update `.gitbook.yaml` accordingly.

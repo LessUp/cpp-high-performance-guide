@@ -1,6 +1,10 @@
-# Modern CMake Examples
+# 01 - Modern CMake Examples
 
-This module demonstrates CMake best practices through anti-pattern vs best-practice comparisons.
+[![CMake](https://img.shields.io/badge/CMake-3.22%2B-green.svg)](https://cmake.org/)
+
+> Learn modern CMake best practices through anti-pattern vs best-practice comparisons.
+
+This module demonstrates why target-based CMake is superior to directory-based approaches and how to use modern CMake features effectively.
 
 ## Contents
 
