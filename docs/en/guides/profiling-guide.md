@@ -2,6 +2,8 @@
 
 This guide covers essential profiling tools and techniques for analyzing C++ performance.
 
+---
+
 ## Overview
 
 Performance optimization follows a simple cycle:
@@ -9,6 +11,8 @@ Performance optimization follows a simple cycle:
 2. **Analyze** - Understand the root cause
 3. **Optimize** - Apply targeted improvements
 4. **Verify** - Measure again to confirm improvement
+
+---
 
 ## Tools
 
@@ -55,6 +59,8 @@ perf stat -e branches,branch-misses ./your_benchmark
 perf record -g --call-graph dwarf ./your_benchmark
 ```
 
+---
+
 ### FlameGraph
 
 FlameGraphs provide intuitive visualization of where time is spent.
@@ -95,6 +101,8 @@ Look for:
 - Deep stacks (excessive call depth)
 - Unexpected functions taking time
 
+---
+
 ### Valgrind
 
 Valgrind provides detailed memory and cache analysis.
@@ -124,6 +132,8 @@ valgrind --tool=callgrind ./your_benchmark
 kcachegrind callgrind.out.*
 ```
 
+---
+
 ### Intel VTune (Advanced)
 
 VTune provides the most detailed analysis on Intel CPUs.
@@ -147,6 +157,8 @@ vtune -collect uarch-exploration ./your_benchmark
 # View results
 vtune-gui
 ```
+
+---
 
 ## Profiling Strategies
 
@@ -191,6 +203,8 @@ OMP_NUM_THREADS=1 ./your_benchmark
 OMP_NUM_THREADS=2 ./your_benchmark
 OMP_NUM_THREADS=4 ./your_benchmark
 ```
+
+---
 
 ## Common Performance Issues
 
@@ -239,6 +253,8 @@ OMP_NUM_THREADS=4 ./your_benchmark
 - Simplify loop structure
 - Use explicit SIMD intrinsics
 
+---
+
 ## Benchmark Best Practices
 
 ### Avoid Measurement Errors
@@ -284,6 +300,8 @@ echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 ./your_benchmark --benchmark_repetitions=10 --benchmark_report_aggregates_only=true
 ```
 
+---
+
 ## Quick Reference
 
 | Task | Tool | Command |
@@ -295,3 +313,11 @@ echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 | Call graph | Valgrind | `valgrind --tool=callgrind ./bench` |
 | Vectorization | GCC | `-fopt-info-vec-optimized` |
 | Vectorization | Clang | `-Rpass=loop-vectorize` |
+
+---
+
+## See Also
+
+- [Learning Path](learning-path.md) - Follow the curriculum
+- [Best Practices](best-practices.md) - Optimization patterns
+- [Troubleshooting](../reference/troubleshooting.md) - Common issues

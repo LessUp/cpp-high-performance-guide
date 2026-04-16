@@ -2,6 +2,8 @@
 
 This guide provides a recommended order for studying the HPC optimization examples, organized from beginner to advanced topics.
 
+---
+
 ## Prerequisites
 
 Before starting, ensure you have:
@@ -9,9 +11,13 @@ Before starting, ensure you have:
 - Familiarity with command-line tools
 - Understanding of basic computer architecture concepts
 
+See [Prerequisites](../getting-started/prerequisites.md) for details.
+
+---
+
 ## Phase 1: Build System Fundamentals
 
-### 1.1 Modern CMake (examples/01-cmake-modern)
+### 1.1 Modern CMake ([examples/01-cmake-modern](https://github.com/LessUp/cpp-high-performance-guide/tree/master/examples/01-cmake-modern))
 
 Start here to understand the project structure and build system.
 
@@ -26,9 +32,11 @@ Start here to understand the project structure and build system.
 2. Add a new example module using the template
 3. Compare the anti-pattern and best-practice CMakeLists.txt files
 
+---
+
 ## Phase 2: Memory Fundamentals
 
-### 2.1 Data Layout - AOS vs SOA (examples/02-memory-cache/src/aos_vs_soa.cpp)
+### 2.1 Data Layout - AOS vs SOA ([examples/02-memory-cache](https://github.com/LessUp/cpp-high-performance-guide/tree/master/examples/02-memory-cache))
 
 Understanding data layout is fundamental to cache optimization.
 
@@ -42,7 +50,7 @@ Understanding data layout is fundamental to cache optimization.
 ./build/release/examples/02-memory-cache/bench/aos_soa_bench
 ```
 
-### 2.2 Memory Alignment (examples/02-memory-cache/src/alignment.cpp)
+### 2.2 Memory Alignment
 
 Learn how alignment affects SIMD performance.
 
@@ -51,7 +59,7 @@ Learn how alignment affects SIMD performance.
 - Aligned memory allocation
 - SIMD alignment requirements
 
-### 2.3 False Sharing (examples/02-memory-cache/src/false_sharing.cpp)
+### 2.3 False Sharing
 
 Critical for multi-threaded performance.
 
@@ -60,7 +68,7 @@ Critical for multi-threaded performance.
 - `alignas(64)` for cache line padding
 - Detecting false sharing with perf
 
-### 2.4 Prefetching (examples/02-memory-cache/src/prefetch.cpp)
+### 2.4 Prefetching
 
 Advanced memory optimization technique.
 
@@ -69,9 +77,11 @@ Advanced memory optimization technique.
 - Prefetch distance tuning
 - When prefetching helps (and when it doesn't)
 
+---
+
 ## Phase 3: Modern C++ Performance
 
-### 3.1 Compile-Time Computation (examples/03-modern-cpp/src/compile_time.cpp)
+### 3.1 Compile-Time Computation ([examples/03-modern-cpp](https://github.com/LessUp/cpp-high-performance-guide/tree/master/examples/03-modern-cpp))
 
 Move computation from runtime to compile time.
 
@@ -80,7 +90,7 @@ Move computation from runtime to compile time.
 - `consteval` for guaranteed compile-time evaluation
 - Template metaprogramming basics
 
-### 3.2 Move Semantics (examples/03-modern-cpp/src/move_semantics.cpp)
+### 3.2 Move Semantics
 
 Avoid unnecessary copies.
 
@@ -89,7 +99,7 @@ Avoid unnecessary copies.
 - Move constructors and assignment
 - `std::move` usage
 
-### 3.3 Vector Capacity (examples/03-modern-cpp/src/vector_reserve.cpp)
+### 3.3 Vector Capacity
 
 Optimize container usage.
 
@@ -98,7 +108,7 @@ Optimize container usage.
 - Allocation counting
 - Capacity vs size
 
-### 3.4 C++20 Ranges (examples/03-modern-cpp/src/ranges_vs_loops.cpp)
+### 3.4 C++20 Ranges
 
 Modern iteration patterns.
 
@@ -107,9 +117,11 @@ Modern iteration patterns.
 - Lazy evaluation
 - Performance comparison with raw loops
 
+---
+
 ## Phase 4: SIMD Vectorization
 
-### 4.1 Auto-Vectorization (examples/04-simd-vectorization/src/auto_vectorize.cpp)
+### 4.1 Auto-Vectorization ([examples/04-simd-vectorization](https://github.com/LessUp/cpp-high-performance-guide/tree/master/examples/04-simd-vectorization))
 
 Let the compiler do the work.
 
@@ -127,7 +139,7 @@ Let the compiler do the work.
 -Rpass=loop-vectorize
 ```
 
-### 4.2 SIMD Intrinsics (examples/04-simd-vectorization/src/intrinsics_intro.cpp)
+### 4.2 SIMD Intrinsics
 
 Manual vectorization for maximum control.
 
@@ -136,7 +148,7 @@ Manual vectorization for maximum control.
 - Intrinsic functions
 - Data alignment for SIMD
 
-### 4.3 SIMD Wrapper (examples/04-simd-vectorization/include/simd_wrapper.hpp)
+### 4.3 SIMD Wrapper
 
 Readable SIMD code.
 
@@ -145,9 +157,11 @@ Readable SIMD code.
 - Scalar fallback implementations
 - Type-safe SIMD operations
 
+---
+
 ## Phase 5: Concurrent Programming
 
-### 5.1 Atomic Operations (examples/05-concurrency/src/atomic_ordering.cpp)
+### 5.1 Atomic Operations ([examples/05-concurrency](https://github.com/LessUp/cpp-high-performance-guide/tree/master/examples/05-concurrency))
 
 Foundation of lock-free programming.
 
@@ -156,7 +170,7 @@ Foundation of lock-free programming.
 - Memory orderings (relaxed, acquire, release, seq_cst)
 - When to use each ordering
 
-### 5.2 Lock-Free Queue (examples/05-concurrency/src/lock_free_queue.cpp)
+### 5.2 Lock-Free Queue
 
 Practical lock-free data structure.
 
@@ -165,7 +179,7 @@ Practical lock-free data structure.
 - Memory ordering in practice
 - Correctness verification
 
-### 5.3 OpenMP (examples/05-concurrency/src/openmp_basics.cpp)
+### 5.3 OpenMP
 
 Simple parallelization.
 
@@ -173,6 +187,8 @@ Simple parallelization.
 - `#pragma omp parallel for`
 - Reductions
 - Thread scaling
+
+---
 
 ## Phase 6: Profiling & Analysis
 
@@ -196,6 +212,8 @@ Find performance bottlenecks.
 
 See [Profiling Guide](profiling-guide.md) for detailed instructions.
 
+---
+
 ## Recommended Study Schedule
 
 | Week | Topics |
@@ -207,10 +225,20 @@ See [Profiling Guide](profiling-guide.md) for detailed instructions.
 | 5 | Phase 5.1-5.2 |
 | 6 | Phase 5.3 + Phase 6 |
 
+---
+
 ## Next Steps
 
 After completing this learning path:
 1. Profile your own code to find bottlenecks
 2. Apply relevant optimizations
 3. Measure the improvement
-4. Contribute new examples to this project!
+4. [Contribute new examples to this project!](../../CONTRIBUTING.md)
+
+---
+
+## Related Resources
+
+- [Best Practices](best-practices.md) - Industry-tested patterns
+- [API Reference](../reference/api-reference.md) - Utility functions
+- [FAQ](../reference/faq.md) - Common questions

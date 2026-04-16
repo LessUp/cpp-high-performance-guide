@@ -10,6 +10,8 @@ You should have:
 - Familiarity with command-line tools
 - Basic computer architecture concepts (CPU, memory, cache)
 
+See [Prerequisites](../getting-started/prerequisites.md) for details.
+
 ### Q: Which operating systems are supported?
 
 The project is primarily tested on **Linux**. macOS and Windows are supported on a best-effort basis:
@@ -67,27 +69,6 @@ cmake --preset=release
 
 Or use offline mode with pre-downloaded dependencies.
 
-### Q: Build fails with "undefined reference to `pthread_create`"
-
-Make sure CMake can find threads:
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install libpthread-stubs0-dev
-
-# Reconfigure with fresh cache
-cmake --preset=release --fresh
-```
-
-### Q: Sanitizer builds fail to link
-
-Some sanitizers are mutually exclusive. Also ensure you have the sanitizer libraries:
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install libasan6 libtsan0 libubsan1
-```
-
 ---
 
 ## Runtime Issues
@@ -119,62 +100,6 @@ sudo usermod -a -G perf $USER
 # Log out and back in for changes to take effect
 ```
 
-### Q: FlameGraph generation fails
-
-Ensure you have the required tools:
-
-```bash
-# Install perf (linux-tools)
-sudo apt-get install linux-tools-common linux-tools-generic
-
-# The project includes FlameGraph scripts in tools/performance/
-# No additional installation needed
-```
-
----
-
-## Test Issues
-
-### Q: Tests fail on ThreadSanitizer build
-
-ThreadSanitizer may report data races in third-party libraries. If the race is in your code:
-
-1. Read the TSan report carefully
-2. Check for missing atomic operations
-3. Verify memory ordering is correct
-4. Refer to [C++ Concurrency in Action](https://www.manning.com/books/c-plus-plus-concurrency-in-action)
-
-### Q: AddressSanitizer reports memory leaks
-
-ASan tracks allocations. If leaks are reported:
-
-1. Check if they're in your code or dependencies
-2. Use `ASAN_OPTIONS=detect_leaks=0` to disable leak checking temporarily
-3. Fix actual leaks in your code
-
----
-
-## Documentation Questions
-
-### Q: Where can I find more learning resources?
-
-- **Books**: "C++ Concurrency in Action", "Effective Modern C++"
-- **Online**: [CppReference](https://en.cppreference.com/), [Compiler Explorer](https://godbolt.org/)
-- **Papers**: [What Every Programmer Should Know About Memory](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf)
-
-### Q: How do I contribute a new example module?
-
-See [Contributing Guide](../../CONTRIBUTING.md) for detailed instructions. Quick steps:
-
-1. Create directory under `examples/XX-topic-name/`
-2. Use the standard structure (src/, bench/, CMakeLists.txt, README.md)
-3. Add tests in `tests/`
-4. Submit a PR
-
-### Q: Can I use this code in my project?
-
-Yes! This project is MIT licensed. You can freely use, modify, and distribute the code. See [LICENSE](../../LICENSE) for details.
-
 ---
 
 ## Still Have Questions?
@@ -182,3 +107,11 @@ Yes! This project is MIT licensed. You can freely use, modify, and distribute th
 - 🐛 [Open an Issue](https://github.com/LessUp/cpp-high-performance-guide/issues)
 - 💬 [Start a Discussion](https://github.com/LessUp/cpp-high-performance-guide/discussions)
 - 📧 Contact maintainers
+
+---
+
+## Related Documentation
+
+- [Troubleshooting](troubleshooting.md) - Detailed problem solving
+- [Learning Path](../guides/learning-path.md) - Study curriculum
+- [Profiling Guide](../guides/profiling-guide.md) - Performance analysis

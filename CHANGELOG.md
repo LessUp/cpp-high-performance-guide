@@ -2,31 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-04-16
+
+### Major Changes
+- Comprehensive documentation restructure with hierarchical organization
+- Complete bilingual (EN/ZH) documentation parity
+- Professional changelog format with standardized release notes
+- New getting-started guides (quickstart, installation, prerequisites)
+
 ### Added
-- Comprehensive FAQ guides (English & Chinese)
-- Troubleshooting guides (English & Chinese)
-- GitHub issue/PR templates
-- Security policy and Code of Conduct
-- Helper scripts (build.sh, test.sh, format.sh, setup.sh)
-- .editorconfig for consistent coding style
+- New `docs/` structure: `getting-started/`, `guides/`, `reference/`, `contributing/`
+- Landing pages for English and Chinese documentation
+- Quick start guides for both languages
+- Platform-specific installation guides (Ubuntu, Fedora, macOS, Windows/WSL)
+- Prerequisites documentation with knowledge and system requirements
+- Best practices guides with code examples
+- API reference documentation
 
 ### Changed
-- Reorganized documentation structure
-- Moved CLAUDE.md to docs/developers/claude-guide.md
-- Moved package files to docs/ subdirectory
-- Updated gitbook-sync guides
+- Updated SUMMARY.md with new documentation paths
+- Professionalized changelog format with metadata and categories
+- Improved navigation between bilingual content
 
-### Fixed
-- All workflow branch references (main → master)
-- npm cache configuration in pages.yml
-- Changelog file naming consistency
-
----
+### Documentation
+- Complete restructuring for better discoverability
+- Cross-linked bilingual content
+- Enhanced getting started experience
 
 ## [1.2.0] - 2026-04-15
 
@@ -49,8 +54,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All internal documentation links
 - Workflow branch references to use correct default branch (master)
 
----
-
 ## [1.1.0] - 2026-03-13
 
 ### Added
@@ -66,13 +69,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Standardized documentation information architecture
 - Clarified entry point responsibilities
 
----
-
 ## [1.0.2] - 2026-03-10
 
 ### Added
 - package.json and package-lock.json for HonKit version locking
-- npm cache support in pages workflow
+- npm cache support in pages workflow for faster builds
 - Sparse-checkout for efficient CI builds
 
 ### Changed
@@ -82,8 +83,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Docs badge link pointing to correct workflow file
 - Reduced CI checkout time by excluding unnecessary directories
-
----
 
 ## [1.0.1] - 2026-03-06
 
@@ -103,8 +102,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform temporary file path issues (Windows compatibility)
 - SIMD dispatch template design (separate template parameters)
 - Property test entry point ordering
-
----
 
 ## [1.0.0] - 2026-02-27
 
@@ -126,8 +123,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MSVC compatibility in simd_utils.hpp
 - CMakeLists.txt registration for atomic and OpenMP benchmarks
 
----
-
 ## [0.1.0] - 2026-01-09
 
 ### Added
@@ -147,7 +142,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/LessUp/cpp-high-performance-guide/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/LessUp/cpp-high-performance-guide/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/LessUp/cpp-high-performance-guide/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/LessUp/cpp-high-performance-guide/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/LessUp/cpp-high-performance-guide/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/LessUp/cpp-high-performance-guide/compare/v1.0.1...v1.0.2

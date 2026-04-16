@@ -16,8 +16,8 @@
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT">
   </a>
-  <a href="https://github.com/LessUp/cpp-high-performance-guide/stargazers">
-    <img src="https://img.shields.io/github/stars/LessUp/cpp-high-performance-guide?style=flat-square&color=orange" alt="Stars">
+  <a href="https://github.com/LessUp/cpp-high-performance-guide/releases">
+    <img src="https://img.shields.io/github/v/release/LessUp/cpp-high-performance-guide?style=flat-square&color=orange" alt="Release">
   </a>
   <a href="https://github.com/LessUp/cpp-high-performance-guide/commits/master">
     <img src="https://img.shields.io/github/last-commit/LessUp/cpp-high-performance-guide?style=flat-square" alt="Last Commit">
@@ -25,11 +25,11 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> | <b>简体中文</b> | <a href="https://lessup.github.io/cpp-high-performance-guide/">📚 文档首页</a>
+  <a href="README.md">English</a> | <b>简体中文</b> | <a href="https://lessup.github.io/cpp-high-performance-guide/">📚 文档</a>
 </p>
 
 <p align="center">
-  <i>通过可运行的示例学习现代 C++ 性能工程 — 覆盖构建系统、内存与缓存、SIMD、并发、基准测试和性能分析</i>
+  <i>通过实战示例学习现代 C++20 性能工程 — CMake、内存优化、SIMD、并发和性能分析。</i>
 </p>
 
 ---
@@ -39,8 +39,7 @@
 - [✨ 核心特性](#-核心特性)
 - [🚀 快速开始](#-快速开始)
 - [📊 性能亮点](#-性能亮点)
-- [📚 学习路径](#-学习路径)
-- [📖 文档导航](#-文档导航)
+- [📚 文档](#-文档)
 - [🏗️ 项目结构](#️-项目结构)
 - [👥 适合人群](#-适合人群)
 - [🛠️ 技术栈](#️-技术栈)
@@ -53,25 +52,31 @@
 
 | 特性 | 描述 |
 |------|------|
-| 🎯 **实战驱动** | 每个优化技术都有可编译、可运行、可度量的示例代码，而非孤立的知识笔记 |
-| 📈 **量化结果** | 集成 Google Benchmark，可视化优化前后的性能差异 |
-| 🏗️ **现代工具链** | CMake Presets、Sanitizers（ASan/TSan/UBSan）、CI/CD、FlameGraph — 工业级实践 |
-| 🌍 **双语文档** | 学习路径和性能分析指南同步维护中英文版本 |
-| 🎓 **六周课程** | 从 CMake 基础到无锁编程的结构化进阶路径 |
-| 🔧 **工程规范** | 代码遵循 `.clang-format`、头文件使用 `#pragma once`、`hpc::` 命名空间层级 |
+| 🎯 **实战驱动** | 每个优化技术都有可编译、可运行、可度量的示例 |
+| 📈 **量化结果** | 集成 Google Benchmark，可视化性能差异 |
+| 🏗️ **现代工具链** | CMake Presets、Sanitizers、CI/CD、FlameGraph |
+| 🌍 **双语文档** | 完整的中英文文档 |
+| 🎓 **六周课程** | 从 CMake 基础到无锁编程的结构化学习 |
+| 🔧 **工程规范** | `.clang-format`、`#pragma once`、`hpc::` 命名空间 |
 
 ---
 
 ## 🚀 快速开始
 
-只需 3 步即可开始：
+### 先决条件
+
+- **编译器**: GCC 11+、Clang 14+ 或 MSVC 2022+
+- **CMake**: 3.20 或更高版本
+- **操作系统**: Linux（推荐）、macOS、Windows（WSL2）
+
+### 安装
 
 ```bash
 # 1. 克隆仓库
 git clone https://github.com/LessUp/cpp-high-performance-guide.git
 cd cpp-high-performance-guide
 
-# 2. 配置并构建（Release 模式，启用了 -O3 -march=native）
+# 2. 配置并构建
 cmake --preset=release
 cmake --build build/release
 
@@ -79,15 +84,23 @@ cmake --build build/release
 ctest --preset=release
 ```
 
-> 💡 **提示**: 探索其他构建预设：`debug`、`asan`（AddressSanitizer）、`tsan`（ThreadSanitizer）、`ubsan`、`coverage`
+> 💡 **提示**: 探索其他构建预设：`debug`、`asan`、`tsan`、`ubsan`、`coverage`
+
+### 运行你的第一个基准测试
+
+```bash
+./build/release/examples/02-memory-cache/bench/aos_soa_bench
+```
+
+见证 AOS 与 SOA 数据布局之间 2-20 倍的性能提升！
 
 ---
 
 ## 📊 性能亮点
 
-| 模块 | 优化技术 | 预期加速比 | 状态 |
-|------|----------|-----------|------|
-| **内存与缓存** | SOA vs AOS 数据布局 | **2-20x** | ✅ 可用 |
+| 模块 | 优化技术 | 加速比 | 状态 |
+|------|----------|--------|------|
+| **内存与缓存** | SOA vs AOS 布局 | **2-20x** | ✅ 可用 |
 | **内存与缓存** | 伪共享修复 | **5-20x** | ✅ 可用 |
 | **现代 C++** | 移动语义 vs 拷贝 | **10-1000x** | ✅ 可用 |
 | **现代 C++** | Vector `reserve()` | **2-5x** | ✅ 可用 |
@@ -95,62 +108,44 @@ ctest --preset=release
 | **SIMD** | AVX-512 内在函数 | **10-16x** | ✅ 可用 |
 | **并发** | 无锁队列 | 线性扩展 | ✅ 可用 |
 
-> 📈 在你的机器上运行 `./build/release/examples/XX-*/bench/*_bench` 查看实际结果！
-
 ---
 
-## 📚 学习路径
+## 📚 文档
 
-### 六周学习计划
+### 📖 完整文档
+
+**[https://lessup.github.io/cpp-high-performance-guide/](https://lessup.github.io/cpp-high-performance-guide/)**
+
+### 🎯 学习路径
+
+跟随我们的 [6 周结构化课程](docs/zh/guides/learning-path.md)：
 
 | 周数 | 主题 | 模块 |
 |:----:|------|------|
-| 1 | 构建系统 + 内存基础 | [现代 CMake](examples/01-cmake-modern/)、[AOS vs SOA](examples/02-memory-cache/) |
-| 2 | 缓存优化 + 现代 C++ 基础 | [伪共享](examples/02-memory-cache/)、[constexpr](examples/03-modern-cpp/) |
-| 3 | 容器优化 + 自动向量化 | [Vector 预留](examples/03-modern-cpp/)、[SIMD 入门](examples/04-simd-vectorization/) |
-| 4 | 高级 SIMD 编程 | [内在函数](examples/04-simd-vectorization/)、[SIMD 封装](examples/04-simd-vectorization/) |
-| 5 | 并发编程 | [原子操作](examples/05-concurrency/)、[无锁队列](examples/05-concurrency/) |
-| 6 | 性能分析与基准测试 | [OpenMP](examples/05-concurrency/)、[性能分析指南](docs/zh/profiling-guide.md) |
+| 1 | 构建系统 + 内存 | 现代 CMake、AOS vs SOA |
+| 2 | 缓存 + 现代 C++ | 伪共享、constexpr |
+| 3 | 容器 + SIMD | Vector 预留、自动向量化 |
+| 4 | 高级 SIMD | 内在函数、SIMD 封装 |
+| 5 | 并发编程 | 原子操作、无锁队列 |
+| 6 | 性能分析 | perf、FlameGraph、VTune |
 
-### 快速导航
+### 📁 示例模块
 
-| 目标 | 资源 |
+| 模块 | 描述 |
 |------|------|
-| 🎓 **系统学习** | [学习路径](docs/zh/learning-path.md) |
-| 🔍 **定位瓶颈** | [性能分析指南](docs/zh/profiling-guide.md) |
-| 📝 **新增模块** | [贡献指南](CONTRIBUTING.zh.md) |
-| ❓ **常见问题** | [FAQ](docs/zh/faq.md) |
-| 🐛 **故障排查** | [故障排查指南](docs/zh/troubleshooting.md) |
+| [01. 现代 CMake](examples/01-cmake-modern/) | 基于目标的 CMake、FetchContent、Presets |
+| [02. 内存与缓存](examples/02-memory-cache/) | AOS/SOA、伪共享、对齐、预取 |
+| [03. 现代 C++](examples/03-modern-cpp/) | constexpr、移动语义、Ranges |
+| [04. SIMD 向量化](examples/04-simd-vectorization/) | 自动向量化、SSE/AVX2/AVX-512 |
+| [05. 并发编程](examples/05-concurrency/) | 原子操作、无锁编程、OpenMP |
 
----
+### 🔧 快速参考
 
-## 📖 文档导航
-
-### 示例模块
-
-探索我们的 5 个实战示例模块：
-
-#### [01. 现代 CMake](examples/01-cmake-modern/)
-学习基于目标的 CMake、FetchContent 依赖管理和使用 CMake Presets 的可复现构建。
-
-#### [02. 内存与缓存](examples/02-memory-cache/)
-掌握 AOS vs SOA 数据布局、伪共享消除、内存对齐和预取技术。
-
-#### [03. 现代 C++](examples/03-modern-cpp/)
-利用 `constexpr`、移动语义、容器容量管理和 C++20 Ranges 实现零开销抽象。
-
-#### [04. SIMD 向量化](examples/04-simd-vectorization/)
-编写编译器友好的循环、使用 SSE/AVX2/AVX-512 内在函数、构建可读的 SIMD 封装。
-
-#### [05. 并发编程](examples/05-concurrency/)
-实现带正确内存序的原子操作、构建无锁数据结构、使用 OpenMP 并行化。
-
-### 其他资源
-
-- 📘 [完整学习路径](docs/zh/learning-path.md) - 分步骤课程
-- 🔬 [性能分析指南](docs/zh/profiling-guide.md) - perf、FlameGraph、Valgrind、VTune
-- 🔄 [GitBook 同步](docs/zh/gitbook-sync.md) - 文档站点设置
-- 💻 [在线文档](https://lessup.github.io/cpp-high-performance-guide/)
+- [快速开始指南](docs/zh/getting-started/quickstart.md) - 5分钟上手
+- [安装指南](docs/zh/getting-started/installation.md) - 各平台安装说明
+- [性能分析指南](docs/zh/guides/profiling-guide.md) - 性能分析工具
+- [常见问题](docs/zh/reference/faq.md) - 常见问题解答
+- [故障排查](docs/zh/reference/troubleshooting.md) - 问题解决方案
 
 ---
 
@@ -164,13 +159,14 @@ cpp-high-performance-guide/
 │   ├── 03-modern-cpp/       # constexpr、移动语义、Ranges
 │   ├── 04-simd-vectorization/ # 自动向量化、SSE/AVX2/AVX-512
 │   └── 05-concurrency/       # 原子操作、无锁编程、OpenMP
-├── 📁 benchmarks/           # 基准测试工具和公共代码
-├── 📁 tests/                # 单元测试、集成测试和属性测试
-├── 📁 tools/                # FlameGraph 生成器、分析脚本
-├── 📁 docs/                 # 双语文档
+├── 📁 benchmarks/           # 基准测试工具
+├── 📁 tests/                # 单元测试、集成测试、属性测试
+├── 📁 tools/                # FlameGraph 脚本、分析工具
+├── 📁 docs/                 # 完整的双语文档
 │   ├── en/                 # 英文文档
 │   └── zh/                 # 中文文档
 ├── 📁 cmake/                # CMake 模块和模板
+├── 📁 changelog/            # 版本历史
 ├── 📄 CMakePresets.json     # 构建配置
 └── 📄 README.md             # 你在这里！
 ```
@@ -179,10 +175,10 @@ cpp-high-performance-guide/
 
 ## 👥 适合人群
 
-- **C++ 工程师** — 需要结构化的性能优化学习路径
-- **学生与自学者** — 通过带基准测试的可执行示例学习
-- **性能工程师** — 需要验证优化策略和工具链
-- **项目维护者** — 需要性能分析、基准测试和贡献参考
+- **C++ 工程师** — 寻求结构化性能优化学习路径
+- **学生与自学者** — 通过可执行示例学习
+- **性能工程师** — 构建基准测试和性能分析技能
+- **项目维护者** — 寻求现代 CMake 和 CI/CD 实践
 - **教育工作者** — 教授现代 C++ 性能工程
 
 ---
@@ -194,45 +190,34 @@ cpp-high-performance-guide/
 | **语言** | C++20 |
 | **编译器** | GCC 11+、Clang 14+、MSVC（尽力支持） |
 | **构建系统** | CMake 3.22+、CMake Presets、Ninja |
-| **测试** | Google Test、RapidCheck（属性测试） |
+| **测试** | Google Test、RapidCheck |
 | **基准测试** | Google Benchmark |
 | **性能分析** | perf、FlameGraph、Valgrind、Intel VTune |
-| **CI/CD** | GitHub Actions（构建、Sanitizers、Pages） |
+| **CI/CD** | GitHub Actions |
 | **文档** | HonKit → GitHub Pages |
 
 ---
 
 ## 🤝 参与贡献
 
-我们欢迎贡献！详情请参阅我们的 [贡献指南](CONTRIBUTING.zh.md)。
+我们欢迎贡献！请查看我们的[贡献指南](CONTRIBUTING.zh.md)。
 
 ### 快速贡献步骤
 
 ```bash
 # Fork 并克隆
-git clone https://github.com/<your-username>/cpp-high-performance-guide.git
+git clone https://github.com/<你的用户名>/cpp-high-performance-guide.git
 
 # 创建功能分支
 git checkout -b feature/your-feature-name
 
 # 构建并测试
 cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
-cmake --preset=asan && cmake --build build/asan && ctest --preset=asan
 
-# 使用清晰的提交信息
-git commit -m "feat: add matrix multiplication SIMD example"
-
-# 推送并创建 PR
+# 提交并推送
+git commit -m "feat: add optimization example"
 git push origin feature/your-feature-name
 ```
-
-### 贡献方式
-
-- 🐛 修复 bug 并改进示例
-- 📚 改进文档和翻译
-- ✨ 添加新的优化示例
-- 🧪 添加基于属性的测试
-- 📊 改进基准测试覆盖
 
 ---
 

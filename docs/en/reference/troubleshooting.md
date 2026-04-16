@@ -42,46 +42,6 @@ cmake --preset=release --fresh
 
 ---
 
-### FetchContent Download Failures
-
-**Symptom:**
-```
-FetchContent failed to populate benchmark
-```
-
-**Solutions:**
-
-1. **Network issues**: Check internet connection and proxy settings
-```bash
-# Test connectivity
-curl -I https://github.com
-
-# If behind proxy
-export HTTP_PROXY=http://proxy:port
-export HTTPS_PROXY=http://proxy:port
-```
-
-2. **Git not found**: Ensure Git is installed
-```bash
-sudo apt-get install git  # Ubuntu/Debian
-```
-
-3. **SSL certificate issues**:
-```bash
-# Update certificates
-sudo apt-get install ca-certificates
-# Or disable SSL verify (temporary workaround)
-git config --global http.sslVerify false
-```
-
-4. **Use system packages instead** (if available):
-```bash
-# Ubuntu/Debian
-sudo apt-get install libbenchmark-dev libgtest-dev
-```
-
----
-
 ### Link Errors with Threads
 
 **Symptom:**
@@ -100,8 +60,6 @@ sudo apt-get install libpthread-stubs0-dev
 ```bash
 cmake --preset=release --fresh
 ```
-
----
 
 ### Sanitizer Link Errors
 
@@ -185,125 +143,6 @@ sudo apt-get install linux-tools-common
 sudo cpupower frequency-set --governor performance
 ```
 
-4. **Disable CPU boost** (for consistent results):
-```bash
-echo 0 | sudo tee /sys/devices/system/cpu/cpufreq/boost
-```
-
-5. **Pin to specific CPU**:
-```bash
-taskset -c 0 ./benchmark
-```
-
-6. **Check for thermal throttling**:
-```bash
-# Monitor temperatures during benchmark
-watch -n1 sensors
-```
-
----
-
-### High Result Variance
-
-**Symptom:** Benchmark results vary significantly between runs.
-
-**Solutions:**
-
-1. **Disable ASLR**:
-```bash
-echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
-# Run benchmarks
-# Re-enable when done: echo 2 | sudo tee /proc/sys/kernel/randomize_va_space
-```
-
-2. **Close other applications**
-
-3. **Use benchmark repetitions**:
-```bash
-./benchmark --benchmark_repetitions=10 --benchmark_report_aggregates_only=true
-```
-
-4. **Disable hyperthreading** (for most consistent results):
-```bash
-# Disable logical CPUs
-echo 0 | sudo tee /sys/devices/system/cpu/cpuX/online
-```
-
----
-
-## Test Failures
-
-### ThreadSanitizer False Positives
-
-**Symptom:** TSan reports data races in system libraries or third-party code.
-
-**Solution:** Use suppression file:
-```bash
-# Create suppressions.txt
-race:libpthread
-race:libstdc++
-
-# Run with suppression
-TSAN_OPTIONS="suppressions=suppressions.txt" ./test
-```
-
----
-
-### AddressSanitizer Out of Memory
-
-**Symptom:** ASan tests fail with OOM.
-
-**Solution:** ASan increases memory usage. Either:
-1. Run on machine with more RAM
-2. Reduce test data sizes
-3. Use debug build instead for those tests
-
----
-
-## Profiling Issues
-
-### FlameGraph Empty or Incomplete
-
-**Symptom:** Generated SVG has no data or is very small.
-
-**Solutions:**
-
-1. **Ensure debug symbols are present**:
-```bash
-# Build with debug info
-cmake --preset=relwithdebinfo
-```
-
-2. **Run benchmark long enough**:
-```bash
-./benchmark --benchmark_min_time=5
-```
-
-3. **Check perf record output**:
-```bash
-perf record -g ./benchmark
-perf report  # See if samples were captured
-```
-
-4. **Increase sampling frequency**:
-```bash
-perf record -F 999 -g ./benchmark
-```
-
----
-
-### Valgrind Too Slow
-
-**Symptom:** Cachegrind/Callgrind takes forever to run.
-
-**Explanation:** Valgrind instrumentation is 10-50x slower than native.
-
-**Solutions:**
-
-1. Use smaller data sets for Valgrind runs
-2. Use perf instead for quick profiling
-3. Run Valgrind only on specific tests, not full benchmark suite
-
 ---
 
 ## Platform-Specific Issues
@@ -316,8 +155,6 @@ perf record -F 999 -g ./benchmark
 - Use Instruments (GUI tool from Xcode)
 - Use `sample` command-line tool
 - Run profiling in Docker/Linux VM
-
----
 
 ### Windows: Build Issues
 
@@ -345,14 +182,8 @@ If your issue isn't resolved here:
 
 ---
 
-## Debugging Checklist
+## Related Documentation
 
-Before reporting an issue, please verify:
-
-- [ ] Using supported compiler (GCC 11+, Clang 14+)
-- [ ] CMake 3.22 or newer
-- [ ] Fresh build directory (`--fresh` flag used)
-- [ ] All dependencies installed
-- [ ] Network connectivity (for FetchContent)
-- [ ] Sufficient disk space
-- [ ] Sufficient memory (especially for sanitizers)
+- [FAQ](faq.md) - Quick answers
+- [Installation Guide](../getting-started/installation.md) - Setup help
+- [Profiling Guide](../guides/profiling-guide.md) - Performance analysis
