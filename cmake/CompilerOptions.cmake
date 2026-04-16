@@ -3,11 +3,12 @@
 # Uses target-based approach (modern CMake best practice)
 
 #------------------------------------------------------------------------------
-# Detect compiler and set appropriate flags
+# Detect compiler and architecture
 #------------------------------------------------------------------------------
 set(HPC_IS_GCC FALSE)
 set(HPC_IS_CLANG FALSE)
 set(HPC_IS_MSVC FALSE)
+set(HPC_IS_ARM FALSE)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(HPC_IS_GCC TRUE)
@@ -15,6 +16,11 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(HPC_IS_CLANG TRUE)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(HPC_IS_MSVC TRUE)
+endif()
+
+# Detect ARM architecture (Apple Silicon, Raspberry Pi, etc.)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|ARM")
+    set(HPC_IS_ARM TRUE)
 endif()
 
 #------------------------------------------------------------------------------
@@ -50,7 +56,15 @@ function(hpc_set_compiler_options target)
     endif()
     
     # Release optimization flags
-    if(HPC_IS_GCC OR HPC_IS_CLANG)
+    if(HPC_IS_ARM)
+        # ARM uses -mcpu=native instead of -march=native
+        target_compile_options(${target} PRIVATE
+            $<$<CONFIG:Release>:-O3>
+            $<$<CONFIG:Release>:-mcpu=native>
+            $<$<CONFIG:RelWithDebInfo>:-O2>
+            $<$<CONFIG:RelWithDebInfo>:-g>
+        )
+    elseif(HPC_IS_GCC OR HPC_IS_CLANG)
         target_compile_options(${target} PRIVATE
             $<$<CONFIG:Release>:-O3>
             $<$<CONFIG:Release>:-march=native>
@@ -103,8 +117,16 @@ endfunction()
 #------------------------------------------------------------------------------
 function(hpc_enable_simd target)
     cmake_parse_arguments(ARG "SSE;AVX;AVX2;AVX512" "" "" ${ARGN})
-    
-    if(HPC_IS_GCC OR HPC_IS_CLANG)
+
+    if(HPC_IS_ARM)
+        # ARM uses NEON instead of x86 SIMD
+        if(HPC_IS_CLANG OR HPC_IS_GCC)
+            # NEON is enabled by default on AArch64, but we can add march flag
+            target_compile_options(${target} PRIVATE
+                $<$<CONFIG:Release>:-mcpu=native>
+            )
+        endif()
+    elseif(HPC_IS_GCC OR HPC_IS_CLANG)
         if(ARG_SSE)
             target_compile_options(${target} PRIVATE -msse4.2)
         endif()
@@ -124,7 +146,6 @@ function(hpc_enable_simd target)
         if(ARG_AVX2 OR ARG_AVX512)
             target_compile_options(${target} PRIVATE /arch:AVX2)
         endif()
-        # Note: MSVC uses /arch:AVX512 only in newer versions
     endif()
 endfunction()
 

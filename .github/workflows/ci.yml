@@ -37,13 +37,13 @@ jobs:
           
           # Ubuntu with Clang
           - os: ubuntu-latest
-            compiler: clang-15
-            cc: clang-15
-            cxx: clang++-15
+            compiler: clang-17
+            cc: clang-17
+            cxx: clang++-17
           - os: ubuntu-latest
-            compiler: clang-16
-            cc: clang-16
-            cxx: clang++-16
+            compiler: clang-18
+            cc: clang-18
+            cxx: clang++-18
           
           # macOS
           - os: macos-latest
@@ -63,11 +63,13 @@ jobs:
         if [[ "${{ matrix.compiler }}" == "gcc-13" ]]; then
           sudo apt-get install -y gcc-13 g++-13
         fi
-        if [[ "${{ matrix.compiler }}" == "clang-16" ]]; then
+        if [[ "${{ matrix.compiler }}" == clang-* ]]; then
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 16
+          sudo ./llvm.sh ${CLANG_VERSION#clang-}
         fi
+      env:
+        CLANG_VERSION: ${{ matrix.compiler }}
 
     - name: Install dependencies (macOS)
       if: runner.os == 'macOS'
