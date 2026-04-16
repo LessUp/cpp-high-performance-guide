@@ -56,8 +56,8 @@ function(hpc_add_example)
         target_link_libraries(${ARG_NAME} PRIVATE OpenMP::OpenMP_CXX)
     endif()
     
-    # Enable SIMD if requested
-    if(ARG_ENABLE_SIMD)
+    # Enable SIMD if requested (only on x86/x64)
+    if(ARG_ENABLE_SIMD AND NOT HPC_IS_ARM)
         foreach(simd_level ${ARG_ENABLE_SIMD})
             hpc_enable_simd(${ARG_NAME} ${simd_level})
         endforeach()

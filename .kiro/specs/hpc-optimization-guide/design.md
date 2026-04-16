@@ -21,11 +21,13 @@
 
 ## Scope and Constraints
 
-- 目标语言标准为 C++20，编译器要求 GCC 11+、Clang 14+（MSVC 为尽力支持），构建工具为 CMake 3.20+。
+- 目标语言标准为 C++20，编译器要求 GCC 11+、Clang 14+（MSVC 为尽力支持），构建工具为 CMake 3.22+。
 - 基准测试依赖 Google Benchmark，单元测试依赖 Google Test，属性测试依赖 RapidCheck。
 - 默认以 Linux 为主要验证平台，macOS/Windows 为尽力支持。
+- **ARM 平台（Apple Silicon）**: SIMD 示例自动降级，不支持 x86 特定的 AVX/SSE 指令集。
 - 性能分析工具（perf、FlameGraph、VTune）允许缺失并提供降级路径。
 - SIMD 示例需要根据 CPU 能力进行编译期或运行期的指令集选择。
+- MemorySanitizer 因与 Google Benchmark 的正则表达式检测不兼容，已被禁用。
 
 ## Architecture
 
@@ -100,8 +102,8 @@ hpc-optimization-guide/
 ├── CMakeLists.txt                 # 根 CMake 配置
 ├── CMakePresets.json              # 构建预设（debug/release/relwithdebinfo/asan/tsan/ubsan/coverage）
 ├── README.md                      # 项目主文档（English）
-├── README.zh-CN.md                   # 项目主文档（中文）
-├── CLAUDE.md                      # AI 助手上下文文档
+├── README.zh-CN.md                # 项目主文档（中文）
+├── CHANGELOG.md                   # 变更日志（Keep a Changelog 格式）
 ├── LICENSE
 │
 ├── cmake/                         # CMake 模块和工具
@@ -129,24 +131,51 @@ hpc-optimization-guide/
 │   └── common/                    # 通用基准测试工具
 │
 ├── tools/                         # 辅助工具
-│   ├── flamegraph/                # FlameGraph 生成脚本
-│   └── analysis/                  # 性能分析脚本
+│   └── performance/               # 性能分析工具
+│       ├── generate_flamegraph.sh # FlameGraph 生成脚本
+│       └── benchmark_compare.py   # 性能对比脚本
 │
 ├── docs/                          # 文档（双语）
+│   ├── package.json               # HonKit 依赖
+│   ├── book.json                  # HonKit 配置
+│   ├── developers/                # 开发者文档
+│   │   └── claude-guide.md        # AI 助手指南
 │   ├── zh/                        # 中文文档
 │   │   ├── learning-path.md       # 学习路径
-│   │   └── profiling-guide.md     # 性能分析指南
+│   │   ├── profiling-guide.md     # 性能分析指南
+│   │   ├── faq.md                 # 常见问题
+│   │   └── troubleshooting.md     # 故障排查
 │   └── en/                        # English docs
 │       ├── learning-path.md       # Learning path
-│       └── profiling-guide.md     # Profiling guide
+│       ├── profiling-guide.md     # Profiling guide
+│       ├── faq.md                 # FAQ
+│       └── troubleshooting.md     # Troubleshooting
 │
-├── changelog/                     # 变更日志
+├── changelog/                     # 变更日志（版本化）
+│   ├── README.md                  # 版本索引
+│   ├── v0.1.0.md                  # 初始发布
+│   ├── v1.0.0.md                  # 首个稳定版
+│   ├── v1.0.1.md                  # GitBook 集成
+│   ├── v1.0.2.md                  # 工作流优化
+│   ├── v1.1.0.md                  # 信息架构标准化
+│   └── v1.2.0.md                  # 文档重构
+│
+├── scripts/                       # 辅助脚本
+│   ├── build.sh                   # 构建脚本
+│   ├── test.sh                    # 测试脚本
+│   ├── format.sh                  # 格式化脚本
+│   └── setup.sh                   # 环境设置
 │
 └── .github/
-    └── workflows/                 # CI/CD 配置
-        ├── build.yml              # 构建工作流
-        ├── benchmark.yml          # 基准测试工作流
-        └── sanitizers.yml         # Sanitizer 工作流
+    ├── workflows/                 # CI/CD 配置
+    │   ├── ci.yml                 # 构建工作流
+    │   ├── benchmark.yml          # 基准测试工作流
+    │   ├── sanitizers.yml         # Sanitizer 工作流
+    │   └── pages.yml              # 文档部署工作流
+    ├── ISSUE_TEMPLATE/            # Issue 模板
+    ├── CODE_OF_CONDUCT.md         # 行为准则
+    ├── SECURITY.md                # 安全政策
+    └── PULL_REQUEST_TEMPLATE.md   # PR 模板
 ```
 
 ## Key Workflows
