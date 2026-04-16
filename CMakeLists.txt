@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(hpc-optimization-guide
-    VERSION 1.0.0
+    VERSION 1.3.0
     DESCRIPTION "High Performance Computing Optimization Guide - Modern C++ Examples"
     LANGUAGES CXX
 )

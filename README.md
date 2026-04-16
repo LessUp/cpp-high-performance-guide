@@ -16,8 +16,8 @@
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT">
   </a>
-  <a href="https://github.com/LessUp/cpp-high-performance-guide/stargazers">
-    <img src="https://img.shields.io/github/stars/LessUp/cpp-high-performance-guide?style=flat-square&color=orange" alt="Stars">
+  <a href="https://github.com/LessUp/cpp-high-performance-guide/releases">
+    <img src="https://img.shields.io/github/v/release/LessUp/cpp-high-performance-guide?style=flat-square&color=orange" alt="Release">
   </a>
   <a href="https://github.com/LessUp/cpp-high-performance-guide/commits/master">
     <img src="https://img.shields.io/github/last-commit/LessUp/cpp-high-performance-guide?style=flat-square" alt="Last Commit">
@@ -25,11 +25,11 @@
 </p>
 
 <p align="center">
-  <b>English</b> | <a href="README.zh-CN.md">简体中文</a> | <a href="https://lessup.github.io/cpp-high-performance-guide/">📚 Documentation Home</a>
+  <b>English</b> | <a href="README.zh-CN.md">简体中文</a> | <a href="https://lessup.github.io/cpp-high-performance-guide/">📚 Documentation</a>
 </p>
 
 <p align="center">
-  <i>Learn modern C++ performance engineering through runnable examples — covering build systems, memory & cache, SIMD, concurrency, benchmarking, and profiling.</i>
+  <i>Modern C++20 performance engineering through hands-on examples — CMake, memory optimization, SIMD, concurrency, and profiling.</i>
 </p>
 
 ---
@@ -39,8 +39,7 @@
 - [✨ Key Features](#-key-features)
 - [🚀 Quick Start](#-quick-start)
 - [📊 Performance Highlights](#-performance-highlights)
-- [📚 Learning Path](#-learning-path)
-- [📖 Documentation](#-documentation)
+- [📚 Documentation](#-documentation)
 - [🏗️ Project Structure](#️-project-structure)
 - [👥 Who This Is For](#-who-this-is-for)
 - [🛠️ Tech Stack](#️-tech-stack)
@@ -53,25 +52,31 @@
 
 | Feature | Description |
 |---------|-------------|
-| 🎯 **Hands-On Examples** | Every optimization technique includes compilable, runnable, and measurable code — not just theoretical notes |
-| 📈 **Quantified Results** | Integrated with Google Benchmark to visualize performance differences before and after optimization |
-| 🏗️ **Modern Toolchain** | CMake Presets, Sanitizers (ASan/TSan/UBSan), CI/CD, FlameGraph — production-ready practices |
-| 🌍 **Bilingual Docs** | Learning paths and profiling guides maintained in both English and Chinese |
-| 🎓 **6-Week Curriculum** | Structured progression from CMake basics to lock-free programming |
-| 🔧 **Industrial Grade** | Code follows `.clang-format`, `#pragma once` headers, and `hpc::` namespace hierarchy |
+| 🎯 **Hands-On Examples** | Every optimization has compilable, runnable, and measurable code |
+| 📈 **Quantified Results** | Google Benchmark integration for performance visualization |
+| 🏗️ **Modern Toolchain** | CMake Presets, Sanitizers, CI/CD, FlameGraph |
+| 🌍 **Bilingual Docs** | Complete English and Chinese documentation |
+| 🎓 **6-Week Curriculum** | Structured learning from CMake basics to lock-free programming |
+| 🔧 **Industrial Grade** | `.clang-format`, `#pragma once`, `hpc::` namespace hierarchy |
 
 ---
 
 ## 🚀 Quick Start
 
-Get started in 3 simple steps:
+### Prerequisites
+
+- **Compiler**: GCC 11+, Clang 14+, or MSVC 2022+
+- **CMake**: 3.20 or higher
+- **OS**: Linux (recommended), macOS, Windows (WSL2)
+
+### Installation
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/LessUp/cpp-high-performance-guide.git
 cd cpp-high-performance-guide
 
-# 2. Configure and build (Release mode with -O3 -march=native)
+# 2. Configure and build
 cmake --preset=release
 cmake --build build/release
 
@@ -79,14 +84,22 @@ cmake --build build/release
 ctest --preset=release
 ```
 
-> 💡 **Tip**: Explore other build presets: `debug`, `asan` (AddressSanitizer), `tsan` (ThreadSanitizer), `ubsan`, `coverage`
+> 💡 **Tip**: Explore other build presets: `debug`, `asan`, `tsan`, `ubsan`, `coverage`
+
+### Run Your First Benchmark
+
+```bash
+./build/release/examples/02-memory-cache/bench/aos_soa_bench
+```
+
+See 2-20x speedup between AOS and SOA data layouts!
 
 ---
 
 ## 📊 Performance Highlights
 
-| Module | Technique | Expected Speedup | Status |
-|--------|-----------|------------------|--------|
+| Module | Technique | Speedup | Status |
+|--------|-----------|---------|--------|
 | **Memory & Cache** | SOA vs AOS Layout | **2-20x** | ✅ Ready |
 | **Memory & Cache** | False Sharing Fix | **5-20x** | ✅ Ready |
 | **Modern C++** | Move vs Copy Semantics | **10-1000x** | ✅ Ready |
@@ -95,62 +108,44 @@ ctest --preset=release
 | **SIMD** | AVX-512 Intrinsics | **10-16x** | ✅ Ready |
 | **Concurrency** | Lock-Free Queue | Linear scaling | ✅ Ready |
 
-> 📈 Run `./build/release/examples/XX-*/bench/*_bench` to see results on your machine!
-
 ---
 
-## 📚 Learning Path
+## 📚 Documentation
 
-### 6-Week Study Plan
+### 📖 Full Documentation
+
+**[https://lessup.github.io/cpp-high-performance-guide/](https://lessup.github.io/cpp-high-performance-guide/)**
+
+### 🎯 Learning Path
+
+Follow our [6-week structured curriculum](docs/en/guides/learning-path.md):
 
 | Week | Topics | Modules |
 |:----:|--------|---------|
-| 1 | Build System + Memory Fundamentals | [Modern CMake](examples/01-cmake-modern/), [AOS vs SOA](examples/02-memory-cache/) |
-| 2 | Cache Optimization + Modern C++ Basics | [False Sharing](examples/02-memory-cache/), [constexpr](examples/03-modern-cpp/) |
-| 3 | Container Optimization + Auto-vectorization | [Vector Reserve](examples/03-modern-cpp/), [SIMD Intro](examples/04-simd-vectorization/) |
-| 4 | Advanced SIMD Programming | [Intrinsics](examples/04-simd-vectorization/), [SIMD Wrapper](examples/04-simd-vectorization/) |
-| 5 | Concurrent Programming | [Atomics](examples/05-concurrency/), [Lock-Free Queue](examples/05-concurrency/) |
-| 6 | Profiling & Benchmarking | [OpenMP](examples/05-concurrency/), [Profiling Guide](docs/en/profiling-guide.md) |
+| 1 | Build System + Memory | Modern CMake, AOS vs SOA |
+| 2 | Cache + Modern C++ | False Sharing, constexpr |
+| 3 | Containers + SIMD | Vector Reserve, Auto-vectorize |
+| 4 | Advanced SIMD | Intrinsics, SIMD Wrapper |
+| 5 | Concurrency | Atomics, Lock-Free Queue |
+| 6 | Profiling | perf, FlameGraph, VTune |
 
-### Quick Navigation
+### 📁 Example Modules
 
-| Goal | Resource |
-|------|----------|
-| 🎓 **Structured Learning** | [Learning Path](docs/en/learning-path.md) |
-| 🔍 **Find Bottlenecks** | [Profiling Guide](docs/en/profiling-guide.md) |
-| 📝 **Add a Module** | [Contributing Guide](CONTRIBUTING.md) |
-| ❓ **Common Issues** | [FAQ](docs/en/faq.md) |
-| 🐛 **Troubleshooting** | [Troubleshooting](docs/en/troubleshooting.md) |
+| Module | Description |
+|--------|-------------|
+| [01. Modern CMake](examples/01-cmake-modern/) | Target-based CMake, FetchContent, Presets |
+| [02. Memory & Cache](examples/02-memory-cache/) | AOS/SOA, False Sharing, Alignment, Prefetch |
+| [03. Modern C++](examples/03-modern-cpp/) | constexpr, Move Semantics, Ranges |
+| [04. SIMD Vectorization](examples/04-simd-vectorization/) | Auto-vectorize, SSE/AVX2/AVX-512 |
+| [05. Concurrency](examples/05-concurrency/) | Atomics, Lock-Free, OpenMP |
 
----
+### 🔧 Quick Reference
 
-## 📖 Documentation
-
-### Example Modules
-
-Explore our 5 hands-on example modules:
-
-#### [01. Modern CMake](examples/01-cmake-modern/)
-Learn target-based CMake, FetchContent dependency management, and reproducible builds with CMake Presets.
-
-#### [02. Memory & Cache](examples/02-memory-cache/)
-Master AOS vs SOA data layout, false sharing mitigation, memory alignment, and prefetching techniques.
-
-#### [03. Modern C++](examples/03-modern-cpp/)
-Leverage `constexpr`, move semantics, vector capacity management, and C++20 Ranges for zero-cost abstractions.
-
-#### [04. SIMD Vectorization](examples/04-simd-vectorization/)
-Write compiler-friendly loops, use SSE/AVX2/AVX-512 intrinsics, and build readable SIMD wrappers.
-
-#### [05. Concurrency](examples/05-concurrency/)
-Implement atomic operations with proper memory ordering, build lock-free data structures, and parallelize with OpenMP.
-
-### Additional Resources
-
-- 📘 [Full Learning Path](docs/en/learning-path.md) - Step-by-step curriculum
-- 🔬 [Profiling Guide](docs/en/profiling-guide.md) - perf, FlameGraph, Valgrind, VTune
-- 🔄 [GitBook Sync](docs/en/gitbook-sync.md) - Documentation site setup
-- 💻 [Online Documentation](https://lessup.github.io/cpp-high-performance-guide/)
+- [Quick Start Guide](docs/en/getting-started/quickstart.md) - Get started in 5 minutes
+- [Installation](docs/en/getting-started/installation.md) - Platform-specific setup
+- [Profiling Guide](docs/en/guides/profiling-guide.md) - Performance analysis tools
+- [FAQ](docs/en/reference/faq.md) - Common questions
+- [Troubleshooting](docs/en/reference/troubleshooting.md) - Problem solving
 
 ---
 
@@ -164,13 +159,14 @@ cpp-high-performance-guide/
 │   ├── 03-modern-cpp/       # constexpr, Move Semantics, Ranges
 │   ├── 04-simd-vectorization/ # Auto-vectorize, SSE/AVX2/AVX-512
 │   └── 05-concurrency/       # Atomics, Lock-Free, OpenMP
-├── 📁 benchmarks/           # Benchmark utilities and common code
-├── 📁 tests/                # Unit, integration, and property tests
-├── 📁 tools/                # FlameGraph generators, analysis scripts
-├── 📁 docs/                 # Bilingual documentation
+├── 📁 benchmarks/           # Benchmark utilities
+├── 📁 tests/                # Unit, integration, property tests
+├── 📁 tools/                # FlameGraph scripts, analysis tools
+├── 📁 docs/                 # Complete bilingual documentation
 │   ├── en/                 # English docs
 │   └── zh/                 # Chinese docs
 ├── 📁 cmake/                # CMake modules and templates
+├── 📁 changelog/            # Version history
 ├── 📄 CMakePresets.json     # Build configurations
 └── 📄 README.md             # You are here!
 ```
@@ -179,10 +175,10 @@ cpp-high-performance-guide/
 
 ## 👥 Who This Is For
 
-- **C++ Engineers** looking for a structured path to master performance optimization
-- **Students & Self-learners** who learn best through executable examples with benchmarks
-- **Performance Engineers** needing to validate optimization strategies and tooling
-- **Project Maintainers** seeking profiling, benchmarking, and contribution references
+- **C++ Engineers** seeking structured performance optimization learning
+- **Students & Self-learners** who learn through executable examples
+- **Performance Engineers** building benchmarking and profiling skills
+- **Project Maintainers** seeking modern CMake and CI/CD practices
 - **Educators** teaching modern C++ performance engineering
 
 ---
@@ -194,17 +190,17 @@ cpp-high-performance-guide/
 | **Language** | C++20 |
 | **Compilers** | GCC 11+, Clang 14+, MSVC (best-effort) |
 | **Build System** | CMake 3.22+, CMake Presets, Ninja |
-| **Testing** | Google Test, RapidCheck (property tests) |
+| **Testing** | Google Test, RapidCheck |
 | **Benchmarking** | Google Benchmark |
 | **Profiling** | perf, FlameGraph, Valgrind, Intel VTune |
-| **CI/CD** | GitHub Actions (Build, Sanitizers, Pages) |
+| **CI/CD** | GitHub Actions |
 | **Documentation** | HonKit → GitHub Pages |
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md).
 
 ### Quick Contributing Steps
 
@@ -217,22 +213,11 @@ git checkout -b feature/your-feature-name
 
 # Build and test
 cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
-cmake --preset=asan && cmake --build build/asan && ctest --preset=asan
 
-# Commit with clear messages
-git commit -m "feat: add matrix multiplication SIMD example"
-
-# Push and create PR
+# Commit and push
+git commit -m "feat: add optimization example"
 git push origin feature/your-feature-name
 ```
-
-### Ways to Contribute
-
-- 🐛 Fix bugs and improve examples
-- 📚 Improve documentation and translations
-- ✨ Add new optimization examples
-- 🧪 Add property-based tests
-- 📊 Improve benchmark coverage
 
 ---
 

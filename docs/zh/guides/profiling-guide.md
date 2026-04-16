@@ -2,6 +2,8 @@
 
 本指南覆盖 C++ 性能分析的关键工具与方法。
 
+---
+
 ## 概览
 
 性能优化遵循一个简单循环：
@@ -9,6 +11,8 @@
 2. **分析** - 理解根因
 3. **优化** - 有针对性地改进
 4. **验证** - 再次测量确认收益
+
+---
 
 ## 工具
 
@@ -55,6 +59,8 @@ perf stat -e branches,branch-misses ./your_benchmark
 perf record -g --call-graph dwarf ./your_benchmark
 ```
 
+---
+
 ### FlameGraph
 
 FlameGraph 以直观方式展示时间花费。
@@ -95,6 +101,8 @@ perf script | ./FlameGraph/stackcollapse-perf.pl | ./FlameGraph/flamegraph.pl > 
 - 深调用栈（过深的调用）
 - 意外函数耗时
 
+---
+
 ### Valgrind
 
 Valgrind 提供细粒度的内存与缓存分析。
@@ -124,6 +132,8 @@ valgrind --tool=callgrind ./your_benchmark
 kcachegrind callgrind.out.*
 ```
 
+---
+
 ### Intel VTune（高级）
 
 在 Intel CPU 上，VTune 提供最详细的分析能力。
@@ -147,6 +157,8 @@ vtune -collect uarch-exploration ./your_benchmark
 # 查看结果
 vtune-gui
 ```
+
+---
 
 ## 分析策略
 
@@ -191,6 +203,8 @@ OMP_NUM_THREADS=1 ./your_benchmark
 OMP_NUM_THREADS=2 ./your_benchmark
 OMP_NUM_THREADS=4 ./your_benchmark
 ```
+
+---
 
 ## 常见性能问题
 
@@ -239,6 +253,8 @@ OMP_NUM_THREADS=4 ./your_benchmark
 - 简化循环结构
 - 使用显式 SIMD 内在函数
 
+---
+
 ## 基准测试最佳实践
 
 ### 避免测量误差
@@ -284,6 +300,8 @@ echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 ./your_benchmark --benchmark_repetitions=10 --benchmark_report_aggregates_only=true
 ```
 
+---
+
 ## 速查表
 
 | 任务 | 工具 | 命令 |
@@ -295,3 +313,11 @@ echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 | 调用图 | Valgrind | `valgrind --tool=callgrind ./bench` |
 | 向量化 | GCC | `-fopt-info-vec-optimized` |
 | 向量化 | Clang | `-Rpass=loop-vectorize` |
+
+---
+
+## 另请参阅
+
+- [学习路径](learning-path.md) - 跟随课程
+- [最佳实践](best-practices.md) - 优化模式
+- [故障排查](../reference/troubleshooting.md) - 常见问题
