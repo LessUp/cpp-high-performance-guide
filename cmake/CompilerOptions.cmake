@@ -9,11 +9,16 @@ set(HPC_IS_GCC FALSE)
 set(HPC_IS_CLANG FALSE)
 set(HPC_IS_MSVC FALSE)
 set(HPC_IS_ARM FALSE)
+set(HPC_IS_APPLE_CLANG FALSE)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(HPC_IS_GCC TRUE)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(HPC_IS_CLANG TRUE)
+    # Detect Apple Clang (has different warning behavior)
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        set(HPC_IS_APPLE_CLANG TRUE)
+    endif()
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(HPC_IS_MSVC TRUE)
 endif()
@@ -30,7 +35,7 @@ endif()
 function(hpc_set_compiler_options target)
     # Parse arguments
     cmake_parse_arguments(ARG "DISABLE_WARNINGS;ENABLE_FAST_MATH" "" "" ${ARGN})
-    
+
     # Warning flags
     if(NOT ARG_DISABLE_WARNINGS)
         if(HPC_IS_GCC OR HPC_IS_CLANG)
@@ -47,6 +52,13 @@ function(hpc_set_compiler_options target)
                 -Woverloaded-virtual
                 -Wformat=2
             )
+            # Apple Clang has stricter sign-conversion warnings that trigger
+            # in third-party libraries like RapidCheck. Suppress them.
+            if(HPC_IS_APPLE_CLANG)
+                target_compile_options(${target} PRIVATE
+                    -Wno-sign-conversion
+                )
+            endif()
         elseif(HPC_IS_MSVC)
             target_compile_options(${target} PRIVATE
                 /W4
