@@ -59,6 +59,17 @@ jobs:
         working-directory: docs
         run: npm ci
 
+      - name: Prepare docs for honkit
+        run: |
+          # Copy README.md to docs/ for honkit (it expects README in the working directory)
+          cp README.md docs/README.md
+          # Copy SUMMARY.md to docs/ for honkit
+          cp SUMMARY.md docs/SUMMARY.md
+          # Copy other root-level docs that SUMMARY.md references
+          cp CONTRIBUTING.md docs/CONTRIBUTING.md || true
+          cp CONTRIBUTING.zh.md docs/CONTRIBUTING.zh.md || true
+          cp CHANGELOG.md docs/CHANGELOG.md || true
+
       - name: Build docs
         working-directory: docs
         run: npx honkit build . ../_site
