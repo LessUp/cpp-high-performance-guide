@@ -35,10 +35,10 @@
 
 ## Changelog / 变更记录
 
-* [2026-04-15 README Refactor Completion](changelog/2026-04-15_readme-refactor-completion.md)
-* [2026-03-13 Docs IA Standardization / 文档信息架构规范化](changelog/2026-03-13-docs-information-architecture-standardization.md)
-* [2026-03-10 Pages Optimization](changelog/2026-03-10-pages-optimization.md)
-* [2026-03-10 Workflow Deep Standardization / 工作流深度标准化](changelog/2026-03-10-workflow-standardization.md)
-* [2026-03-06 Code & Docs Optimization / 代码与文档优化](changelog/2026-03-06-code-docs-optimization.md)
-* [2026-02-27 Spec Docs & Optimization / Spec 文档与全面优化](changelog/2026-02-27-spec-docs-optimization.md)
-* [2026-01-09 Bug Fixes & Stability / Bug 修复与测试稳定性](changelog/2026-01-09-bug-fixes.md)
+* [CHANGELOG.md](CHANGELOG.md) - Full Version History
+* [v1.2.0](changelog/v1.2.0.md) - 2026-04-15: Documentation restructure
+* [v1.1.0](changelog/v1.1.0.md) - 2026-03-13: Information architecture
+* [v1.0.2](changelog/v1.0.2.md) - 2026-03-10: Workflow optimization
+* [v1.0.1](changelog/v1.0.1.md) - 2026-03-06: GitBook integration
+* [v1.0.0](changelog/v1.0.0.md) - 2026-02-27: First stable release
+* [v0.1.0](changelog/v0.1.0.md) - 2026-01-09: Initial release
