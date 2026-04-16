@@ -28,5 +28,7 @@ hpc_add_benchmark(
     LIBRARIES simd_utils
 )
 
-# Enable SIMD for benchmark
-hpc_enable_simd(simd_bench AVX2)
+# Enable SIMD for benchmark (only on x86/x64)
+if(NOT HPC_IS_ARM)
+    hpc_enable_simd(simd_bench AVX2)
+endif()
