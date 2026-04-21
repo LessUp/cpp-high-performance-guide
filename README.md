@@ -89,7 +89,7 @@ ctest --preset=release
 ### Run Your First Benchmark
 
 ```bash
-./build/release/examples/02-memory-cache/bench/aos_soa_bench
+./build/release/examples/02-memory-cache/aos_vs_soa_bench
 ```
 
 See 2-20x speedup between AOS and SOA data layouts!

@@ -171,7 +171,7 @@ cmake --build build/release
 ctest --preset=release
 
 # 运行基准测试
-./build/release/examples/02-memory-cache/bench/aos_soa_bench
+./build/release/examples/02-memory-cache/aos_vs_soa_bench
 ```
 
 ---

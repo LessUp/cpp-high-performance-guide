@@ -55,11 +55,9 @@ public:
     
     // Movable
     AlignedArray(AlignedArray&& other) noexcept
-        : size_(other.size_), data_(other.data_)
-    {
-        other.size_ = 0;
-        other.data_ = nullptr;
-    }
+        : size_(std::exchange(other.size_, 0))
+        , data_(std::exchange(other.data_, nullptr))
+    {}
     
     T* data() { return data_; }
     const T* data() const { return data_; }

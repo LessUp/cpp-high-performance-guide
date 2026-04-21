@@ -5,6 +5,7 @@
 #include <vector>
 #include <functional>
 #include <chrono>
+#include <new>  // for std::hardware_destructive_interference_size
 
 namespace hpc::concurrency {
 
@@ -14,8 +15,13 @@ inline unsigned int hardware_concurrency() {
     return n > 0 ? n : 1;
 }
 
-/// Cache line size for alignment
-constexpr size_t CACHE_LINE_SIZE = 64;
+/// Cache line size for alignment - use std::hardware_destructive_interference_size when available
+#if defined(__cpp_lib_hardware_interference_size)
+    constexpr size_t CACHE_LINE_SIZE = std::hardware_destructive_interference_size;
+#else
+    /// Fallback: typical cache line size on x86/ARM (64 bytes)
+    constexpr size_t CACHE_LINE_SIZE = 64;
+#endif
 
 /// Aligned atomic counter to avoid false sharing
 struct alignas(CACHE_LINE_SIZE) AlignedCounter {
