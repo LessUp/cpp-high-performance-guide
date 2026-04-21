@@ -57,11 +57,11 @@ endfunction()
 #------------------------------------------------------------------------------
 function(hpc_fetch_rapidcheck)
     message(STATUS "Fetching RapidCheck...")
-    
+
     FetchContent_Declare(
         rapidcheck
         GIT_REPOSITORY https://github.com/emil-e/rapidcheck.git
-        GIT_TAG        master
+        GIT_TAG        v1.1.2
         GIT_SHALLOW    TRUE
     )
     

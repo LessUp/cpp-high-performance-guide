@@ -19,8 +19,14 @@ namespace hpc::memory {
 // Constants
 //------------------------------------------------------------------------------
 
-/// Typical cache line size on modern x86 processors
-constexpr std::size_t CACHE_LINE_SIZE = 64;
+/// Cache line size - use std::hardware_destructive_interference_size when available
+#if defined(__cpp_lib_hardware_interference_size)
+    constexpr std::size_t CACHE_LINE_SIZE = std::hardware_destructive_interference_size;
+#else
+    /// Fallback: typical cache line size on x86/ARM (64 bytes)
+    /// Note: Some ARM systems may have 128-byte cache lines
+    constexpr std::size_t CACHE_LINE_SIZE = 64;
+#endif
 
 /// Page size on most systems
 constexpr std::size_t PAGE_SIZE = 4096;

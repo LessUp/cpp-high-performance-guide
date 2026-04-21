@@ -89,7 +89,7 @@ ctest --preset=release
 ### 运行你的第一个基准测试
 
 ```bash
-./build/release/examples/02-memory-cache/bench/aos_soa_bench
+./build/release/examples/02-memory-cache/aos_vs_soa_bench
 ```
 
 见证 AOS 与 SOA 数据布局之间 2-20 倍的性能提升！

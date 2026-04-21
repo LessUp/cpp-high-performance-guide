@@ -35,9 +35,13 @@ target_link_libraries(simd_properties_test PRIVATE
 
 hpc_set_compiler_options(simd_properties_test)
 
-# Enable SIMD for the test
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(simd_properties_test PRIVATE -mavx2 -mfma)
+# Enable SIMD for the test (only on x86/x64, not ARM)
+if(NOT HPC_IS_ARM)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(simd_properties_test PRIVATE -mavx2 -mfma)
+    elseif(MSVC)
+        target_compile_options(simd_properties_test PRIVATE /arch:AVX2)
+    endif()
 endif()
 
 gtest_discover_tests(simd_properties_test)
