@@ -61,7 +61,7 @@ function(hpc_fetch_rapidcheck)
     FetchContent_Declare(
         rapidcheck
         GIT_REPOSITORY https://github.com/emil-e/rapidcheck.git
-        GIT_TAG        v1.1.2
+        GIT_TAG        master
         GIT_SHALLOW    TRUE
     )
     
