@@ -13,44 +13,67 @@ This reference documents utilities found in:
 
 ---
 
-## Memory Utilities
+## API Modules
 
-### Aligned Allocation
+### [Memory Utilities](api/memory-utils.md)
 
-```cpp
-namespace hpc::memory {
+Aligned allocation, cache-friendly containers, and prefetching.
 
-// Allocate memory with specified alignment
-void* aligned_alloc(size_t alignment, size_t size);
+**Key Functions:**
+- `aligned_alloc()` - Allocate aligned memory
+- `aligned_free()` - Free aligned memory
+- `make_aligned()` - Smart aligned allocation
+- `CacheLinePadded` - Prevent false sharing
+- `prefetch_read()` / `prefetch_write()` - Cache hints
 
-// Free aligned memory
-void aligned_free(void* ptr);
+**Namespace:** `hpc::memory`
 
-// Cache line size constant
-constexpr size_t CACHE_LINE_SIZE = 64;
+---
 
-// Check if pointer is aligned
-bool is_aligned(const void* ptr, size_t alignment);
+### [SIMD Wrapper](api/simd-wrapper.md)
 
-}
-```
+Portable SIMD abstraction with operator overloading.
 
-### Cache Utilities
+**Key Classes:**
+- `SimdVec<T, Width>` - SIMD vector class
+- `FloatVec` - Default float vector type
 
-```cpp
-namespace hpc::memory {
+**Key Operations:**
+- Arithmetic: `+`, `-`, `*`, `/`
+- `horizontal_sum()` - Reduce to scalar
+- `fmadd()` - Fused multiply-add
+- `sqrt()`, `min()`, `max()`
 
-// Prefetch data into cache
-void prefetch(const void* ptr, int locality = 3);
+**Namespace:** `hpc::simd`
 
-// Cache line size (typically 64 bytes)
-constexpr size_t CACHE_LINE_SIZE = 64;
+---
 
-// Pad a struct to prevent false sharing
-#define CACHE_LINE_PAD(name) char name##_pad[64 - sizeof(name)]
+### [Benchmark Utilities](api/benchmark-utils.md)
 
-}
-```
+Benchmarking helpers and result export.
+
+**Key Functions:**
+- `DoNotOptimize()` - Prevent optimization
+- `ClobberMemory()` - Memory barrier
+- `export_to_json()` - Save results
+- `calculate_speedup()` - Compare times
+
+**Key Classes:**
+- `BenchmarkResult` - Single result
+- `BenchmarkSuite` - Result collection
+- `Timer` - Manual timing
+
+**Namespace:** `hpc::bench`
+
+---
+
+## Quick Reference
+
+| Header | Namespace | Purpose |
+|--------|-----------|---------|
+| `memory_utils.hpp` | `hpc::memory` | Memory optimization |
+| `simd_wrapper.hpp` | `hpc::simd` | SIMD operations |
+| `benchmark_utils.hpp` | `hpc::bench` | Benchmarking |
 
 ---
 

@@ -4,6 +4,53 @@
 
 ---
 
+## 内存层次结构概述
+
+理解内存层次结构是性能优化的基础：
+
+```mermaid
+graph TB
+    subgraph "CPU 内存层次结构"
+        REG[CPU寄存器<br/>~1周期<br/>~512字节]
+        L1[L1缓存<br/>~4周期<br/>32-64 KB]
+        L2[L2缓存<br/>~12周期<br/>256-512 KB]
+        L3[L3缓存<br/>~40周期<br/>8-32 MB]
+        RAM[主内存<br/>~200周期<br/>GB级]
+    end
+
+    REG --> L1 --> L2 --> L3 --> RAM
+
+    style REG fill:#6bcb77
+    style L1 fill:#4d96ff
+    style L2 fill:#ffd93d
+    style L3 fill:#ff9f43
+    style RAM fill:#ff6b6b
+```
+
+**关键洞察：** 每一级比前一级慢约10倍。改善缓存利用率的优化能带来最大的收益。
+
+---
+
+## 学习流程图
+
+```mermaid
+flowchart LR
+    A[第1周<br/>构建系统] --> B[第2周<br/>内存基础]
+    B --> C[第3周<br/>现代C++]
+    C --> D[第4周<br/>SIMD]
+    D --> E[第5周<br/>并发]
+    E --> F[第6周<br/>性能分析]
+
+    style A fill:#e3f2fd
+    style B fill:#fff3e0
+    style C fill:#e8f5e9
+    style D fill:#fce4ec
+    style E fill:#f3e5f5
+    style F fill:#e0f7fa
+```
+
+---
+
 ## 先决条件
 
 开始前建议具备：
@@ -233,7 +280,7 @@
 1. 分析你自己的代码以定位瓶颈
 2. 应用相关优化
 3. 度量改进效果
-4. [为本项目贡献新的示例！](../../CONTRIBUTING.zh.md)
+4. [为本项目贡献新的示例！](https://github.com/LessUp/cpp-high-performance-guide/blob/master/CONTRIBUTING.zh.md)
 
 ---
 

@@ -4,6 +4,53 @@ This guide provides a recommended order for studying the HPC optimization exampl
 
 ---
 
+## Memory Hierarchy Overview
+
+Understanding the memory hierarchy is fundamental to performance optimization:
+
+```mermaid
+graph TB
+    subgraph "CPU Memory Hierarchy"
+        REG[CPU Registers<br/>~1 cycle<br/>~512 bytes]
+        L1[L1 Cache<br/>~4 cycles<br/>32-64 KB]
+        L2[L2 Cache<br/>~12 cycles<br/>256-512 KB]
+        L3[L3 Cache<br/>~40 cycles<br/>8-32 MB]
+        RAM[Main Memory<br/>~200 cycles<br/>GBs]
+    end
+    
+    REG --> L1 --> L2 --> L3 --> RAM
+    
+    style REG fill:#6bcb77
+    style L1 fill:#4d96ff
+    style L2 fill:#ffd93d
+    style L3 fill:#ff9f43
+    style RAM fill:#ff6b6b
+```
+
+**Key Insight:** Each level is ~10x slower than the previous. Optimizations that improve cache utilization yield the biggest gains.
+
+---
+
+## Learning Flowchart
+
+```mermaid
+flowchart LR
+    A[Week 1<br/>Build System] --> B[Week 2<br/>Memory Basics]
+    B --> C[Week 3<br/>Modern C++]
+    C --> D[Week 4<br/>SIMD]
+    D --> E[Week 5<br/>Concurrency]
+    E --> F[Week 6<br/>Profiling]
+    
+    style A fill:#e3f2fd
+    style B fill:#fff3e0
+    style C fill:#e8f5e9
+    style D fill:#fce4ec
+    style E fill:#f3e5f5
+    style F fill:#e0f7fa
+```
+
+---
+
 ## Prerequisites
 
 Before starting, ensure you have:
@@ -233,7 +280,7 @@ After completing this learning path:
 1. Profile your own code to find bottlenecks
 2. Apply relevant optimizations
 3. Measure the improvement
-4. [Contribute new examples to this project!](../../CONTRIBUTING.md)
+4. [Contribute new examples to this project!](https://github.com/LessUp/cpp-high-performance-guide/blob/master/CONTRIBUTING.md)
 
 ---
 
