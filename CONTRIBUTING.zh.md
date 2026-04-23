@@ -1,132 +1,77 @@
-# 参与贡献到 C++ 高性能指南
+# 参与贡献
 
-[![Contributors](https://img.shields.io/badge/Contributors-Welcome-brightgreen.svg)](https://github.com/LessUp/cpp-high-performance-guide/blob/master/CONTRIBUTING.zh.md)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+感谢你的贡献。这个仓库更偏好 **规格驱动、低噪声** 的修改，而不是范围松散的大改。
 
-感谢你对本项目的关注！本文档介绍如何为本项目贡献内容。
-
-> 💡 **第一次贡献？** 查看我们的 [Good First Issues](https://github.com/LessUp/cpp-high-performance-guide/labels/good%20first%20issue) 来开始吧！
-
-## 开始之前
-
-1. Fork 本仓库
-2. 克隆你的 Fork：
-   ```bash
-   git clone https://github.com/<your-username>/cpp-high-performance-guide.git
-   ```
-3. 创建功能分支：
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-## 构建与测试
+## 首次配置
 
 ```bash
-# Debug 构建并启用测试
+git clone https://github.com/<your-username>/cpp-high-performance-guide.git
+cd cpp-high-performance-guide
+
+./scripts/setup.sh
 cmake --preset=debug
 cmake --build build/debug
 ctest --preset=debug
-
-# Release 构建并运行基准测试
-cmake --preset=release
-cmake --build build/release
-ctest --preset=release
 ```
 
-## 代码风格
+`./scripts/setup.sh` 会检查本地工具链，并通过 `.githooks/` 配置仓库自带的 Git hooks。
 
-- 遵循项目根目录中的 `.clang-format` 配置
-- 提交前格式化代码：
-  ```bash
-  find examples tests benchmarks -name "*.cpp" -o -name "*.hpp" | xargs clang-format -i
-  ```
-- 头文件统一使用 `#pragma once`
-- 代码放在 `hpc::` 命名空间层级下
+## 默认开发流程
 
-## 添加新的示例模块
+1. 先阅读 `openspec/specs/` 中相关的 capability spec。
+2. 在 `openspec/changes/<change-id>/` 下创建或更新一个 change。
+3. 按任务依赖顺序实施。
+4. 保持 docs、specs 与代码同步。
+5. 运行要求的验证命令。
+6. 对非 trivial 修改在合并前使用 `/review`。
+7. 完成后归档该 change。
 
-1. 在 `examples/` 下创建新目录，遵循命名规则：`XX-topic-name/`
-2. 使用统一结构：
-   ```
-   examples/XX-topic-name/
-   ├── src/           # 带 demo main() 的源码文件
-   ├── bench/         # Google Benchmark 文件
-   ├── include/       # 可复用头文件（可选）
-   ├── CMakeLists.txt # 使用 ExampleTemplate.cmake 中的 hpc_add_example()
-   └── README.md      # 模块文档
-   ```
-3. 在 `examples/CMakeLists.txt` 中注册子目录
-4. 在 `tests/` 下补充对应测试
+## 验证命令
 
-## 测试要求
+```bash
+cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
+cmake --preset=release && cmake --build build/release && ctest --preset=release
 
-提交 Pull Request 之前，请确保：
+cmake --preset=asan && cmake --build build/asan && ctest --preset=asan
+cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
+cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
+```
 
-1. **所有测试通过：**
-   ```bash
-   cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
-   ```
+`tsan` preset 默认走 **Clang**，这是当前仓库里最稳定的 ThreadSanitizer 路径。
 
-2. **没有 AddressSanitizer 错误：**
-   ```bash
-   cmake --preset=asan && cmake --build build/asan && ctest --preset=asan
-   ```
+## 格式化与 hooks
 
-3. **没有 ThreadSanitizer 错误**（并发代码尤其重要）：
-   ```bash
-   cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
-   ```
+```bash
+./scripts/format.sh
+./scripts/format.sh --check
+./scripts/setup-hooks.sh
+```
 
-4. **没有 UndefinedBehaviorSanitizer 错误：**
-   ```bash
-   cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
-   ```
+当前 hooks 会做这些事情：
 
-## Commit Message 建议
+- 拒绝提交生成的构建产物或 docs 产物
+- 对 staged C++ 文件做格式检查
+- push 前执行一次 debug build/test
 
-请使用清晰、可描述的提交信息：
-- `feat: add matrix multiplication SIMD example`
-- `fix: resolve false sharing in concurrent counter`
-- `docs: update learning path with new module`
-- `bench: add parameterized benchmark for prefetch distance`
-- `test: add property tests for lock-free queue`
+## 文档规则
 
-## Pull Request 流程
+- 根 README 保持简洁，专注仓库入口。
+- `docs/` 承担更完整的叙事与学习路径。
+- 英文与中文的对外入口保持一致。
+- 不要重新引入 GitBook / HonKit / `.kiro` 引用。
 
-1. 确保你的分支与 `main` 保持同步
-2. 确保所有 CI 检查通过
-3. 在 PR 描述中清楚说明本次修改的内容和原因
-4. 如有相关 issue，请在 PR 中引用
+## 流程规则
 
-## Issue 和 PR 模板
+- 对过时内容，优先删除或归档，而不是继续留在主路径。
+- 新增 workflow 或工程化配置前，要能说明其项目特定价值。
+- 避免同时维护大量长期分支；一个 change 对应一个聚焦分支或 PR 更合适。
+- 非 trivial 的结构性修改不要跳过 review。
 
-我们提供了模板来帮助你提交有效的问题和 Pull Request：
+## 如果你需要 AI 开发流程
 
-- **Bug Report（错误报告）**：用于报告代码、构建或文档中的错误
-- **Feature Request（功能请求）**：用于建议新的示例或增强功能
-- **Documentation（文档）**：用于报告文档问题
+参见：
 
-创建新 Issue 时请选择恰当的模板。
-
-## 行为准则
-
-本项目遵循行为准则，我们期望所有贡献者遵守：
-
-- 在所有互动中保持尊重和建设性
-- 欢迎新人并帮助他们入门
-- 专注于对社区和学习者最有利的事情
-- 对他人保持同理心
-
-## 文档同步
-
-当进行影响文档的更改时：
-
-1. **代码更改**：更新受影响示例的相关 README 文件
-2. **新示例**：建议同时提供英文和中文 README 文件
-3. **API 更改**：在相关模块的 README 中记录
-
-虽然理想的 bilingual 同步是完美的，但仅英文的贡献也是受欢迎的 —— 维护者将协助中文翻译。
-
-## License
-
-通过提交贡献，你同意你的贡献将以 MIT License 进行许可。
+- `AGENTS.md`
+- `CLAUDE.md`
+- `.github/copilot-instructions.md`
+- `docs/zh/contributing/ai-workflow.md`

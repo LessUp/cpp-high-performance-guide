@@ -1,132 +1,77 @@
-# Contributing to C++ High Performance Guide
+# Contributing
 
-[![Contributors](https://img.shields.io/badge/Contributors-Welcome-brightgreen.svg)](https://github.com/LessUp/cpp-high-performance-guide/blob/master/CONTRIBUTING.md)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+Thanks for contributing. This repository prefers **spec-driven, low-noise changes** over broad, loosely scoped edits.
 
-Thank you for your interest in contributing! This document provides guidelines for contributing to this project.
-
-> 💡 **New to contributing?** Check out our [Good First Issues](https://github.com/LessUp/cpp-high-performance-guide/labels/good%20first%20issue) to get started!
-
-## Getting Started
-
-1. Fork the repository
-2. Clone your fork:
-   ```bash
-   git clone https://github.com/<your-username>/cpp-high-performance-guide.git
-   ```
-3. Create a feature branch:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-## Build & Test
+## First-time setup
 
 ```bash
-# Debug build with tests
+git clone https://github.com/<your-username>/cpp-high-performance-guide.git
+cd cpp-high-performance-guide
+
+./scripts/setup.sh
 cmake --preset=debug
 cmake --build build/debug
 ctest --preset=debug
-
-# Release build with benchmarks
-cmake --preset=release
-cmake --build build/release
-ctest --preset=release
 ```
 
-## Code Style
+`./scripts/setup.sh` checks the local toolchain and configures repository-managed Git hooks through `.githooks/`.
 
-- Follow the `.clang-format` configuration in the project root
-- Format your code before committing:
-  ```bash
-  find examples tests benchmarks -name "*.cpp" -o -name "*.hpp" | xargs clang-format -i
-  ```
-- Use `#pragma once` for header guards
-- Place code in the `hpc::` namespace hierarchy
+## Default workflow
 
-## Adding a New Example Module
+1. Read the relevant capability specs in `openspec/specs/`.
+2. Create or update one change under `openspec/changes/<change-id>/`.
+3. Implement tasks in dependency order.
+4. Keep docs, specs, and code in sync.
+5. Run the required validation commands.
+6. Use `/review` before merge for non-trivial work.
+7. Archive the change after completion.
 
-1. Create a new directory under `examples/` following the naming convention: `XX-topic-name/`
-2. Use the standard structure:
-   ```
-   examples/XX-topic-name/
-   ├── src/           # Source files with demo main()
-   ├── bench/         # Google Benchmark files
-   ├── include/       # Header-only utilities (optional)
-   ├── CMakeLists.txt # Use hpc_add_example() from ExampleTemplate.cmake
-   └── README.md      # Module documentation
-   ```
-3. Register the subdirectory in `examples/CMakeLists.txt`
-4. Add corresponding tests under `tests/`
+## Validation commands
 
-## Testing Requirements
+```bash
+cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
+cmake --preset=release && cmake --build build/release && ctest --preset=release
 
-Before submitting a pull request, ensure:
+cmake --preset=asan && cmake --build build/asan && ctest --preset=asan
+cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
+cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
+```
 
-1. **All tests pass:**
-   ```bash
-   cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
-   ```
+The `tsan` preset is standardized on **Clang** because it is the most reliable ThreadSanitizer path for this repository.
 
-2. **No AddressSanitizer errors:**
-   ```bash
-   cmake --preset=asan && cmake --build build/asan && ctest --preset=asan
-   ```
+## Formatting and hooks
 
-3. **No ThreadSanitizer errors** (for concurrency code):
-   ```bash
-   cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
-   ```
+```bash
+./scripts/format.sh
+./scripts/format.sh --check
+./scripts/setup-hooks.sh
+```
 
-4. **No UndefinedBehaviorSanitizer errors:**
-   ```bash
-   cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
-   ```
+The repository hooks currently enforce:
 
-## Commit Messages
+- no generated build or docs artifacts in commits
+- formatting checks for staged C++ files
+- a debug build/test pass on push
 
-Use clear, descriptive commit messages:
-- `feat: add matrix multiplication SIMD example`
-- `fix: resolve false sharing in concurrent counter`
-- `docs: update learning path with new module`
-- `bench: add parameterized benchmark for prefetch distance`
-- `test: add property tests for lock-free queue`
+## Documentation rules
 
-## Pull Request Process
+- Keep root README files concise and entry-focused.
+- Treat `docs/` as the richer narrative surface.
+- Keep user-facing English and Chinese entry points aligned.
+- Do not reintroduce GitBook / HonKit / `.kiro` references.
 
-1. Ensure your branch is up to date with `main`
-2. All CI checks must pass
-3. Include a clear description of what your PR adds or fixes
-4. Reference any related issues
+## Process rules
 
-## Issue and PR Templates
+- Prefer deleting or archiving stale content over preserving it in active paths.
+- Keep workflow additions justified and repository-specific.
+- Avoid long-lived branch sprawl; one focused branch or PR per change is preferred.
+- Do not merge non-trivial structural work without review.
 
-We provide templates to help you submit effective issues and pull requests:
+## Need the AI workflow?
 
-- **Bug Report**: Use when reporting bugs in code, build, or documentation
-- **Feature Request**: Use when suggesting new examples or enhancements  
-- **Documentation**: Use when reporting documentation issues
+See:
 
-Please select the appropriate template when creating a new issue.
-
-## Code of Conduct
-
-This project adheres to a code of conduct that we expect all contributors to follow:
-
-- Be respectful and constructive in all interactions
-- Welcome newcomers and help them get started
-- Focus on what's best for the community and learners
-- Show empathy towards others
-
-## Documentation Sync
-
-When making changes that affect documentation:
-
-1. **Code changes**: Update relevant README files in affected examples
-2. **New examples**: Both English and Chinese README files are preferred
-3. **API changes**: Document in the relevant module's README
-
-While perfect bilingual sync is ideal, English-only contributions are also welcome — the maintainers will help with Chinese translations.
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
+- `AGENTS.md`
+- `CLAUDE.md`
+- `.github/copilot-instructions.md`
+- `docs/en/contributing/ai-workflow.md`
