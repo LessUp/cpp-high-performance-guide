@@ -15,7 +15,7 @@ target_link_libraries(memory_properties_test PRIVATE
 
 hpc_set_compiler_options(memory_properties_test)
 
-gtest_discover_tests(memory_properties_test)
+gtest_add_tests(TARGET memory_properties_test)
 
 # SIMD properties test
 add_executable(simd_properties_test
@@ -44,7 +44,7 @@ if(NOT HPC_IS_ARM)
     endif()
 endif()
 
-gtest_discover_tests(simd_properties_test)
+gtest_add_tests(TARGET simd_properties_test)
 
 # Concurrency properties test
 add_executable(concurrency_properties_test
@@ -70,7 +70,7 @@ endif()
 
 hpc_set_compiler_options(concurrency_properties_test)
 
-gtest_discover_tests(concurrency_properties_test)
+gtest_add_tests(TARGET concurrency_properties_test)
 
 # Benchmark properties test
 add_executable(benchmark_properties_test
@@ -90,4 +90,4 @@ target_link_libraries(benchmark_properties_test PRIVATE
 
 hpc_set_compiler_options(benchmark_properties_test)
 
-gtest_discover_tests(benchmark_properties_test)
+gtest_add_tests(TARGET benchmark_properties_test)

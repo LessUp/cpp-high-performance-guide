@@ -1,12 +1,13 @@
 /**
  * @file alignment_bench.cpp
  * @brief Benchmark for memory alignment
- * 
+ *
  * Property 5: Aligned Memory SIMD Performance
  * Validates: Requirements 2.3
  */
 
 #include <benchmark/benchmark.h>
+
 #include <cstdlib>
 #include <vector>
 
@@ -52,7 +53,8 @@ void add_avx_aligned(const float* a, const float* b, float* c, size_t n) {
         __m256 vb = _mm256_load_ps(b + i);
         _mm256_store_ps(c + i, _mm256_add_ps(va, vb));
     }
-    for (; i < n; ++i) c[i] = a[i] + b[i];
+    for (; i < n; ++i)
+        c[i] = a[i] + b[i];
 }
 
 void add_avx_unaligned(const float* a, const float* b, float* c, size_t n) {
@@ -62,20 +64,21 @@ void add_avx_unaligned(const float* a, const float* b, float* c, size_t n) {
         __m256 vb = _mm256_loadu_ps(b + i);
         _mm256_storeu_ps(c + i, _mm256_add_ps(va, vb));
     }
-    for (; i < n; ++i) c[i] = a[i] + b[i];
+    for (; i < n; ++i)
+        c[i] = a[i] + b[i];
 }
 #endif
 
 static void BM_Scalar(benchmark::State& state) {
     const size_t n = static_cast<size_t>(state.range(0));
     std::vector<float> a(n, 1.0f), b(n, 2.0f), c(n);
-    
+
     for (auto _ : state) {
         add_scalar(a.data(), b.data(), c.data(), n);
         benchmark::DoNotOptimize(c.data());
         benchmark::ClobberMemory();
     }
-    
+
     state.SetBytesProcessed(state.iterations() * n * 3 * sizeof(float));
 }
 
@@ -85,17 +88,20 @@ static void BM_AVX_Aligned(benchmark::State& state) {
     float* a = static_cast<float*>(aligned_alloc_impl(n * sizeof(float), ALIGNMENT));
     float* b = static_cast<float*>(aligned_alloc_impl(n * sizeof(float), ALIGNMENT));
     float* c = static_cast<float*>(aligned_alloc_impl(n * sizeof(float), ALIGNMENT));
-    
-    for (size_t i = 0; i < n; ++i) { a[i] = 1.0f; b[i] = 2.0f; }
-    
+
+    for (size_t i = 0; i < n; ++i) {
+        a[i] = 1.0f;
+        b[i] = 2.0f;
+    }
+
     for (auto _ : state) {
         add_avx_aligned(a, b, c, n);
         benchmark::DoNotOptimize(c);
         benchmark::ClobberMemory();
     }
-    
+
     state.SetBytesProcessed(state.iterations() * n * 3 * sizeof(float));
-    
+
     aligned_free_impl(a);
     aligned_free_impl(b);
     aligned_free_impl(c);
@@ -107,13 +113,13 @@ static void BM_AVX_Unaligned(benchmark::State& state) {
     float* a = buf_a.data() + 1;  // Misalign
     float* b = buf_b.data() + 1;
     float* c = buf_c.data() + 1;
-    
+
     for (auto _ : state) {
         add_avx_unaligned(a, b, c, n);
         benchmark::DoNotOptimize(c);
         benchmark::ClobberMemory();
     }
-    
+
     state.SetBytesProcessed(state.iterations() * n * 3 * sizeof(float));
 }
 #endif
@@ -135,6 +141,6 @@ BENCHMARK(BM_AVX_Unaligned)
     ->Unit(benchmark::kMicrosecond);
 #endif
 
-} // namespace
+}  // namespace
 
 BENCHMARK_MAIN();

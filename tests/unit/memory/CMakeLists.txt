@@ -16,4 +16,4 @@ target_link_libraries(memory_utils_test PRIVATE
 hpc_set_compiler_options(memory_utils_test)
 hpc_enable_sanitizers(memory_utils_test)
 
-gtest_discover_tests(memory_utils_test)
+gtest_add_tests(TARGET memory_utils_test)

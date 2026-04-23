@@ -10,4 +10,4 @@ target_link_libraries(modern_cpp_examples_test PRIVATE
 hpc_set_compiler_options(modern_cpp_examples_test)
 hpc_enable_sanitizers(modern_cpp_examples_test)
 
-gtest_discover_tests(modern_cpp_examples_test)
+gtest_add_tests(TARGET modern_cpp_examples_test)

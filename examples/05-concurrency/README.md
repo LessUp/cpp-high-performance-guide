@@ -1,10 +1,109 @@
 # 05 - Concurrency & Multi-threading
 
-[![Concurrency](https://img.shields.io/badge/Concurrency-Lock--Free-red.svg)](https://en.cppreference.com/w/cpp/atomic)
+<p align="center">
+  <img src="https://img.shields.io/badge/Concurrency-Lock--Free-red.svg" alt="Concurrency">
+  <img src="https://img.shields.io/badge/Difficulty-Advanced-red.svg" alt="Difficulty">
+  <img src="https://img.shields.io/badge/Topic-Multithreading-blue.svg" alt="Topic">
+</p>
 
 > Write efficient multi-threaded code with atomics, lock-free structures, and OpenMP.
 
 Master `std::atomic` memory orderings, build lock-free queues, and parallelize with OpenMP for **linear thread scaling**.
+
+---
+
+## SPSC Queue Operation
+
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant H as Head (Read)
+    participant B as Buffer
+    participant T as Tail (Write)
+    participant C as Consumer
+    
+    Note over P,C: Initial: Head=0, Tail=0
+    
+    P->>T: Read tail=0
+    P->>B: Write item to buffer[0]
+    P->>T: Store tail=1 (release)
+    
+    P->>T: Read tail=1
+    P->>B: Write item to buffer[1]
+    P->>T: Store tail=2 (release)
+    
+    C->>H: Read head=0 (acquire)
+    C->>T: Read tail=2 (acquire)
+    C->>B: Read item from buffer[0]
+    C->>H: Store head=1 (release)
+    
+    Note over P,C: Memory ordering ensures<br/>data is visible after<br/>acquire sees release
+```
+
+---
+
+## Memory Ordering Hierarchy
+
+```mermaid
+graph TB
+    subgraph Strength["Memory Ordering Strength"]
+        direction TB
+        RELAXED["relaxed<br/>No ordering guarantees<br/>Just atomicity"]
+        ACQREL["acquire/release<br/>Pair-wise synchronization<br/>Producer-consumer"]
+        SEQ["seq_cst<br/>Total global order<br/>Default, strongest"]
+    end
+    
+    RELAXED -->|More sync| ACQREL
+    ACQREL -->|More sync| SEQ
+    
+    subgraph UseCases["Common Use Cases"]
+        C1["Counter increments"]
+        C2["Flags, queues"]
+        C3["Complex protocols"]
+    end
+    
+    RELAXED -.-> C1
+    ACQREL -.-> C2
+    SEQ -.-> C3
+    
+    style SEQ fill:#ffcccc
+    style ACQREL fill:#ffffcc
+    style RELAXED fill:#ccffcc
+```
+
+---
+
+## Thread Scaling Visualization
+
+```mermaid
+graph LR
+    subgraph Ideal["Ideal Scaling"]
+        I1[1 thread: 1x]
+        I2[2 threads: 2x]
+        I4[4 threads: 4x]
+        I8[8 threads: 8x]
+    end
+    
+    subgraph Real["Real-World Scaling"]
+        R1[1 thread: 1x]
+        R2[2 threads: 1.8x]
+        R4[4 threads: 3.2x]
+        R8[8 threads: 5.5x]
+    end
+    
+    subgraph Limits["Scaling Limiters"]
+        L1[Amdahl's Law]
+        L2[Memory Bandwidth]
+        L3[False Sharing]
+    end
+    
+    Ideal -.->|Limited by| Limits
+    Real -.->|Caused by| Limits
+    
+    style Ideal fill:#ccffcc
+    style Real fill:#ffffcc
+    style Limits fill:#ffcccc
+```
 
 ## Contents
 
@@ -158,7 +257,52 @@ Real-world factors limiting scaling:
 - Cache contention
 - False sharing
 
+---
+
+## Expected Results
+
+| Optimization | Speedup | Notes |
+|--------------|---------|-------|
+| Atomic vs Mutex | 2-5x | Atomics avoid kernel transitions |
+| Lock-free vs Mutex Queue | 3-10x | No blocking, cache-friendly |
+| OpenMP parallel for | Near-linear | Depends on workload and cores |
+| False sharing fix | 5-20x | Critical for shared counters |
+
+---
+
+## Knowledge Check
+
+Test your understanding:
+
+1. **When should you use `memory_order_relaxed`?**
+   <details>
+   <summary>Click for answer</summary>
+   For counters and statistics where you only need atomicity, not ordering. Example: incrementing a global request counter where exact ordering doesn't matter.
+   </details>
+
+2. **Why is `alignas(64)` used in the SPSC queue?**
+   <details>
+   <summary>Click for answer</summary>
+   To place head and tail on separate cache lines, preventing false sharing. Without this, producer and consumer threads would contend for the same cache line even though they access different variables.
+   </details>
+
+3. **What's the difference between `parallel for` and `parallel for reduction`?**
+   <details>
+   <summary>Click for answer</summary>
+   `parallel for` divides iterations among threads with no coordination. `reduction` handles variables that accumulate values (like sum), creating thread-local copies and combining them at the end.
+   </details>
+
+---
+
 ## Further Reading
 
 - [C++ Concurrency in Action](https://www.manning.com/books/c-plus-plus-concurrency-in-action)
 - [Memory Barriers: a Hardware View for Software Hackers](http://www.rdrop.com/users/paulmck/scalability/paper/whymb.2010.07.23a.pdf)
+
+---
+
+## Next Steps
+
+- Review the [Optimization Decision Tree](../../docs/en/guides/optimization-decision-tree.md) for systematic optimization
+- Practice with [Concurrency Exercises](../../docs/en/exercises/module-05-concurrency.md)
+- Read the [Profiling Guide](../../docs/en/guides/profiling-guide.md) to analyze multi-threaded performance

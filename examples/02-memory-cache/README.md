@@ -1,10 +1,103 @@
 # 02 - Memory & Cache Optimization
 
-[![C++](https://img.shields.io/badge/Language-C%2B%2B20-blue.svg)](https://isocpp.org/)
+<p align="center">
+  <img src="https://img.shields.io/badge/Language-C%2B%2B20-blue.svg" alt="C++20">
+  <img src="https://img.shields.io/badge/Difficulty-Beginner-green.svg" alt="Difficulty">
+  <img src="https://img.shields.io/badge/Topic-Memory-orange.svg" alt="Topic">
+</p>
 
 > Master memory and cache optimization techniques critical for high-performance computing.
 
 Learn how data layout, alignment, and prefetching can deliver **2-20x performance improvements**.
+
+---
+
+## Memory Layout Visualization
+
+### AOS vs SOA Memory Layout
+
+```mermaid
+graph TB
+    subgraph AOS["Array of Structures (AOS)"]
+        direction LR
+        P1["Particle 0<br/>x₀ y₀ z₀ vx₀ vy₀ vz₀"]
+        P2["Particle 1<br/>x₁ y₁ z₁ vx₁ vy₁ vz₁"]
+        P3["Particle 2<br/>x₂ y₂ z₂ vx₂ vy₂ vz₂"]
+    end
+    
+    subgraph SOA["Structure of Arrays (SOA)"]
+        direction LR
+        X["x: x₀ x₁ x₂ ..."]
+        Y["y: y₀ y₁ y₂ ..."]
+        Z["z: z₀ z₁ z₂ ..."]
+        VX["vx: vx₀ vx₁ vx₂ ..."]
+    end
+    
+    subgraph CacheLine["Cache Line (64 bytes)"]
+        C1["16 floats of same field"]
+    end
+    
+    AOS -->|"Poor cache utilization"| Note1["❌ Only 2-3 particles<br/>per cache line when<br/>accessing single field"]
+    SOA -->|"Excellent cache utilization"| Note2["✓ 16 values per cache line<br/>when processing one field"]
+    
+    style AOS fill:#ffcccc
+    style SOA fill:#ccffcc
+    style CacheLine fill:#e6f3ff
+```
+
+**When updating all x coordinates:**
+- AOS: Loads unnecessary y, z, vx, vy, vz data → Poor cache utilization
+- SOA: Only loads x values → Maximum cache efficiency
+
+---
+
+## False Sharing Visualization
+
+```mermaid
+graph TB
+    subgraph Bad["❌ False Sharing"]
+        direction LR
+        T1[Thread 1] --> C1[Counter 0]
+        T2[Thread 2] --> C2[Counter 1]
+        T3[Thread 3] --> C3[Counter 2]
+        T4[Thread 4] --> C4[Counter 3]
+        
+        subgraph CL1["Single Cache Line (64 bytes)"]
+            C1
+            C2
+            C3
+            C4
+        end
+    end
+    
+    subgraph Good["✓ Cache Line Aligned"]
+        direction LR
+        T1b[Thread 1] --> C1b[Counter 0]
+        T2b[Thread 2] --> C2b[Counter 1]
+        T3b[Thread 3] --> C3b[Counter 2]
+        T4b[Thread 4] --> C4b[Counter 3]
+        
+        subgraph CL2["Cache Line 0"]
+            C1b
+            PAD1[padding...]
+        end
+        subgraph CL3["Cache Line 1"]
+            C2b
+            PAD2[padding...]
+        end
+        subgraph CL4["Cache Line 2"]
+            C3b
+            PAD3[padding...]
+        end
+        subgraph CL5["Cache Line 3"]
+            C4b
+            PAD4[padding...]
+        end
+    end
+    
+    style Bad fill:#ffcccc
+    style Good fill:#ccffcc
+```
 
 ## Contents
 
@@ -105,3 +198,55 @@ perf stat -e cache-misses,cache-references ./build/release/examples/02-memory-ca
 
 - [What Every Programmer Should Know About Memory](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf)
 - [Gallery of Processor Cache Effects](http://igoro.com/archive/gallery-of-processor-cache-effects/)
+
+---
+
+## Common Pitfalls
+
+### ❌ Assuming AOS is always bad
+
+AOS can be better when accessing all fields together (e.g., particle physics where you need x, y, z, vx, vy, vz simultaneously).
+
+### ❌ Over-aligning everything
+
+Only data accessed in hot loops needs alignment. Don't waste memory aligning rarely-used data.
+
+### ❌ Prefetching too early
+
+Prefetch distance must match your access pattern. Too early = data evicted before use. Too late = no benefit.
+
+### ❌ Forgetting to measure
+
+Always benchmark before and after. Some "optimizations" can hurt performance on certain CPUs.
+
+---
+
+## Knowledge Check
+
+Test your understanding:
+
+1. **When should you prefer SOA over AOS?**
+   <details>
+   <summary>Click for answer</summary>
+   When you process one field at a time (e.g., updating all x-coordinates). SOA improves cache utilization when access patterns are field-wise.
+   </details>
+
+2. **What cache line size do most modern x86 CPUs use?**
+   <details>
+   <summary>Click for answer</summary>
+   64 bytes. This is why `alignas(64)` is used to prevent false sharing.
+   </details>
+
+3. **Why does false sharing hurt multi-threaded performance?**
+   <details>
+   <summary>Click for answer</summary>
+   When multiple threads write to variables on the same cache line, the cache coherence protocol causes the line to "bounce" between cores, serializing access that should be parallel.
+   </details>
+
+---
+
+## Next Steps
+
+- Continue to [Modern C++ Features](../03-modern-cpp/) to learn about compile-time optimization
+- Read the [Optimization Decision Tree](../../docs/en/guides/optimization-decision-tree.md) for systematic optimization
+- Practice with [Memory Exercises](../../docs/en/exercises/module-02-memory.md)

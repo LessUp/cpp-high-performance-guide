@@ -3,8 +3,9 @@
  * @brief Unit tests for concurrency_utils.hpp
  */
 
-#include <gtest/gtest.h>
 #include "concurrency_utils.hpp"
+
+#include <gtest/gtest.h>
 
 #include <numeric>
 
@@ -86,9 +87,8 @@ TEST(RunParallelTest, AllThreadsRun) {
     std::atomic<int> counter{0};
     constexpr unsigned int NUM_THREADS = 4;
 
-    run_parallel([&counter](unsigned int) {
-        counter.fetch_add(1, std::memory_order_relaxed);
-    }, NUM_THREADS);
+    run_parallel([&counter](unsigned int) { counter.fetch_add(1, std::memory_order_relaxed); },
+                 NUM_THREADS);
 
     EXPECT_EQ(counter.load(), static_cast<int>(NUM_THREADS));
 }
@@ -97,9 +97,11 @@ TEST(RunParallelTest, ThreadIdIsUnique) {
     constexpr unsigned int NUM_THREADS = 4;
     std::atomic<unsigned int> seen_mask{0};
 
-    run_parallel([&seen_mask](unsigned int thread_id) {
-        seen_mask.fetch_or(1u << thread_id, std::memory_order_relaxed);
-    }, NUM_THREADS);
+    run_parallel(
+        [&seen_mask](unsigned int thread_id) {
+            seen_mask.fetch_or(1u << thread_id, std::memory_order_relaxed);
+        },
+        NUM_THREADS);
 
     // All bits 0..3 should be set
     unsigned int expected = (1u << NUM_THREADS) - 1;
@@ -115,13 +117,15 @@ TEST(ConcurrentIncrementTest, AtomicCounterIsCorrect) {
     constexpr unsigned int NUM_THREADS = 4;
     constexpr int ITERATIONS = 100000;
 
-    run_parallel([&counter](unsigned int) {
-        for (int i = 0; i < ITERATIONS; ++i) {
-            counter.increment(std::memory_order_relaxed);
-        }
-    }, NUM_THREADS);
+    run_parallel(
+        [&counter](unsigned int) {
+            for (int i = 0; i < ITERATIONS; ++i) {
+                counter.increment(std::memory_order_relaxed);
+            }
+        },
+        NUM_THREADS);
 
     EXPECT_EQ(counter.load(), static_cast<int64_t>(NUM_THREADS) * ITERATIONS);
 }
 
-} // namespace hpc::concurrency::test
+}  // namespace hpc::concurrency::test

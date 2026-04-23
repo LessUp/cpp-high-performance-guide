@@ -25,4 +25,4 @@ if(NOT HPC_IS_ARM)
     endif()
 endif()
 
-gtest_discover_tests(simd_utils_test)
+gtest_add_tests(TARGET simd_utils_test)

@@ -1,17 +1,18 @@
 /**
  * @file prefetch_bench.cpp
  * @brief Benchmark for software prefetching
- * 
+ *
  * Validates: Requirements 2.4
  */
 
 #include <benchmark/benchmark.h>
+
 #include <random>
 #include <vector>
 
 namespace {
 
-template<typename T>
+template <typename T>
 inline void prefetch_read(const T* ptr) {
 #if defined(__GNUC__) || defined(__clang__)
     __builtin_prefetch(ptr, 0, 3);
@@ -61,26 +62,28 @@ int64_t sum_random_with_prefetch(const int64_t* data, const size_t* indices, siz
 static void BM_Sequential_NoPrefetch(benchmark::State& state) {
     const size_t n = static_cast<size_t>(state.range(0));
     std::vector<int64_t> data(n);
-    for (size_t i = 0; i < n; ++i) data[i] = static_cast<int64_t>(i);
-    
+    for (size_t i = 0; i < n; ++i)
+        data[i] = static_cast<int64_t>(i);
+
     for (auto _ : state) {
         auto result = sum_no_prefetch(data.data(), n);
         benchmark::DoNotOptimize(result);
     }
-    
+
     state.SetBytesProcessed(state.iterations() * n * sizeof(int64_t));
 }
 
 static void BM_Sequential_WithPrefetch(benchmark::State& state) {
     const size_t n = static_cast<size_t>(state.range(0));
     std::vector<int64_t> data(n);
-    for (size_t i = 0; i < n; ++i) data[i] = static_cast<int64_t>(i);
-    
+    for (size_t i = 0; i < n; ++i)
+        data[i] = static_cast<int64_t>(i);
+
     for (auto _ : state) {
         auto result = sum_with_prefetch(data.data(), n);
         benchmark::DoNotOptimize(result);
     }
-    
+
     state.SetBytesProcessed(state.iterations() * n * sizeof(int64_t));
 }
 
@@ -88,23 +91,23 @@ static void BM_Random_NoPrefetch(benchmark::State& state) {
     const size_t n = static_cast<size_t>(state.range(0));
     std::vector<int64_t> data(n);
     std::vector<size_t> indices(n);
-    
+
     for (size_t i = 0; i < n; ++i) {
         data[i] = static_cast<int64_t>(i);
         indices[i] = i;
     }
-    
+
     std::mt19937 rng(42);
     for (size_t i = n - 1; i > 0; --i) {
         std::uniform_int_distribution<size_t> dist(0, i);
         std::swap(indices[i], indices[dist(rng)]);
     }
-    
+
     for (auto _ : state) {
         auto result = sum_random_no_prefetch(data.data(), indices.data(), n);
         benchmark::DoNotOptimize(result);
     }
-    
+
     state.SetBytesProcessed(state.iterations() * n * sizeof(int64_t));
 }
 
@@ -112,23 +115,23 @@ static void BM_Random_WithPrefetch(benchmark::State& state) {
     const size_t n = static_cast<size_t>(state.range(0));
     std::vector<int64_t> data(n);
     std::vector<size_t> indices(n);
-    
+
     for (size_t i = 0; i < n; ++i) {
         data[i] = static_cast<int64_t>(i);
         indices[i] = i;
     }
-    
+
     std::mt19937 rng(42);
     for (size_t i = n - 1; i > 0; --i) {
         std::uniform_int_distribution<size_t> dist(0, i);
         std::swap(indices[i], indices[dist(rng)]);
     }
-    
+
     for (auto _ : state) {
         auto result = sum_random_with_prefetch(data.data(), indices.data(), n);
         benchmark::DoNotOptimize(result);
     }
-    
+
     state.SetBytesProcessed(state.iterations() * n * sizeof(int64_t));
 }
 
@@ -152,6 +155,6 @@ BENCHMARK(BM_Random_WithPrefetch)
     ->Range(1024 * 1024, 16 * 1024 * 1024)
     ->Unit(benchmark::kMillisecond);
 
-} // namespace
+}  // namespace
 
 BENCHMARK_MAIN();

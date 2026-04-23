@@ -3,8 +3,9 @@
  * @brief Unit tests for memory_utils.hpp
  */
 
-#include <gtest/gtest.h>
 #include "memory_utils.hpp"
+
+#include <gtest/gtest.h>
 
 namespace hpc::memory::test {
 
@@ -70,4 +71,4 @@ TEST(ConstantsTest, PageSizeIsReasonable) {
     EXPECT_EQ(PAGE_SIZE, 4096u);
 }
 
-} // namespace hpc::memory::test
+}  // namespace hpc::memory::test

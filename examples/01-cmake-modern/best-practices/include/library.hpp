@@ -11,16 +11,16 @@ class Library {
 public:
     Library();
     ~Library();
-    
+
     /**
      * @brief Get the library version
      */
     static std::string version();
-    
+
     /**
      * @brief Example function
      */
     void do_something();
 };
 
-} // namespace myproject
+}  // namespace myproject
