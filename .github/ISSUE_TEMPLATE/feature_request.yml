@@ -16,9 +16,21 @@ body:
     attributes:
       label: Motivation
       description: Why is this feature needed?
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Expected scope
+      description: Which examples, docs, workflows, or specs would this touch?
   
   - type: textarea
     id: alternatives
     attributes:
       label: Alternatives
       description: Any alternative solutions you've considered
+
+  - type: textarea
+    id: openspec
+    attributes:
+      label: OpenSpec notes
+      description: If you already know the affected capability or a proposed change id, note it here.

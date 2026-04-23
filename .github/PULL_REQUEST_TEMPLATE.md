@@ -4,6 +4,12 @@
 
 Brief description of what this PR adds or fixes.
 
+## OpenSpec
+
+- [ ] This change is trivial and does not need an OpenSpec change
+- [ ] I updated or created the relevant OpenSpec change under `openspec/changes/`
+- [ ] I reviewed the affected capability specs under `openspec/specs/`
+
 ## Type of Change
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
@@ -27,6 +33,7 @@ Brief description of what this PR adds or fixes.
 - [ ] Both English and Chinese documentation are updated (if applicable)
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works (if applicable)
+- [ ] I ran `/review` or an equivalent review pass for this non-trivial change
 
 ## Testing Notes
 

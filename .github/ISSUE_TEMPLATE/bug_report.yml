@@ -18,6 +18,12 @@ body:
       description: Steps to reproduce the behavior
     validations:
       required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: Failing command or preset
+      placeholder: "e.g., ctest --preset=debug"
   
   - type: input
     id: os
@@ -37,3 +43,9 @@ body:
       label: Logs
       description: Relevant log output
       render: shell
+
+  - type: textarea
+    id: spec-impact
+    attributes:
+      label: Related capability or OpenSpec change
+      description: Which capability spec or OpenSpec change does this affect, if known?

@@ -15,9 +15,24 @@ body:
     attributes:
       label: Location
       description: Which file or section?
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language scope
+      options:
+        - English only
+        - Chinese only
+        - Both English and Chinese
   
   - type: textarea
     id: suggestion
     attributes:
       label: Suggested Improvement
       description: How should it be improved?
+
+  - type: textarea
+    id: drift
+    attributes:
+      label: Drift or inconsistency
+      description: Does the issue reflect drift between README, docs, OpenSpec, workflows, or code?
