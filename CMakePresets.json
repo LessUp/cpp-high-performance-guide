@@ -65,6 +65,10 @@
       "displayName": "ThreadSanitizer",
       "description": "Debug build with ThreadSanitizer enabled",
       "inherits": "base",
+      "environment": {
+        "CC": "clang",
+        "CXX": "clang++"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "ENABLE_TSAN": "ON",
@@ -204,6 +208,16 @@
       },
       "environment": {
         "TSAN_OPTIONS": "halt_on_error=1"
+      }
+    },
+    {
+      "name": "ubsan",
+      "configurePreset": "ubsan",
+      "output": {
+        "outputOnFailure": true
+      },
+      "environment": {
+        "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
       }
     }
   ]

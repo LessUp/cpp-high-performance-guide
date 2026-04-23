@@ -1,12 +1,12 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Build script for C++ High Performance Guide
+preset="${1:-release}"
 
-PRESET=${1:-release}
+echo "Configuring preset: $preset"
+cmake --preset="$preset"
 
-echo "Building with preset: $PRESET"
-cmake --preset=$PRESET
-cmake --build build/$PRESET
+echo "Building preset: $preset"
+cmake --build --preset "$preset"
 
-echo "Build completed successfully!"
+echo "Build completed successfully."

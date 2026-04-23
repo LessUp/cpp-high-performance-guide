@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+staged_files="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+if grep -Eq '^(build/|docs/node_modules/|docs/.vitepress/dist/)' <<<"$staged_files"; then
+  echo "Refusing to commit generated artifacts or vendored docs dependencies."
+  exit 1
+fi
+
+if grep -Eq '^(examples|tests|benchmarks)/.*\.(cpp|hpp|h)$' <<<"$staged_files"; then
+  ./scripts/format.sh --check --staged
+fi
