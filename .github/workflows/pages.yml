@@ -1,19 +1,11 @@
-name: Deploy Docs
+name: Docs
 
 on:
   push:
-    branches: [master, main]
+    branches: [master]
     paths:
-      - "docs/**"
-      - "examples/*/README.md"
-      - "README.md"
-      - "README.zh-CN.md"
-      - "SUMMARY.md"
-      - "CONTRIBUTING.md"
-      - "CONTRIBUTING.zh.md"
-      - ".gitbook.yaml"
-      - ".github/workflows/pages.yml"
-      - "changelog/**"
+      - 'docs/**'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -29,55 +21,36 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            docs
-            examples/01-cmake-modern/README.md
-            examples/02-memory-cache/README.md
-            examples/03-modern-cpp/README.md
-            examples/04-simd-vectorization/README.md
-            examples/05-concurrency/README.md
-            changelog
-            README.md
-            README.zh-CN.md
-            SUMMARY.md
-            CONTRIBUTING.md
-            CONTRIBUTING.zh.md
-            .gitbook.yaml
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          static_site_generator: vitepress
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: docs/package-lock.json
 
-      - name: Install honkit
+      - name: Install dependencies
         working-directory: docs
         run: npm ci
 
-      - name: Prepare docs for honkit
-        run: |
-          # Copy README.md to docs/ for honkit (it expects README in the working directory)
-          cp README.md docs/README.md
-          # Copy SUMMARY.md to docs/ for honkit
-          cp SUMMARY.md docs/SUMMARY.md
-          # Copy other root-level docs that SUMMARY.md references
-          cp CONTRIBUTING.md docs/CONTRIBUTING.md || true
-          cp CONTRIBUTING.zh.md docs/CONTRIBUTING.zh.md || true
-          cp CHANGELOG.md docs/CHANGELOG.md || true
-
       - name: Build docs
         working-directory: docs
-        run: npx honkit build . ../_site
+        run: npm run docs:build
 
-      - name: Upload artifact
+      - name: Verify output
+        run: test -f docs/.vitepress/dist/index.html
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: docs/.vitepress/dist
 
   deploy:
     needs: build
