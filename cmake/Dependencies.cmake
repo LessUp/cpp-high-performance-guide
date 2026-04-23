@@ -6,6 +6,9 @@ include(FetchContent)
 
 # Set FetchContent to be quiet by default
 set(FETCHCONTENT_QUIET ON)
+# Keep preset reconfiguration stable and avoid unnecessary remote updates once
+# dependencies have been fetched locally or in CI workspaces.
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 
 #------------------------------------------------------------------------------
 # Google Benchmark
@@ -61,7 +64,7 @@ function(hpc_fetch_rapidcheck)
     FetchContent_Declare(
         rapidcheck
         GIT_REPOSITORY https://github.com/emil-e/rapidcheck.git
-        GIT_TAG        master
+        GIT_TAG        b96a4e626ef4c7348dcd16c500353c2f997a9f3f
         GIT_SHALLOW    TRUE
     )
     

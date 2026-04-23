@@ -1,11 +1,9 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Test script for C++ High Performance Guide
+preset="${1:-release}"
 
-PRESET=${1:-release}
+echo "Running tests with preset: $preset"
+ctest --preset="$preset"
 
-echo "Running tests with preset: $PRESET"
-ctest --preset=$PRESET
-
-echo "All tests passed!"
+echo "All tests passed."
