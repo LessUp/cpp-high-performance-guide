@@ -4,6 +4,10 @@ build-*/
 out/
 cmake-build-*/
 
+# VitePress
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
 # CMake generated files
 CMakeCache.txt
 CMakeFiles/
@@ -205,3 +209,7 @@ build_errors.txt
 # VS Code user-specific settings (keep workspace settings in .vscode/ only if needed)
 .vscode/settings.json.user
 .vscode/launch.json.user
+
+# BMad Method V6
+_bmad/
+_bmad-output/
