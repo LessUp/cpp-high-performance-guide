@@ -3,12 +3,14 @@
  * @brief Unit tests for simd_utils.hpp and simd_wrapper.hpp
  */
 
-#include <gtest/gtest.h>
 #include "simd_utils.hpp"
-#include "simd_wrapper.hpp"
+
+#include <gtest/gtest.h>
 
 #include <cmath>
 #include <numeric>
+
+#include "simd_wrapper.hpp"
 
 namespace hpc::simd::test {
 
@@ -143,4 +145,4 @@ TEST(SimdWrapperTest, NonAlignedSize) {
     }
 }
 
-} // namespace hpc::simd::test
+}  // namespace hpc::simd::test

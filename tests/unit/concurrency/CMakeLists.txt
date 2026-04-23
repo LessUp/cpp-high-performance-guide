@@ -17,4 +17,4 @@ target_link_libraries(concurrency_utils_test PRIVATE
 hpc_set_compiler_options(concurrency_utils_test)
 hpc_enable_sanitizers(concurrency_utils_test)
 
-gtest_discover_tests(concurrency_utils_test)
+gtest_add_tests(TARGET concurrency_utils_test)

@@ -3,37 +3,37 @@
 /**
  * @file simd_utils.hpp
  * @brief SIMD utility functions and feature detection
- * 
+ *
  * This header provides common utilities for SIMD programming including
  * feature detection, alignment helpers, and basic SIMD operations.
  */
 
 #include <cstddef>
 #include <cstdint>
-#include <vector>
-#include <memory>
 #include <cstdlib>
+#include <memory>
 #include <new>
+#include <vector>
 
 // Feature detection macros
 #ifdef __SSE2__
-    #define HPC_HAS_SSE2 1
-    #include <emmintrin.h>
+#define HPC_HAS_SSE2 1
+#include <emmintrin.h>
 #endif
 
 #ifdef __AVX__
-    #define HPC_HAS_AVX 1
-    #include <immintrin.h>
+#define HPC_HAS_AVX 1
+#include <immintrin.h>
 #endif
 
 #ifdef __AVX2__
-    #define HPC_HAS_AVX2 1
-    #include <immintrin.h>
+#define HPC_HAS_AVX2 1
+#include <immintrin.h>
 #endif
 
 #ifdef __AVX512F__
-    #define HPC_HAS_AVX512 1
-    #include <immintrin.h>
+#define HPC_HAS_AVX512 1
+#include <immintrin.h>
 #endif
 
 namespace hpc::simd {
@@ -74,7 +74,7 @@ inline size_t get_simd_alignment() {
  * to keep the SIMD module self-contained. This allocator uses runtime SIMD
  * detection for alignment, whereas AlignedAllocator uses a compile-time parameter.
  */
-template<typename T>
+template <typename T>
 class aligned_allocator {
 public:
     using value_type = T;
@@ -85,20 +85,20 @@ public:
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
-    template<typename U>
+    template <typename U>
     struct rebind {
         using other = aligned_allocator<U>;
     };
 
     aligned_allocator() = default;
-    
-    template<typename U>
+
+    template <typename U>
     aligned_allocator(const aligned_allocator<U>&) {}
 
     pointer allocate(size_type n) {
         const size_t alignment = get_simd_alignment();
         const size_t size = n * sizeof(T);
-        
+
         void* ptr = nullptr;
 #if defined(_MSC_VER)
         ptr = _aligned_malloc(size, alignment);
@@ -121,29 +121,33 @@ public:
 #endif
     }
 
-    template<typename U>
-    bool operator==(const aligned_allocator<U>&) const { return true; }
-    
-    template<typename U>
-    bool operator!=(const aligned_allocator<U>&) const { return false; }
+    template <typename U>
+    bool operator==(const aligned_allocator<U>&) const {
+        return true;
+    }
+
+    template <typename U>
+    bool operator!=(const aligned_allocator<U>&) const {
+        return false;
+    }
 };
 
 /**
  * @brief Aligned vector type for SIMD operations
  */
-template<typename T>
+template <typename T>
 using aligned_vector = std::vector<T, aligned_allocator<T>>;
 
 /**
  * @brief Aligned buffer type alias for compatibility
  */
-template<typename T>
+template <typename T>
 using AlignedBuffer = aligned_vector<T>;
 
 /**
  * @brief Create an aligned vector with the specified size
  */
-template<typename T>
+template <typename T>
 aligned_vector<T> make_aligned_vector(size_t size) {
     return aligned_vector<T>(size);
 }
@@ -151,7 +155,7 @@ aligned_vector<T> make_aligned_vector(size_t size) {
 /**
  * @brief Create an aligned vector with the specified size and initial value
  */
-template<typename T>
+template <typename T>
 aligned_vector<T> make_aligned_vector(size_t size, const T& value) {
     return aligned_vector<T>(size, value);
 }
@@ -159,13 +163,7 @@ aligned_vector<T> make_aligned_vector(size_t size, const T& value) {
 /**
  * @brief SIMD capability levels
  */
-enum class SIMDLevel {
-    Scalar,
-    SSE2,
-    AVX,
-    AVX2,
-    AVX512
-};
+enum class SIMDLevel { Scalar, SSE2, AVX, AVX2, AVX512 };
 
 /**
  * @brief Detect the highest available SIMD level
@@ -189,12 +187,18 @@ inline SIMDLevel detect_simd_level() {
  */
 inline const char* simd_level_name(SIMDLevel level) {
     switch (level) {
-        case SIMDLevel::AVX512: return "AVX-512";
-        case SIMDLevel::AVX2:   return "AVX2";
-        case SIMDLevel::AVX:    return "AVX";
-        case SIMDLevel::SSE2:   return "SSE2";
-        case SIMDLevel::Scalar: return "Scalar";
-        default:                return "Unknown";
+        case SIMDLevel::AVX512:
+            return "AVX-512";
+        case SIMDLevel::AVX2:
+            return "AVX2";
+        case SIMDLevel::AVX:
+            return "AVX";
+        case SIMDLevel::SSE2:
+            return "SSE2";
+        case SIMDLevel::Scalar:
+            return "Scalar";
+        default:
+            return "Unknown";
     }
 }
 
@@ -203,13 +207,19 @@ inline const char* simd_level_name(SIMDLevel level) {
  */
 inline size_t simd_vector_width(SIMDLevel level) {
     switch (level) {
-        case SIMDLevel::AVX512: return 64;
-        case SIMDLevel::AVX2:   return 32;
-        case SIMDLevel::AVX:    return 32;
-        case SIMDLevel::SSE2:   return 16;
-        case SIMDLevel::Scalar: return sizeof(float);
-        default:                return sizeof(float);
+        case SIMDLevel::AVX512:
+            return 64;
+        case SIMDLevel::AVX2:
+            return 32;
+        case SIMDLevel::AVX:
+            return 32;
+        case SIMDLevel::SSE2:
+            return 16;
+        case SIMDLevel::Scalar:
+            return sizeof(float);
+        default:
+            return sizeof(float);
     }
 }
 
-} // namespace hpc::simd
+}  // namespace hpc::simd

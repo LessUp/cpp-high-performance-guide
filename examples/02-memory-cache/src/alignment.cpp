@@ -1,20 +1,19 @@
 /**
  * @file alignment.cpp
  * @brief Memory alignment for SIMD operations
- * 
+ *
  * This example demonstrates the importance of memory alignment for SIMD
  * operations. Aligned memory access is faster because:
  * 1. Aligned loads/stores can use efficient SIMD instructions
  * 2. Unaligned access may cross cache line boundaries
  * 3. Some older CPUs don't support unaligned SIMD at all
- * 
+ *
  * Key concepts:
  * - alignas() specifier
  * - posix_memalign / _aligned_malloc
  * - SIMD alignment requirements (16 for SSE, 32 for AVX, 64 for AVX-512)
  */
 
-#include "memory_utils.hpp"
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -22,6 +21,8 @@
 #include <memory>
 #include <utility>
 #include <vector>
+
+#include "memory_utils.hpp"
 
 #ifdef __AVX2__
 #include <immintrin.h>
@@ -34,39 +35,33 @@ constexpr size_t SIMD_ALIGNMENT = 32;  // AVX alignment
 /**
  * @brief RAII wrapper for aligned memory
  */
-template<typename T>
+template <typename T>
 class AlignedArray {
 public:
     explicit AlignedArray(size_t count, size_t alignment = SIMD_ALIGNMENT)
-        : size_(count)
-        , data_(static_cast<T*>(aligned_alloc(count * sizeof(T), alignment)))
-    {
+        : size_(count), data_(static_cast<T*>(aligned_alloc(count * sizeof(T), alignment))) {
         if (!data_) {
             throw std::bad_alloc();
         }
     }
-    
-    ~AlignedArray() {
-        aligned_free(data_);
-    }
-    
+
+    ~AlignedArray() { aligned_free(data_); }
+
     // Non-copyable
     AlignedArray(const AlignedArray&) = delete;
     AlignedArray& operator=(const AlignedArray&) = delete;
-    
+
     // Movable
     AlignedArray(AlignedArray&& other) noexcept
-        : size_(std::exchange(other.size_, 0))
-        , data_(std::exchange(other.data_, nullptr))
-    {}
-    
+        : size_(std::exchange(other.size_, 0)), data_(std::exchange(other.data_, nullptr)) {}
+
     T* data() { return data_; }
     const T* data() const { return data_; }
     size_t size() const { return size_; }
-    
+
     T& operator[](size_t i) { return data_[i]; }
     const T& operator[](size_t i) const { return data_[i]; }
-    
+
 private:
     size_t size_;
     T* data_;
@@ -91,15 +86,15 @@ void add_scalar(const float* a, const float* b, float* c, size_t n) {
  */
 void add_avx_aligned(const float* a, const float* b, float* c, size_t n) {
     size_t i = 0;
-    
+
     // Process 8 floats at a time with AVX
     for (; i + 8 <= n; i += 8) {
-        __m256 va = _mm256_load_ps(a + i);   // Aligned load
-        __m256 vb = _mm256_load_ps(b + i);   // Aligned load
+        __m256 va = _mm256_load_ps(a + i);  // Aligned load
+        __m256 vb = _mm256_load_ps(b + i);  // Aligned load
         __m256 vc = _mm256_add_ps(va, vb);
-        _mm256_store_ps(c + i, vc);          // Aligned store
+        _mm256_store_ps(c + i, vc);  // Aligned store
     }
-    
+
     // Handle remaining elements
     for (; i < n; ++i) {
         c[i] = a[i] + b[i];
@@ -111,15 +106,15 @@ void add_avx_aligned(const float* a, const float* b, float* c, size_t n) {
  */
 void add_avx_unaligned(const float* a, const float* b, float* c, size_t n) {
     size_t i = 0;
-    
+
     // Process 8 floats at a time with AVX
     for (; i + 8 <= n; i += 8) {
         __m256 va = _mm256_loadu_ps(a + i);  // Unaligned load
         __m256 vb = _mm256_loadu_ps(b + i);  // Unaligned load
         __m256 vc = _mm256_add_ps(va, vb);
-        _mm256_storeu_ps(c + i, vc);         // Unaligned store
+        _mm256_storeu_ps(c + i, vc);  // Unaligned store
     }
-    
+
     // Handle remaining elements
     for (; i < n; ++i) {
         c[i] = a[i] + b[i];
@@ -134,12 +129,12 @@ void add_avx_unaligned(const float* a, const float* b, float* c, size_t n) {
 void run_benchmark() {
     constexpr size_t N = 10'000'000;
     constexpr int ITERATIONS = 100;
-    
+
     // Aligned arrays
     AlignedArray<float> a_aligned(N);
     AlignedArray<float> b_aligned(N);
     AlignedArray<float> c_aligned(N);
-    
+
     // Unaligned arrays (offset by 4 bytes to misalign)
     std::vector<float> buffer_a(N + 1);
     std::vector<float> buffer_b(N + 1);
@@ -147,7 +142,7 @@ void run_benchmark() {
     float* a_unaligned = buffer_a.data() + 1;  // Misaligned by 4 bytes
     float* b_unaligned = buffer_b.data() + 1;
     float* c_unaligned = buffer_c.data() + 1;
-    
+
     // Initialize
     for (size_t i = 0; i < N; ++i) {
         float val_a = static_cast<float>(i % 1000) * 0.001f;
@@ -157,15 +152,16 @@ void run_benchmark() {
         a_unaligned[i] = val_a;
         b_unaligned[i] = val_b;
     }
-    
+
     std::cout << "Array size: " << N << " floats\n";
     std::cout << "Iterations: " << ITERATIONS << "\n\n";
-    
-    std::cout << "Aligned array address:   " << a_aligned.data() 
-              << " (aligned: " << (reinterpret_cast<uintptr_t>(a_aligned.data()) % 32 == 0) << ")\n";
-    std::cout << "Unaligned array address: " << a_unaligned 
+
+    std::cout << "Aligned array address:   " << a_aligned.data()
+              << " (aligned: " << (reinterpret_cast<uintptr_t>(a_aligned.data()) % 32 == 0)
+              << ")\n";
+    std::cout << "Unaligned array address: " << a_unaligned
               << " (aligned: " << (reinterpret_cast<uintptr_t>(a_unaligned) % 32 == 0) << ")\n\n";
-    
+
     // Scalar benchmark
     {
         auto start = std::chrono::high_resolution_clock::now();
@@ -176,7 +172,7 @@ void run_benchmark() {
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "Scalar:        " << ms << " ms\n";
     }
-    
+
 #ifdef __AVX2__
     // AVX aligned benchmark
     {
@@ -188,7 +184,7 @@ void run_benchmark() {
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "AVX aligned:   " << ms << " ms\n";
     }
-    
+
     // AVX unaligned benchmark
     {
         auto start = std::chrono::high_resolution_clock::now();
@@ -204,14 +200,14 @@ void run_benchmark() {
 #endif
 }
 
-} // namespace hpc::memory
+}  // namespace hpc::memory
 
 int main() {
     std::cout << "=== Memory Alignment for SIMD ===\n\n";
     hpc::memory::run_benchmark();
-    
+
     std::cout << "\nNote: On modern CPUs, unaligned access penalty is small,\n";
     std::cout << "but aligned access is still preferred for best performance.\n";
-    
+
     return 0;
 }

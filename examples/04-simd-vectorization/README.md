@@ -1,10 +1,75 @@
 # 04 - SIMD Vectorization
 
-[![SIMD](https://img.shields.io/badge/SIMD-SSE%2FAVX2%2FAVX--512-orange.svg)](https://www.intel.com/content/www/us/en/docs/intrinsics-guide/)
+<p align="center">
+  <img src="https://img.shields.io/badge/SIMD-SSE%2FAVX2%2FAVX--512-orange.svg" alt="SIMD">
+  <img src="https://img.shields.io/badge/Difficulty-Intermediate-yellow.svg" alt="Difficulty">
+  <img src="https://img.shields.io/badge/Topic-Vectorization-purple.svg" alt="Topic">
+</p>
 
 > Unlock CPU vector units for massive data parallelism with SIMD programming.
 
 Learn auto-vectorization, SSE/AVX2/AVX-512 intrinsics, and write readable SIMD wrappers for **3-16x speedups**.
+
+---
+
+## SIMD Register Comparison
+
+```mermaid
+graph TB
+    subgraph Registers["SIMD Register Sizes"]
+        SSE["SSE/XMM<br/>128-bit<br/>──────<br/>4 floats"]
+        AVX["AVX/AVX2/YMM<br/>256-bit<br/>────────────<br/>8 floats"]
+        AVX512["AVX-512/ZMM<br/>512-bit<br/>────────────────────────<br/>16 floats"]
+    end
+    
+    subgraph Example["Processing 16 floats"]
+        S1["SSE: 4 iterations"]
+        A1["AVX2: 2 iterations"]
+        A5["AVX-512: 1 iteration"]
+    end
+    
+    SSE --> S1
+    AVX --> A1
+    AVX512 --> A5
+    
+    style SSE fill:#ffcccc
+    style AVX fill:#ffffcc
+    style AVX512 fill:#ccffcc
+```
+
+---
+
+## Vectorization Decision Tree
+
+```mermaid
+flowchart TD
+    A[Hot loop identified] --> B{Check dependencies}
+    B -->|Loop-carried| C[Cannot vectorize<br/>Refactor algorithm]
+    B -->|Independent| D{Check data}
+    
+    D -->|Pointer aliasing possible| E[Add __restrict]
+    D -->|No aliasing| F{Check alignment}
+    
+    E --> F
+    F -->|Aligned| G{Compile with flags}
+    F -->|Unknown| H[alignas or aligned_alloc]
+    
+    G --> I{Vectorized?}
+    H --> G
+    
+    I -->|Yes| J[✓ Done!]
+    I -->|No| K{Why not?}
+    
+    K -->|Complex logic| L[Simplify or manual intrinsics]
+    K -->|Unknown reason| M[Check compiler report]
+    
+    L --> N[Verify with benchmark]
+    M --> L
+    
+    style J fill:#ccffcc
+    style C fill:#ffcccc
+    style J fill:#ccffcc
+```
 
 ## Contents
 
@@ -139,3 +204,65 @@ cat /proc/cpuinfo | grep flags
 
 - [Intel Intrinsics Guide](https://www.intel.com/content/www/us/en/docs/intrinsics-guide/)
 - [Agner Fog's Optimization Manuals](https://www.agner.org/optimize/)
+
+---
+
+## Common Pitfalls
+
+### ❌ Forgetting alignment
+
+Unaligned loads are slower on older CPUs and impossible for some instructions:
+```cpp
+// Bad: Might be unaligned
+float* data = new float[1024];
+
+// Good: Guaranteed alignment
+alignas(64) float data[1024];
+```
+
+### ❌ Not checking compiler output
+
+Always verify vectorization happened:
+```bash
+g++ -O3 -march=native -fopt-info-vec-missed file.cpp 2>&1 | head
+```
+
+### ❌ Ignoring memory bandwidth
+
+SIMD can't help if memory bandwidth is saturated. Profile first!
+
+### ❌ Mixing SSE and AVX
+
+Transitioning between SSE and AVX registers causes penalties. Stick to one instruction set in hot code.
+
+---
+
+## Knowledge Check
+
+Test your understanding:
+
+1. **How many floats can AVX2 process in one instruction?**
+   <details>
+   <summary>Click for answer</summary>
+   8 floats. AVX2 uses 256-bit registers (256 / 32 = 8).
+   </details>
+
+2. **What compiler flag shows which loops were vectorized in GCC?**
+   <details>
+   <summary>Click for answer</summary>
+   `-fopt-info-vec-optimized` shows vectorized loops. Use `-fopt-info-vec-missed` to see why loops weren't vectorized.
+   </details>
+
+3. **Why might auto-vectorization fail even for a simple loop?**
+   <details>
+   <summary>Click for answer</summary>
+   Common reasons: pointer aliasing (compiler can't prove independence), unknown trip count, function calls inside loop, or data dependencies between iterations.
+   </details>
+
+---
+
+## Next Steps
+
+- Continue to [Concurrency](../05-concurrency/) to learn about multi-threaded optimization
+- Read the [SIMD API Reference](../../docs/en/reference/api/simd-wrapper.md) for detailed wrapper documentation
+- Practice with [SIMD Exercises](../../docs/en/exercises/module-04-simd.md)

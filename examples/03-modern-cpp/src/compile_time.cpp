@@ -1,10 +1,10 @@
 /**
  * @file compile_time.cpp
  * @brief Compile-time computation with constexpr and consteval
- * 
+ *
  * This example demonstrates how to move computation from runtime to
  * compile time using C++20 constexpr and consteval features.
- * 
+ *
  * Key concepts:
  * - constexpr: may be evaluated at compile time
  * - consteval: must be evaluated at compile time
@@ -37,7 +37,7 @@ int64_t factorial_runtime(int n) {
 
 /**
  * @brief Compile-time factorial using constexpr
- * 
+ *
  * Can be evaluated at compile time if argument is known at compile time.
  */
 constexpr int64_t factorial_constexpr(int n) {
@@ -50,7 +50,7 @@ constexpr int64_t factorial_constexpr(int n) {
 
 /**
  * @brief Compile-time factorial using consteval (C++20)
- * 
+ *
  * MUST be evaluated at compile time. Compiler error if called with
  * runtime value.
  */
@@ -69,7 +69,7 @@ consteval int64_t factorial_consteval(int n) {
 /**
  * @brief Generate sine lookup table at compile time
  */
-template<size_t N>
+template <size_t N>
 constexpr std::array<double, N> generate_sin_table() {
     std::array<double, N> table{};
     constexpr double PI = 3.14159265358979323846;
@@ -78,9 +78,11 @@ constexpr std::array<double, N> generate_sin_table() {
         // Taylor series approximation for sin (constexpr-friendly)
         double x = angle;
         // Normalize to [-PI, PI]
-        while (x > PI) x -= 2.0 * PI;
-        while (x < -PI) x += 2.0 * PI;
-        
+        while (x > PI)
+            x -= 2.0 * PI;
+        while (x < -PI)
+            x += 2.0 * PI;
+
         // Taylor series: sin(x) = x - x^3/3! + x^5/5! - x^7/7! + ...
         double x2 = x * x;
         double term = x;
@@ -104,11 +106,12 @@ double fast_sin(double angle) {
     constexpr double PI = 3.14159265358979323846;
     constexpr double TWO_PI = 2.0 * PI;
     constexpr size_t TABLE_SIZE = SIN_TABLE.size();
-    
+
     // Normalize angle to [0, 2*PI) in O(1) using fmod
     angle = std::fmod(angle, TWO_PI);
-    if (angle < 0) angle += TWO_PI;
-    
+    if (angle < 0)
+        angle += TWO_PI;
+
     // Convert to table index
     size_t index = static_cast<size_t>((angle / TWO_PI) * TABLE_SIZE) % TABLE_SIZE;
     return SIN_TABLE[index];
@@ -124,7 +127,7 @@ double fast_sin(double angle) {
 constexpr uint64_t fnv1a_hash(const char* str) {
     constexpr uint64_t FNV_OFFSET = 14695981039346656037ULL;
     constexpr uint64_t FNV_PRIME = 1099511628211ULL;
-    
+
     uint64_t hash = FNV_OFFSET;
     while (*str) {
         hash ^= static_cast<uint64_t>(*str++);
@@ -145,11 +148,15 @@ consteval uint64_t operator""_hash(const char* str, size_t) {
 //------------------------------------------------------------------------------
 
 constexpr bool is_prime(int n) {
-    if (n < 2) return false;
-    if (n == 2) return true;
-    if (n % 2 == 0) return false;
+    if (n < 2)
+        return false;
+    if (n == 2)
+        return true;
+    if (n % 2 == 0)
+        return false;
     for (int i = 3; i * i <= n; i += 2) {
-        if (n % i == 0) return false;
+        if (n % i == 0)
+            return false;
     }
     return true;
 }
@@ -157,7 +164,7 @@ constexpr bool is_prime(int n) {
 /**
  * @brief Generate array of first N primes at compile time
  */
-template<size_t N>
+template <size_t N>
 constexpr std::array<int, N> generate_primes() {
     std::array<int, N> primes{};
     int count = 0;
@@ -180,22 +187,22 @@ constexpr auto FIRST_100_PRIMES = generate_primes<100>();
 
 void demonstrate_factorial() {
     std::cout << "=== Factorial ===\n";
-    
+
     // Compile-time evaluation
     constexpr auto fact_10_compile = factorial_constexpr(10);
     constexpr auto fact_10_eval = factorial_consteval(10);
-    
+
     std::cout << "10! (constexpr): " << fact_10_compile << "\n";
     std::cout << "10! (consteval): " << fact_10_eval << "\n";
-    
+
     // Runtime evaluation
     int n = 10;
     auto fact_10_runtime = factorial_runtime(n);
     std::cout << "10! (runtime):   " << fact_10_runtime << "\n";
-    
+
     // Benchmark
     constexpr int ITERATIONS = 10'000'000;
-    
+
     {
         auto start = std::chrono::high_resolution_clock::now();
         volatile int64_t sum = 0;
@@ -206,7 +213,7 @@ void demonstrate_factorial() {
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "Runtime factorial: " << ms << " ms\n";
     }
-    
+
     {
         auto start = std::chrono::high_resolution_clock::now();
         volatile int64_t sum = 0;
@@ -222,21 +229,21 @@ void demonstrate_factorial() {
 
 void demonstrate_lookup_table() {
     std::cout << "\n=== Sine Lookup Table ===\n";
-    
+
     constexpr double PI = 3.14159265358979323846;
-    
+
     // Compare accuracy
     std::cout << "Angle\t\tstd::sin\tfast_sin\tError\n";
-    for (double angle : {0.0, PI/6, PI/4, PI/3, PI/2, PI}) {
+    for (double angle : {0.0, PI / 6, PI / 4, PI / 3, PI / 2, PI}) {
         double std_sin = std::sin(angle);
         double fast = fast_sin(angle);
         double error = std::abs(std_sin - fast);
         std::cout << angle << "\t\t" << std_sin << "\t" << fast << "\t" << error << "\n";
     }
-    
+
     // Benchmark
     constexpr int ITERATIONS = 10'000'000;
-    
+
     {
         auto start = std::chrono::high_resolution_clock::now();
         volatile double sum = 0;
@@ -247,7 +254,7 @@ void demonstrate_lookup_table() {
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "std::sin: " << ms << " ms\n";
     }
-    
+
     {
         auto start = std::chrono::high_resolution_clock::now();
         volatile double sum = 0;
@@ -262,16 +269,16 @@ void demonstrate_lookup_table() {
 
 void demonstrate_string_hash() {
     std::cout << "\n=== Compile-time String Hashing ===\n";
-    
+
     // These hashes are computed at compile time
     constexpr auto hash1 = "hello"_hash;
     constexpr auto hash2 = "world"_hash;
     constexpr auto hash3 = fnv1a_hash("hello");
-    
+
     std::cout << "Hash of 'hello': " << hash1 << "\n";
     std::cout << "Hash of 'world': " << hash2 << "\n";
     std::cout << "fnv1a('hello'):  " << hash3 << "\n";
-    
+
     // Can be used in switch statements
     const char* test = "hello";
     switch (fnv1a_hash(test)) {
@@ -296,17 +303,17 @@ void demonstrate_primes() {
     std::cout << "100th prime: " << FIRST_100_PRIMES[99] << "\n";
 }
 
-} // namespace hpc::compile_time
+}  // namespace hpc::compile_time
 
 #ifndef HPC_TEST_MODE
 int main() {
     std::cout << "=== Compile-Time Computation Demo ===\n\n";
-    
+
     hpc::compile_time::demonstrate_factorial();
     hpc::compile_time::demonstrate_lookup_table();
     hpc::compile_time::demonstrate_string_hash();
     hpc::compile_time::demonstrate_primes();
-    
+
     return 0;
 }
 #endif

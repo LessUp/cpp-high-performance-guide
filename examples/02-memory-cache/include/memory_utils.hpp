@@ -2,7 +2,7 @@
 /**
  * @file memory_utils.hpp
  * @brief Memory and cache optimization utilities
- * 
+ *
  * This header provides utilities for memory alignment, cache-friendly
  * data structures, and performance measurement helpers.
  */
@@ -21,11 +21,11 @@ namespace hpc::memory {
 
 /// Cache line size - use std::hardware_destructive_interference_size when available
 #if defined(__cpp_lib_hardware_interference_size)
-    constexpr std::size_t CACHE_LINE_SIZE = std::hardware_destructive_interference_size;
+constexpr std::size_t CACHE_LINE_SIZE = std::hardware_destructive_interference_size;
 #else
-    /// Fallback: typical cache line size on x86/ARM (64 bytes)
-    /// Note: Some ARM systems may have 128-byte cache lines
-    constexpr std::size_t CACHE_LINE_SIZE = 64;
+/// Fallback: typical cache line size on x86/ARM (64 bytes)
+/// Note: Some ARM systems may have 128-byte cache lines
+constexpr std::size_t CACHE_LINE_SIZE = 64;
 #endif
 
 /// Page size on most systems
@@ -69,21 +69,19 @@ inline void aligned_free(void* ptr) {
  * @brief Custom deleter for aligned memory
  */
 struct AlignedDeleter {
-    void operator()(void* ptr) const {
-        aligned_free(ptr);
-    }
+    void operator()(void* ptr) const { aligned_free(ptr); }
 };
 
 /**
  * @brief Unique pointer with aligned memory
  */
-template<typename T>
+template <typename T>
 using aligned_unique_ptr = std::unique_ptr<T, AlignedDeleter>;
 
 /**
  * @brief Create aligned unique pointer
  */
-template<typename T>
+template <typename T>
 aligned_unique_ptr<T> make_aligned(std::size_t count, std::size_t alignment = CACHE_LINE_SIZE) {
     void* ptr = aligned_alloc(count * sizeof(T), alignment);
     if (!ptr) {
@@ -99,48 +97,46 @@ aligned_unique_ptr<T> make_aligned(std::size_t count, std::size_t alignment = CA
 /**
  * @brief STL-compatible allocator with custom alignment
  */
-template<typename T, std::size_t Alignment = CACHE_LINE_SIZE>
+template <typename T, std::size_t Alignment = CACHE_LINE_SIZE>
 class AlignedAllocator {
 public:
     using value_type = T;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
-    
+
     static constexpr std::size_t alignment = Alignment;
-    
+
     AlignedAllocator() noexcept = default;
-    
-    template<typename U>
+
+    template <typename U>
     AlignedAllocator(const AlignedAllocator<U, Alignment>&) noexcept {}
-    
+
     T* allocate(std::size_t n) {
         if (n > std::size_t(-1) / sizeof(T)) {
             throw std::bad_alloc();
         }
-        
+
         void* ptr = aligned_alloc(n * sizeof(T), Alignment);
         if (!ptr) {
             throw std::bad_alloc();
         }
         return static_cast<T*>(ptr);
     }
-    
-    void deallocate(T* ptr, std::size_t) noexcept {
-        aligned_free(ptr);
-    }
-    
-    template<typename U>
+
+    void deallocate(T* ptr, std::size_t) noexcept { aligned_free(ptr); }
+
+    template <typename U>
     struct rebind {
         using other = AlignedAllocator<U, Alignment>;
     };
 };
 
-template<typename T, typename U, std::size_t A>
+template <typename T, typename U, std::size_t A>
 bool operator==(const AlignedAllocator<T, A>&, const AlignedAllocator<U, A>&) noexcept {
     return true;
 }
 
-template<typename T, typename U, std::size_t A>
+template <typename T, typename U, std::size_t A>
 bool operator!=(const AlignedAllocator<T, A>&, const AlignedAllocator<U, A>&) noexcept {
     return false;
 }
@@ -148,7 +144,7 @@ bool operator!=(const AlignedAllocator<T, A>&, const AlignedAllocator<U, A>&) no
 /**
  * @brief Vector with cache-line aligned storage
  */
-template<typename T>
+template <typename T>
 using aligned_vector = std::vector<T, AlignedAllocator<T, CACHE_LINE_SIZE>>;
 
 //------------------------------------------------------------------------------
@@ -158,17 +154,17 @@ using aligned_vector = std::vector<T, AlignedAllocator<T, CACHE_LINE_SIZE>>;
 /**
  * @brief Pad a type to cache line size to prevent false sharing
  */
-template<typename T>
+template <typename T>
 struct alignas(CACHE_LINE_SIZE) CacheLinePadded {
     T value;
-    
+
     CacheLinePadded() = default;
     explicit CacheLinePadded(const T& v) : value(v) {}
     explicit CacheLinePadded(T&& v) : value(std::move(v)) {}
-    
+
     operator T&() { return value; }
     operator const T&() const { return value; }
-    
+
     T* operator->() { return &value; }
     const T* operator->() const { return &value; }
 };
@@ -180,7 +176,7 @@ struct alignas(CACHE_LINE_SIZE) CacheLinePadded {
 /**
  * @brief Prefetch data for reading
  */
-template<typename T>
+template <typename T>
 inline void prefetch_read(const T* ptr) {
 #if defined(__GNUC__) || defined(__clang__)
     __builtin_prefetch(ptr, 0, 3);  // Read, high temporal locality
@@ -192,7 +188,7 @@ inline void prefetch_read(const T* ptr) {
 /**
  * @brief Prefetch data for writing
  */
-template<typename T>
+template <typename T>
 inline void prefetch_write(T* ptr) {
 #if defined(__GNUC__) || defined(__clang__)
     __builtin_prefetch(ptr, 1, 3);  // Write, high temporal locality
@@ -205,18 +201,26 @@ inline void prefetch_write(T* ptr) {
  * @brief Prefetch with specified locality hint
  * @param locality 0 = non-temporal, 3 = high temporal locality
  */
-template<typename T>
+template <typename T>
 inline void prefetch(const T* ptr, int locality = 3) {
 #if defined(__GNUC__) || defined(__clang__)
     __builtin_prefetch(ptr, 0, locality);
 #elif defined(_MSC_VER)
     switch (locality) {
-        case 0: _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_NTA); break;
-        case 1: _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T2); break;
-        case 2: _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T1); break;
-        default: _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T0); break;
+        case 0:
+            _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_NTA);
+            break;
+        case 1:
+            _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T2);
+            break;
+        case 2:
+            _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T1);
+            break;
+        default:
+            _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T0);
+            break;
     }
 #endif
 }
 
-} // namespace hpc::memory
+}  // namespace hpc::memory

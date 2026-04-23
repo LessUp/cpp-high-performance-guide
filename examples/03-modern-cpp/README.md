@@ -1,10 +1,16 @@
 # 03 - Modern C++ Performance Features
 
-[![C++20](https://img.shields.io/badge/Standard-C%2B%2B20-blue.svg)](https://isocpp.org/)
+<p align="center">
+  <img src="https://img.shields.io/badge/Standard-C%2B%2B20-blue.svg" alt="C++20">
+  <img src="https://img.shields.io/badge/Difficulty-Beginner-green.svg" alt="Difficulty">
+  <img src="https://img.shields.io/badge/Topic-Language%20Features-purple.svg" alt="Topic">
+</p>
 
 > Leverage C++20 features for zero-cost abstractions and significant performance gains.
 
 Discover how `constexpr`, move semantics, container optimizations, and C++20 Ranges can deliver **2-1000x speedups**.
+
+---
 
 ## Contents
 
@@ -119,7 +125,87 @@ cmake --build build/release
 | Reserve vs No Reserve | 2-5x |
 | Ranges vs Loops | ~1x (similar performance) |
 
+---
+
+## Common Pitfalls
+
+### ❌ Forgetting std::move
+
+```cpp
+// BAD: Unnecessary copy
+Buffer process(Buffer input) {
+    Buffer result = input;  // Copy!
+    return result;
+}
+
+// GOOD: Move semantics
+Buffer process(Buffer input) {
+    return input;  // Implicit move
+}
+```
+
+### ❌ Not reserving vector capacity
+
+```cpp
+// BAD: Multiple reallocations
+std::vector<int> v;
+for (int i = 0; i < 10000; ++i) {
+    v.push_back(i);  // May reallocate many times
+}
+
+// GOOD: Single allocation
+std::vector<int> v;
+v.reserve(10000);
+for (int i = 0; i < 10000; ++i) {
+    v.push_back(i);  // No reallocation
+}
+```
+
+### ❌ Using consteval incorrectly
+
+```cpp
+// BAD: Runtime value can't be used with consteval
+int runtime_value = get_input();
+consteval_func(runtime_value);  // Error!
+
+// GOOD: Use constexpr for runtime-compatible compile-time
+constexpr_func(runtime_value);  // Works
+```
+
+---
+
+## Knowledge Check
+
+Test your understanding:
+
+1. **When should you use `consteval` instead of `constexpr`?**
+   <details>
+   <summary>Click for answer</summary>
+   Use `consteval` when you want to guarantee compile-time evaluation and prevent any possibility of runtime execution. Useful for compile-time constants, template parameters, or ensuring no runtime overhead.
+   </details>
+
+2. **What makes move semantics faster than copy semantics?**
+   <details>
+   <summary>Click for answer</summary>
+   Move semantics transfer ownership of resources (like heap-allocated memory) instead of duplicating them. A move is typically O(1) (pointer swap), while a copy is O(n) (deep copy of all data).
+   </details>
+
+3. **Does `reserve()` change the size of a vector?**
+   <details>
+   <summary>Click for answer</summary>
+   No, `reserve()` only affects capacity, not size. It pre-allocates memory to avoid reallocations during subsequent `push_back()` calls. The vector remains empty (size = 0) after `reserve()`.
+   </details>
+
+---
+
 ## Further Reading
 
 - [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/)
 - [Effective Modern C++](https://www.oreilly.com/library/view/effective-modern-c/9781491908419/)
+
+---
+
+## Next Steps
+
+- Continue to [SIMD Vectorization](../04-simd-vectorization/) to learn about CPU vector units
+- Practice with [Modern C++ Exercises](../../docs/en/exercises/module-03-modern-cpp.md)

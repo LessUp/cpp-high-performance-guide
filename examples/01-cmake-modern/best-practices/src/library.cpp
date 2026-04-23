@@ -1,4 +1,5 @@
 #include "library.hpp"
+
 #include <iostream>
 
 namespace myproject {
@@ -18,4 +19,4 @@ void Library::do_something() {
     std::cout << "Library version: " << version() << std::endl;
 }
 
-} // namespace myproject
+}  // namespace myproject

@@ -1,12 +1,13 @@
 /**
  * @file move_semantics_bench.cpp
  * @brief Benchmark for move semantics
- * 
+ *
  * Property 6: Move Semantics Performance Advantage
  * Validates: Requirements 3.2
  */
 
 #include <benchmark/benchmark.h>
+
 #include <cstring>
 #include <vector>
 
@@ -17,18 +18,18 @@ public:
     explicit Buffer(size_t size) : data_(new char[size]), size_(size) {
         std::memset(data_, 'x', size_);
     }
-    
+
     ~Buffer() { delete[] data_; }
-    
+
     Buffer(const Buffer& other) : data_(new char[other.size_]), size_(other.size_) {
         std::memcpy(data_, other.data_, size_);
     }
-    
+
     Buffer(Buffer&& other) noexcept : data_(other.data_), size_(other.size_) {
         other.data_ = nullptr;
         other.size_ = 0;
     }
-    
+
     Buffer& operator=(const Buffer& other) {
         if (this != &other) {
             delete[] data_;
@@ -38,7 +39,7 @@ public:
         }
         return *this;
     }
-    
+
     Buffer& operator=(Buffer&& other) noexcept {
         if (this != &other) {
             delete[] data_;
@@ -49,9 +50,9 @@ public:
         }
         return *this;
     }
-    
+
     size_t size() const { return size_; }
-    
+
 private:
     char* data_;
     size_t size_;
@@ -60,23 +61,23 @@ private:
 static void BM_Copy_Construction(benchmark::State& state) {
     const size_t size = static_cast<size_t>(state.range(0));
     Buffer source(size);
-    
+
     for (auto _ : state) {
         Buffer copy(source);
         benchmark::DoNotOptimize(copy);
     }
-    
+
     state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(size));
 }
 
 static void BM_Move_Construction(benchmark::State& state) {
     const size_t size = static_cast<size_t>(state.range(0));
-    
+
     for (auto _ : state) {
         state.PauseTiming();
         Buffer source(size);
         state.ResumeTiming();
-        
+
         Buffer moved(std::move(source));
         benchmark::DoNotOptimize(moved);
     }
@@ -85,7 +86,7 @@ static void BM_Move_Construction(benchmark::State& state) {
 static void BM_Vector_PushBack_Copy(benchmark::State& state) {
     const size_t buffer_size = static_cast<size_t>(state.range(0));
     const int count = 100;
-    
+
     for (auto _ : state) {
         std::vector<Buffer> vec;
         vec.reserve(count);
@@ -100,7 +101,7 @@ static void BM_Vector_PushBack_Copy(benchmark::State& state) {
 static void BM_Vector_PushBack_Move(benchmark::State& state) {
     const size_t buffer_size = static_cast<size_t>(state.range(0));
     const int count = 100;
-    
+
     for (auto _ : state) {
         std::vector<Buffer> vec;
         vec.reserve(count);
@@ -115,7 +116,7 @@ static void BM_Vector_PushBack_Move(benchmark::State& state) {
 static void BM_Vector_EmplaceBack(benchmark::State& state) {
     const size_t buffer_size = static_cast<size_t>(state.range(0));
     const int count = 100;
-    
+
     for (auto _ : state) {
         std::vector<Buffer> vec;
         vec.reserve(count);
@@ -151,6 +152,6 @@ BENCHMARK(BM_Vector_EmplaceBack)
     ->Range(1024, 1024 * 1024)
     ->Unit(benchmark::kMillisecond);
 
-} // namespace
+}  // namespace
 
 BENCHMARK_MAIN();
