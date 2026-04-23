@@ -4,6 +4,42 @@ This guide covers essential profiling tools and techniques for analyzing C++ per
 
 ---
 
+## Optimization Workflow
+
+```mermaid
+flowchart TD
+    A[Identify Performance Issue] --> B[Profile with perf]
+    B --> C[Generate FlameGraph]
+    C --> D[Identify Hot Functions]
+    D --> E{CPU or Memory bound?}
+    
+    E -->|CPU| F{Vectorizable?}
+    E -->|Memory| G{High cache misses?}
+    
+    F -->|Yes| H[SIMD Optimization]
+    F -->|No| I[Algorithm Change]
+    
+    G -->|Yes| J[Data Layout SOA]
+    G -->|No| K[Prefetching]
+    
+    H --> L[Implement Fix]
+    I --> L
+    J --> L
+    K --> L
+    
+    L --> M[Re-run Benchmark]
+    M --> N{Faster?}
+    N -->|Yes| O[Document & Commit]
+    N -->|No| P[Try Different Approach]
+    P --> B
+    
+    style A fill:#ff6b6b
+    style O fill:#6bcb77
+    style N fill:#ffd93d
+```
+
+---
+
 ## Overview
 
 Performance optimization follows a simple cycle:
@@ -19,6 +55,25 @@ Performance optimization follows a simple cycle:
 ### perf (Linux)
 
 `perf` is the standard Linux profiling tool.
+
+#### Profiling Workflow with perf
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Perf as perf
+    participant App as Application
+    participant FG as FlameGraph
+    
+    Dev->>Perf: perf record -g ./benchmark
+    Perf->>App: Execute with sampling
+    App-->>Perf: Profile data (perf.data)
+    Dev->>Perf: perf script
+    Perf-->>Dev: Call stacks
+    Dev->>FG: stackcollapse + flamegraph.pl
+    FG-->>Dev: flamegraph.svg
+    Dev->>Dev: Identify hotspots
+```
 
 #### Installation
 

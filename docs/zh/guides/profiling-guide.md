@@ -4,6 +4,42 @@
 
 ---
 
+## 优化工作流程
+
+```mermaid
+flowchart TD
+    A[识别性能问题] --> B[用perf分析]
+    B --> C[生成火焰图]
+    C --> D[识别热点函数]
+    D --> E{CPU还是内存瓶颈?}
+
+    E -->|CPU| F{可向量化?}
+    E -->|内存| G{高缓存未命中?}
+
+    F -->|是| H[SIMD优化]
+    F -->|否| I[算法变更]
+
+    G -->|是| J[数据布局SOA]
+    G -->|否| K[预取]
+
+    H --> L[实现修复]
+    I --> L
+    J --> L
+    K --> L
+
+    L --> M[重新运行基准测试]
+    M --> N{变快了?}
+    N -->|是| O[文档化并提交]
+    N -->|否| P[尝试不同方法]
+    P --> B
+
+    style A fill:#ff6b6b
+    style O fill:#6bcb77
+    style N fill:#ffd93d
+```
+
+---
+
 ## 概览
 
 性能优化遵循一个简单循环：
@@ -19,6 +55,25 @@
 ### perf（Linux）
 
 `perf` 是 Linux 上的标准性能分析工具。
+
+#### perf 分析工作流程
+
+```mermaid
+sequenceDiagram
+    participant Dev as 开发者
+    participant Perf as perf
+    participant App as 应用程序
+    participant FG as FlameGraph
+
+    Dev->>Perf: perf record -g ./benchmark
+    Perf->>App: 带采样执行
+    App-->>Perf: 分析数据 (perf.data)
+    Dev->>Perf: perf script
+    Perf-->>Dev: 调用栈
+    Dev->>FG: stackcollapse + flamegraph.pl
+    FG-->>Dev: flamegraph.svg
+    Dev->>Dev: 识别热点
+```
 
 #### 安装
 

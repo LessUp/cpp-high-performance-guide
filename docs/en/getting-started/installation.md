@@ -171,7 +171,7 @@ cmake --build build/release
 ctest --preset=release
 
 # Run a benchmark
-./build/release/examples/02-memory-cache/aos_vs_soa_bench
+./build/release/examples/02-memory-cache/aos_soa_bench
 ```
 
 ---
