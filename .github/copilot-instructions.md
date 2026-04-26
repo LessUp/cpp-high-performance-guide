@@ -1,6 +1,6 @@
 # Copilot instructions for this repository
 
-This repository is in **closure and normalization mode**.
+This repository is in **closure and hardening mode**.
 
 ## Priorities
 
