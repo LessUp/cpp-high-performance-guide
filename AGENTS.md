@@ -85,9 +85,13 @@ ctest --preset=ubsan
 - **AGENTS.md**: shared repo guidance for Codex-style agents and terminal copilots.
 - **CLAUDE.md**: Claude Code specific guidance.
 - **`.github/copilot-instructions.md`**: GitHub Copilot repository instructions.
-- **LSP**: prefer `clangd` backed by `compile_commands.json`.
+- **LSP**: prefer `clangd` backed by `compile_commands.json`. The `.clangd` config at the repo root points `CompilationDatabase` to `build/debug`; all CMake presets export `compile_commands.json` via `CMAKE_EXPORT_COMPILE_COMMANDS=ON`.
 - **Review model**: use `/review` before merge or after major cleanup phases.
 - **Autopilot strategy**: prefer a longer single-session implementation flow over `/fleet` unless the task is truly parallelizable.
+
+## Editor integration
+
+The `.vscode/` directory is **gitignored** and does not exist in the repository. Workspace settings live only in local developer environments. Do not commit `.vscode/` content — use the `.clangd`, `.editorconfig`, and `CMakePresets.json` files for machine-readable project conventions instead.
 
 ## Things to avoid reintroducing
 

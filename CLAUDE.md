@@ -21,7 +21,7 @@ Help finish this repository cleanly. Prioritize hardening, consistency, and remo
 
 - Docs stack: **VitePress**, published via GitHub Pages
 - Build system: **CMake + presets**
-- Language server: **clangd**
+- Language server: **clangd** — configured via `.clangd` at repo root (`CompilationDatabase: build/debug`); all CMake presets export `compile_commands.json` via `CMAKE_EXPORT_COMPILE_COMMANDS=ON`
 - Primary maintenance target: **Linux**
 - Repo posture: **archive-ready / low-frequency maintenance**
 
