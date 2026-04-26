@@ -64,7 +64,7 @@ function(hpc_fetch_rapidcheck)
     FetchContent_Declare(
         rapidcheck
         GIT_REPOSITORY https://github.com/emil-e/rapidcheck.git
-        GIT_TAG        b96a4e626ef4c7348dcd16c500353c2f997a9f3f
+        GIT_TAG        b2d9ed2dddefc4b84318d664b4f221eb792d89c7
         GIT_SHALLOW    TRUE
     )
     
