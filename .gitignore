@@ -210,9 +210,5 @@ build_errors.txt
 .vscode/settings.json.user
 .vscode/launch.json.user
 
-# BMad Method V6
-_bmad/
-_bmad-output/
-
 # Local git worktrees
 .worktrees/
