@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
+# Lightweight pre-push check - format only
+# Full build/test validation happens in CI
 set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
-./scripts/build.sh debug
-./scripts/test.sh debug
+# Only run format check if there are C++ files changed
+if git diff --name-only --cached | grep -qE '\.(cpp|hpp|h|cxx|cc)$'; then
+    echo "Checking C++ formatting..."
+    ./scripts/format.sh --check || {
+        echo "❌ Format check failed. Run ./scripts/format.sh to fix."
+        exit 1
+    }
+    echo "✓ Format check passed"
+fi

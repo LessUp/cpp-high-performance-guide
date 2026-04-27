@@ -70,9 +70,15 @@ inline size_t get_simd_alignment() {
 /**
  * @brief Aligned memory allocator for SIMD operations
  *
- * Note: This is intentionally separate from memory_utils.hpp's AlignedAllocator
- * to keep the SIMD module self-contained. This allocator uses runtime SIMD
- * detection for alignment, whereas AlignedAllocator uses a compile-time parameter.
+ * **Design Note**: This allocator is intentionally separate from
+ * `hpc::memory::AlignedAllocator` to keep the SIMD module self-contained.
+ *
+ * Key differences from `hpc::memory::AlignedAllocator`:
+ * - Uses **runtime SIMD detection** for alignment (16/32/64 bytes based on CPU)
+ * - `hpc::memory::AlignedAllocator` uses a **compile-time constant** (CACHE_LINE_SIZE)
+ *
+ * This is NOT an ODR violation - they exist in separate namespaces and serve
+ * different purposes: SIMD optimization vs cache-line alignment.
  */
 template <typename T>
 class aligned_allocator {

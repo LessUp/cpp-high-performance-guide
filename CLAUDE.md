@@ -4,6 +4,10 @@
 
 Help finish this repository cleanly. Prioritize hardening, consistency, and removal of stale surfaces over feature expansion.
 
+## Project position
+
+This repository is in **closure and hardening mode** (archive-ready for low-frequency maintenance).
+
 ## Working style
 
 1. Read the relevant capability specs in `openspec/specs/`.
@@ -17,6 +21,14 @@ Help finish this repository cleanly. Prioritize hardening, consistency, and remo
    - `.github/copilot-instructions.md`
 5. Use `/review` before merge or after a large cleanup phase.
 
+## C++ Standards and Style
+
+- **Target**: C++17 minimum, C++20 where beneficial
+- **Style**: enforced via `.clang-format` (Google style, 100 chars)
+- **Memory safety**: prefer RAII, smart pointers, avoid raw `new/delete`
+- **Performance**: always measure with benchmarks before claiming improvement
+- **Concurrency**: use `std::atomic` with explicit memory ordering
+
 ## Project facts
 
 - Docs stack: **VitePress**, published via GitHub Pages
@@ -28,12 +40,20 @@ Help finish this repository cleanly. Prioritize hardening, consistency, and remo
 ## Commands
 
 ```bash
+# Build and test
 cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
 cmake --preset=release && cmake --build build/release && ctest --preset=release
+
+# Sanitizers
 cmake --preset=asan && cmake --build build/asan && ctest --preset=asan
 cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
 cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 
+# Benchmarks
+cmake --preset=release && cmake --build build/release
+./build/release/benchmarks/<benchmark_name> --benchmark_time_unit=us
+
+# Utilities
 ./scripts/format.sh
 ./scripts/setup-hooks.sh
 ```

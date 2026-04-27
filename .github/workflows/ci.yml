@@ -39,6 +39,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Cache CMake dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/debug/_deps
+            ~/.cache/ccache
+          key: cmake-deps-${{ runner.os }}-gcc-debug-${{ hashFiles('cmake/Dependencies.cmake') }}
+          restore-keys: |
+            cmake-deps-${{ runner.os }}-gcc-
+            cmake-deps-${{ runner.os }}-
+
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -63,6 +74,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Cache CMake dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/release/_deps
+            ~/.cache/ccache
+          key: cmake-deps-${{ runner.os }}-clang-release-${{ hashFiles('cmake/Dependencies.cmake') }}
+          restore-keys: |
+            cmake-deps-${{ runner.os }}-clang-
+            cmake-deps-${{ runner.os }}-
+
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -83,6 +105,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Cache CMake dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/release/_deps
+            ~/Library/Caches/ccache
+          key: cmake-deps-${{ runner.os }}-release-${{ hashFiles('cmake/Dependencies.cmake') }}
+          restore-keys: |
+            cmake-deps-${{ runner.os }}-
 
       - name: Install dependencies
         run: brew install ninja libomp

@@ -28,7 +28,25 @@ constexpr std::size_t CACHE_LINE_SIZE = std::hardware_destructive_interference_s
 constexpr std::size_t CACHE_LINE_SIZE = 64;
 #endif
 
-/// Page size on most systems
+/// Page size - detected at runtime for portability
+/// Returns the system page size, with 4096 as fallback
+inline std::size_t get_page_size() {
+    static const std::size_t page_size = []() {
+#if defined(_WIN32)
+        SYSTEM_INFO sysInfo;
+        GetSystemInfo(&sysInfo);
+        return static_cast<std::size_t>(sysInfo.dwPageSize);
+#elif defined(__unix__) || defined(__APPLE__)
+        long ps = sysconf(_SC_PAGESIZE);
+        return ps > 0 ? static_cast<std::size_t>(ps) : 4096;
+#else
+        return 4096;  // Fallback
+#endif
+    }();
+    return page_size;
+}
+
+/// Default page size constant for compile-time use (most systems)
 constexpr std::size_t PAGE_SIZE = 4096;
 
 //------------------------------------------------------------------------------
