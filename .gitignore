@@ -216,3 +216,7 @@ _bmad-output/
 
 # Local git worktrees
 .worktrees/
+
+# Claude Code / OMC
+.claude/
+.omc/

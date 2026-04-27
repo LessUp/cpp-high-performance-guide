@@ -2,7 +2,15 @@
 
 ## Project position
 
-This repository is in **closure and hardening mode**. Prefer normalization, defect fixing, and removal of stale or low-signal surfaces over adding new features.
+This repository is in **closure and hardening mode** (archive-ready for low-frequency maintenance). Prefer normalization, defect fixing, and removal of stale or low-signal surfaces over adding new features.
+
+## C++ Standards and Style
+
+- **Target**: C++17 minimum, C++20 where beneficial
+- **Style**: enforced via `.clang-format` (Google style, 100 chars)
+- **Memory safety**: prefer RAII, smart pointers, avoid raw `new/delete`
+- **Performance**: always measure with benchmarks before claiming improvement
+- **Concurrency**: use `std::atomic` with explicit memory ordering
 
 ## Canonical sources of truth
 
@@ -56,26 +64,20 @@ cpp-high-performance-guide/
 ## Standard commands
 
 ```bash
-cmake --preset=debug
-cmake --build build/debug
-ctest --preset=debug
+# Build and test
+cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
+cmake --preset=release && cmake --build build/release && ctest --preset=release
 
-cmake --preset=release
-cmake --build build/release
-ctest --preset=release
+# Sanitizers
+cmake --preset=asan && cmake --build build/asan && ctest --preset=asan
+cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
+cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 
-cmake --preset=asan
-cmake --build build/asan
-ctest --preset=asan
+# Benchmarks
+cmake --preset=release && cmake --build build/release
+./build/release/benchmarks/<benchmark_name> --benchmark_time_unit=us
 
-cmake --preset=tsan
-cmake --build build/tsan
-ctest --preset=tsan
-
-cmake --preset=ubsan
-cmake --build build/ubsan
-ctest --preset=ubsan
-
+# Utilities
 ./scripts/format.sh
 ./scripts/setup-hooks.sh
 ```

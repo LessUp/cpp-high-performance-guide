@@ -1,12 +1,20 @@
 # Copilot instructions for this repository
 
-This repository is in **closure and normalization mode**.
+This repository is in **closure and hardening mode** (archive-ready for low-frequency maintenance).
 
 ## Priorities
 
 1. Fix drift between code, docs, OpenSpec, and GitHub workflows.
 2. Prefer removing stale or redundant content over preserving it.
 3. Keep the repository easy to maintain for low-frequency future updates.
+
+## C++ Standards and Style
+
+- **Target**: C++17 minimum, C++20 where beneficial
+- **Style**: enforced via `.clang-format` (Google style, 100 chars)
+- **Memory safety**: prefer RAII, smart pointers, avoid raw `new/delete`
+- **Performance**: always measure with benchmarks before claiming improvement
+- **Concurrency**: use `std::atomic` with explicit memory ordering
 
 ## Required workflow
 

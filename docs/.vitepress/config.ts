@@ -200,11 +200,24 @@ export default defineConfig({
               ],
             },
             {
+              text: '练习',
+              items: [
+                { text: '概述', link: '/zh/exercises/' },
+                { text: '内存优化', link: '/zh/exercises/module-02-memory' },
+                { text: 'SIMD', link: '/zh/exercises/module-04-simd' },
+                { text: '并发', link: '/zh/exercises/module-05-concurrency' },
+                { text: '解答', link: '/zh/exercises/solutions' },
+              ],
+            },
+            {
               text: '参考',
               items: [
                 { text: '常见问题', link: '/zh/reference/faq' },
                 { text: '故障排查', link: '/zh/reference/troubleshooting' },
                 { text: 'API 入口', link: '/zh/reference/api-reference' },
+                { text: '内存工具', link: '/zh/reference/api/memory-utils' },
+                { text: 'SIMD 包装器', link: '/zh/reference/api/simd-wrapper' },
+                { text: '基准测试工具', link: '/zh/reference/api/benchmark-utils' },
               ],
             },
             {

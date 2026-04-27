@@ -29,6 +29,7 @@ namespace hpc::concurrency {
  * 1. Power-of-2 capacity for fast modulo (bitwise AND)
  * 2. Separate cache lines for head and tail to avoid false sharing
  * 3. Acquire-release ordering for synchronization
+ * 4. Uses std::optional for buffer storage to support non-default-constructible types
  */
 template <typename T, size_t Capacity>
 class SPSCQueue {
@@ -37,10 +38,7 @@ class SPSCQueue {
 
 public:
     SPSCQueue() : head_(0), tail_(0) {
-        // Initialize buffer
-        for (size_t i = 0; i < Capacity; ++i) {
-            buffer_[i] = T{};
-        }
+        // Buffer uses std::optional, no initialization needed
     }
 
     /**
@@ -56,7 +54,7 @@ public:
             return false;  // Queue is full
         }
 
-        buffer_[current_tail] = value;
+        buffer_[current_tail].emplace(value);
         tail_.store(next_tail, std::memory_order_release);
         return true;
     }
@@ -72,7 +70,7 @@ public:
             return false;
         }
 
-        buffer_[current_tail] = std::move(value);
+        buffer_[current_tail].emplace(std::move(value));
         tail_.store(next_tail, std::memory_order_release);
         return true;
     }
@@ -89,7 +87,8 @@ public:
             return std::nullopt;  // Queue is empty
         }
 
-        T value = std::move(buffer_[current_head]);
+        T value = std::move(*buffer_[current_head]);
+        buffer_[current_head].reset();  // Clear the optional
         head_.store((current_head + 1) & MASK, std::memory_order_release);
         return value;
     }
@@ -123,7 +122,8 @@ private:
     // Align head and tail to separate cache lines to avoid false sharing
     alignas(CACHE_LINE_SIZE) std::atomic<size_t> head_;
     alignas(CACHE_LINE_SIZE) std::atomic<size_t> tail_;
-    alignas(CACHE_LINE_SIZE) T buffer_[Capacity];
+    alignas(CACHE_LINE_SIZE)
+        std::optional<T> buffer_[Capacity];  // Changed from T[] to std::optional<T>[]
 };
 
 /**
@@ -151,6 +151,7 @@ public:
     bool push(const T& value) {
         Cell* cell;
         size_t pos = enqueue_pos_.load(std::memory_order_relaxed);
+        int backoff = 1;  // Exponential backoff for high contention
 
         for (;;) {
             cell = &cells_[pos & MASK];
@@ -166,7 +167,11 @@ public:
                 // Queue is full
                 return false;
             } else {
-                // Another producer got here first, retry
+                // Another producer got here first, retry with exponential backoff
+                for (int i = 0; i < backoff; ++i) {
+                    std::this_thread::yield();
+                }
+                backoff = std::min(backoff * 2, 64);  // Cap at 64 yields
                 pos = enqueue_pos_.load(std::memory_order_relaxed);
             }
         }
@@ -179,6 +184,7 @@ public:
     std::optional<T> pop() {
         Cell* cell;
         size_t pos = dequeue_pos_.load(std::memory_order_relaxed);
+        int backoff = 1;  // Exponential backoff for high contention
 
         for (;;) {
             cell = &cells_[pos & MASK];
@@ -194,7 +200,11 @@ public:
                 // Queue is empty
                 return std::nullopt;
             } else {
-                // Another consumer got here first, retry
+                // Another consumer got here first, retry with exponential backoff
+                for (int i = 0; i < backoff; ++i) {
+                    std::this_thread::yield();
+                }
+                backoff = std::min(backoff * 2, 64);  // Cap at 64 yields
                 pos = dequeue_pos_.load(std::memory_order_relaxed);
             }
         }
