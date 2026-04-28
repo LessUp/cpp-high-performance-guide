@@ -4,15 +4,34 @@
 
 This change closes four teaching gaps on existing surfaces without introducing new modules. All work is bounded to `examples/04-simd-vectorization/`, `scripts/`, `docs/`, and module README files.
 
+## Architecture overview
+
+```mermaid
+graph TD
+    A[runtime_dispatch.cpp] -->|compiled into| B[simd_dispatch STATIC lib]
+    C[simd_utils INTERFACE lib<br/>header-only] -->|provides headers| B
+    B -->|linked by| D[dispatch_example executable]
+    B -->|linked by| E[simd_dispatch_test]
+    F[scripts/compare_benchmarks.py] -->|reads| G[baseline.json]
+    F -->|reads| H[candidate.json]
+    F -->|writes| I[regression table + exit code]
+    J[docs/en/guides/learning-path.md] -->|links to| K[examples/04-simd-vectorization/README.md]
+    J -->|links to| L[docs/en/guides/validation.md]
+    M[README.md] -->|cross-links| L
+    N[benchmarks/README.md] -->|documents| F
+```
+
 ## Design decisions
 
 ### 1. SIMD runtime dispatch
 
 **Goal**: Show readers how to select the fastest available instruction path at runtime rather than at compile time.
 
-**Approach**: Add `examples/04-simd-vectorization/src/runtime_dispatch.cpp` with a `dispatch_add_arrays` function that uses `cpuid` (via `__builtin_cpu_supports` on GCC/Clang) to select AVX2, SSE2, or scalar at runtime. Export the function through the existing `simd_utils` interface library so the existing test runner can reach it.
+**Approach**: Add `examples/04-simd-vectorization/src/runtime_dispatch.cpp` with a `dispatch_add_arrays` function that uses `cpuid` (via `__builtin_cpu_supports` on GCC/Clang) to select AVX2, SSE2, or scalar at runtime. The function is compiled into a new **`STATIC` library target `simd_dispatch`** (not the existing `simd_utils` INTERFACE target) that links `simd_utils` for headers. The example executable and the corresponding test both link `simd_dispatch`. `simd_utils` remains header-only.
 
 **Rationale**: `__builtin_cpu_supports` is available on GCC ≥ 4.8 and Clang ≥ 3.7, covers the C++17 baseline, and avoids a platform-specific CPUID wrapper. The function name stays within the `hpc::simd` namespace. A companion `tests/` entry validates correctness against the scalar reference.
+
+**Compiler guard**: `__builtin_cpu_supports` is a GCC/Clang extension. The implementation must wrap dispatch logic in `#if defined(__GNUC__) || defined(__clang__)`. On any other compiler (e.g., MSVC) the code falls through to the scalar path unconditionally. MSVC-specific CPUID dispatch is explicitly out of scope for this change.
 
 **Trade-off**: Does not use `ifunc` or a separate DSO; runtime dispatch is done once via a function pointer set at call site. This is simpler and sufficient for a teaching example.
 
@@ -36,7 +55,7 @@ This change closes four teaching gaps on existing surfaces without introducing n
 
 **Goal**: A maintainer can compare two benchmark JSON runs and see which benchmarks regressed.
 
-**Approach**: Add `scripts/compare_benchmarks.py` (Python 3, stdlib only — no third-party packages) that accepts two JSON files (baseline and candidate) and prints a table of benchmark name, baseline ns/iter, candidate ns/iter, and delta %. Exit code 1 if any benchmark regresses by more than a configurable threshold (default 10%). Add a "Regression Comparison" section to `examples/02-memory-cache/README.md` and the relevant benchmark docs entry showing the capture-and-compare workflow.
+**Approach**: Add `scripts/compare_benchmarks.py` (Python 3, stdlib only — no third-party packages) that accepts two JSON files (baseline and candidate) and prints a table of benchmark name, baseline ns/iter, candidate ns/iter, and delta %. Exit code 1 if any benchmark regresses by more than a configurable threshold (default 10%). Add a "Regression Comparison" section to `benchmarks/README.md` showing the capture-and-compare workflow.
 
 **Rationale**: stdlib-only ensures the script works without a virtualenv. The threshold flag makes it usable in CI without hardcoding expected values.
 
@@ -47,11 +66,11 @@ This change closes four teaching gaps on existing surfaces without introducing n
 | Path | Change |
 |------|--------|
 | `examples/04-simd-vectorization/src/runtime_dispatch.cpp` | New: runtime CPU dispatch example |
-| `examples/04-simd-vectorization/CMakeLists.txt` | Extend: wire `runtime_dispatch` target |
+| `examples/04-simd-vectorization/CMakeLists.txt` | Extend: add `simd_dispatch` STATIC library target |
 | `tests/` (simd subdir) | New: correctness test for `dispatch_add_arrays` |
 | `examples/04-simd-vectorization/README.md` | Extend: vectorization diagnostics section |
-| `docs/` (SIMD learning path entry) | Extend: vectorization diagnostics, sanitizer link |
-| `docs/` (validation/safety page or section) | New or extend: sanitizer preset workflow |
+| `docs/en/guides/learning-path.md` | Extend: vectorization diagnostics, sanitizer cross-link |
+| `docs/en/guides/validation.md` | New: sanitizer preset workflow (asan/tsan/ubsan) |
 | `README.md` | Extend: cross-link to sanitizer docs |
 | `scripts/compare_benchmarks.py` | New: benchmark regression comparison script |
-| `benchmarks/` README or docs entry | Extend: capture-and-compare workflow |
+| `benchmarks/README.md` | New: capture-and-compare workflow section |

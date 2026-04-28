@@ -20,3 +20,8 @@ THE HPC_Guide SHALL provide a script to compare two Google Benchmark JSON output
 
 - **WHEN** the script is invoked with `--threshold N`
 - **THEN** the regression threshold is set to N percent rather than the default 10 percent
+
+#### Scenario: Script smoke test passes
+
+- **WHEN** `scripts/compare_benchmarks.py` is invoked with two synthesised JSON inputs (one stable, one regressed)
+- **THEN** it exits 0 for the stable case and exits 1 for the regressed case, confirming the script is functional
