@@ -24,5 +24,5 @@ THE Documentation SHALL document how to obtain compiler vectorization reports fo
 
 #### Scenario: Reader enables vectorization diagnostics
 
-- **WHEN** a reader builds the SIMD examples with GCC (`-fopt-info-vec`) or Clang (`-Rpass=loop-vectorize`)
+- **WHEN** a reader builds the SIMD examples with GCC (`-fopt-info-vec-optimized`) or Clang (`-Rpass=loop-vectorize`)
 - **THEN** the module README provides the exact command and an explanation of the output
