@@ -4,6 +4,8 @@
 
 ### Requirement: Runtime CPU Dispatch
 
+> **Scope note**: This requirement adds *function-level runtime dispatch* for a single binary (selecting AVX2, SSE2, or scalar at call time via `__builtin_cpu_supports`). It extends the existing compile-time CPU capability / build-system requirement already covered by this module; it does not replace it. The compile-time path (e.g., `-mavx2` flag, CMake feature detection) remains in effect for all other targets.
+
 THE Example_Module SHALL provide a runtime CPU dispatch example that selects the highest-available SIMD instruction set at runtime.
 
 #### Scenario: Runtime dispatch selects correct path
