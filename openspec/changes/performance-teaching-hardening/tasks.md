@@ -4,13 +4,14 @@
 
 - [ ] 1.1 Add `examples/04-simd-vectorization/src/runtime_dispatch.cpp` with `hpc::simd::dispatch_add_arrays` using `__builtin_cpu_supports` for AVX2/SSE2/scalar selection
 - [ ] 1.2 Add a `simd_dispatch` STATIC library target in `examples/04-simd-vectorization/CMakeLists.txt` (separate from the INTERFACE `simd_utils` target) that compiles `runtime_dispatch.cpp` and links `simd_utils` for headers
-- [ ] 1.3 Add a correctness test under `tests/` that calls `dispatch_add_arrays` and validates results against the scalar reference
-- [ ] 1.4 Verify `cmake --preset=debug && cmake --build build/debug && ctest --preset=debug` passes with the new target and test
+- [ ] 1.3 Add `examples/04-simd-vectorization/src/dispatch_example_main.cpp` and a `dispatch_example` executable target in `examples/04-simd-vectorization/CMakeLists.txt` that links `simd_dispatch` and demonstrates runtime dispatch
+- [ ] 1.4 Add `tests/unit/simd/simd_dispatch_test.cpp` (and wire it into `tests/unit/simd/CMakeLists.txt`) that calls `dispatch_add_arrays` and validates results against the scalar reference; note: the test must compile without `-mavx2` so the runtime guard is exercised on machines without AVX2
+- [ ] 1.5 Verify `cmake --preset=debug && cmake --build build/debug && ctest --preset=debug` passes with the new targets and test
 
 ## 2. Vectorization diagnostics documentation
 
-- [ ] 2.1 Add a "Vectorization Diagnostics" section to `examples/04-simd-vectorization/README.md` with GCC (`-fopt-info-vec`) and Clang (`-Rpass=loop-vectorize`) flag examples and sample output
-- [ ] 2.2 Extend `docs/en/guides/learning-path.md` (SIMD section) to surface the vectorization diagnostics workflow for readers
+- [ ] 2.1 Add a "Vectorization Diagnostics" section to `examples/04-simd-vectorization/README.md` with GCC (`-fopt-info-vec-optimized`) and Clang (`-Rpass=loop-vectorize`) flag examples and sample output
+- [ ] 2.2 Extend `docs/en/guides/learning-path.md` (SIMD section) to surface the vectorization diagnostics workflow for readers, using `-fopt-info-vec-optimized` to stay consistent with the existing content in that file
 
 ## 3. Sanitizer workflow documentation
 

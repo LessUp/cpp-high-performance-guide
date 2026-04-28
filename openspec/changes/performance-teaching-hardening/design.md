@@ -39,7 +39,9 @@ graph TD
 
 **Goal**: Make compiler vectorization reports reachable without reading CMakeLists.txt.
 
-**Approach**: Add a "Vectorization Diagnostics" section to `examples/04-simd-vectorization/README.md` that shows the exact build commands (`cmake --preset=debug -DCMAKE_CXX_FLAGS="-fopt-info-vec"` / `-Rpass=loop-vectorize`) and how to read the output. Mirror a condensed version in `docs/` under the SIMD learning path entry.
+**Approach**: Add a "Vectorization Diagnostics" section to `examples/04-simd-vectorization/README.md` that shows the exact build commands (`cmake --preset=debug -DCMAKE_CXX_FLAGS="-fopt-info-vec-optimized"` / `-Rpass=loop-vectorize`) and how to read the output. Mirror a condensed version in `docs/` under the SIMD learning path entry.
+
+**Flag note**: Use `-fopt-info-vec-optimized` (not the broader `-fopt-info-vec`) for GCC because it reports only successfully vectorized loops, which is more useful for teaching. The existing `docs/en/guides/learning-path.md` already uses `-fopt-info-vec-optimized`; this change must stay consistent with that.
 
 **Trade-off**: We do not add a new CMake preset for this; a reader-visible flag override is sufficient and avoids preset sprawl.
 
@@ -47,7 +49,7 @@ graph TD
 
 **Goal**: A reader can find and run ASan/TSan/UBSan without knowing the preset names in advance.
 
-**Approach**: Add a "Validation and Safety" page (or expand an existing section) in the VitePress docs site. Reference the three preset names (`asan`, `tsan`, `ubsan`) with copy-pasteable commands. Cross-link from the repository README quick-start.
+**Approach**: Add `docs/en/guides/validation.md` as a new VitePress page in the docs site. Reference the three preset names (`asan`, `tsan`, `ubsan`) with copy-pasteable commands. Cross-link from the repository README quick-start.
 
 **Trade-off**: Keep this as documentation only. Do not add a new composite preset or script; the existing presets are complete.
 
@@ -65,9 +67,10 @@ graph TD
 
 | Path | Change |
 |------|--------|
-| `examples/04-simd-vectorization/src/runtime_dispatch.cpp` | New: runtime CPU dispatch example |
-| `examples/04-simd-vectorization/CMakeLists.txt` | Extend: add `simd_dispatch` STATIC library target |
-| `tests/` (simd subdir) | New: correctness test for `dispatch_add_arrays` |
+| `examples/04-simd-vectorization/src/runtime_dispatch.cpp` | New: runtime CPU dispatch implementation |
+| `examples/04-simd-vectorization/src/dispatch_example_main.cpp` | New: `dispatch_example` executable entry point |
+| `examples/04-simd-vectorization/CMakeLists.txt` | Extend: add `simd_dispatch` STATIC library target and `dispatch_example` executable target |
+| `tests/unit/simd/simd_dispatch_test.cpp` | New: correctness test for `dispatch_add_arrays` |
 | `examples/04-simd-vectorization/README.md` | Extend: vectorization diagnostics section |
 | `docs/en/guides/learning-path.md` | Extend: vectorization diagnostics, sanitizer cross-link |
 | `docs/en/guides/validation.md` | New: sanitizer preset workflow (asan/tsan/ubsan) |
