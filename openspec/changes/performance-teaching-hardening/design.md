@@ -71,9 +71,11 @@ graph TD
 | `examples/04-simd-vectorization/src/dispatch_example_main.cpp` | New: `dispatch_example` executable entry point |
 | `examples/04-simd-vectorization/CMakeLists.txt` | Extend: add `simd_dispatch` STATIC library target and `dispatch_example` executable target |
 | `tests/unit/simd/simd_dispatch_test.cpp` | New: correctness test for `dispatch_add_arrays` |
+| `tests/unit/simd/CMakeLists.txt` | Extend: wire `simd_dispatch_test` into the existing test target list |
 | `examples/04-simd-vectorization/README.md` | Extend: vectorization diagnostics section |
 | `docs/en/guides/learning-path.md` | Extend: vectorization diagnostics, sanitizer cross-link |
 | `docs/en/guides/validation.md` | New: sanitizer preset workflow (asan/tsan/ubsan) |
+| `docs/.vitepress/config.ts` | Extend: add English nav/sidebar entry for `docs/en/guides/validation.md` so the new page is reachable from the site; zh navigation is out of scope for this change |
 | `README.md` | Extend: cross-link to sanitizer docs |
 | `scripts/compare_benchmarks.py` | New: benchmark regression comparison script |
 | `benchmarks/README.md` | New: capture-and-compare workflow section |

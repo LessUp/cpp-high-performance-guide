@@ -15,7 +15,7 @@
 
 ## 3. Sanitizer workflow documentation
 
-- [ ] 3.1 Add `docs/en/guides/validation.md` documenting the `asan`, `tsan`, and `ubsan` presets with copy-pasteable commands; add entry to VitePress nav
+- [ ] 3.1 Add `docs/en/guides/validation.md` documenting the `asan`, `tsan`, and `ubsan` presets with copy-pasteable commands; update `docs/.vitepress/config.ts` to add an English nav/sidebar entry for the new page so it is reachable from the site (zh navigation is out of scope)
 - [ ] 3.2 Cross-link the sanitizer section from the root `README.md` quick-start
 
 ## 4. Benchmark regression comparison
