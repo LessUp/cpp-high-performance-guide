@@ -13,6 +13,11 @@
 #include <new>
 #include <vector>
 
+// POSIX headers for sysconf
+#if defined(__unix__) || defined(__APPLE__)
+#include <unistd.h>
+#endif
+
 namespace hpc::memory {
 
 //------------------------------------------------------------------------------
