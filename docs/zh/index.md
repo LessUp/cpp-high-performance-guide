@@ -19,8 +19,13 @@
 
 ## 练习与实验室
 
-练习模块（`exercises/`）和 API 参考子页面仅提供英文版本，请直接访问
-[英文练习页面](/en/exercises/README)。
+练习模块（`exercises/`）和 API 参考子页面仅提供英文版本，以降低维护成本。
+
+- [练习概述](/en/exercises/README)
+- [内存优化练习](/en/exercises/module-02-memory)
+- [SIMD 练习](/en/exercises/module-04-simd)
+- [并发练习](/en/exercises/module-05-concurrency)
+- [练习解答](/en/exercises/solutions)
 
 ## 贡献者提示
 
