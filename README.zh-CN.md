@@ -61,6 +61,9 @@ cmake --build build/release
 ./build/release/examples/02-memory-cache/aos_soa_bench
 ```
 
+如果你想在快速开始之后直接使用 sanitizer，请查看
+[`docs/zh/guides/validation.md`](docs/zh/guides/validation.md)。
+
 ## 常用验证命令
 
 ```bash
@@ -78,6 +81,7 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 - **快速开始：** `docs/zh/getting-started/quickstart.md`
 - **学习路径：** `docs/zh/guides/learning-path.md`
 - **性能分析指南：** `docs/zh/guides/profiling-guide.md`
+- **验证与 Sanitizer：** `docs/zh/guides/validation.md`
 - **英文入口：** `README.md` 与 `docs/en/`
 
 ## 开发流程

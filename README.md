@@ -61,6 +61,9 @@ Run one benchmark:
 ./build/release/examples/02-memory-cache/aos_soa_bench
 ```
 
+Need sanitizer-specific guidance after the quick start? See
+[`docs/en/guides/validation.md`](docs/en/guides/validation.md).
+
 ## Validation commands
 
 ```bash
@@ -78,6 +81,7 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 - **Quick start:** `docs/en/getting-started/quickstart.md`
 - **Learning path:** `docs/en/guides/learning-path.md`
 - **Profiling guide:** `docs/en/guides/profiling-guide.md`
+- **Validation & sanitizers:** `docs/en/guides/validation.md`
 - **Chinese entry:** `README.zh-CN.md` and `docs/zh/`
 
 ## Development workflow
