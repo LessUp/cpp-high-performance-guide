@@ -77,6 +77,8 @@ flowchart TD
 |------|-------|-------------|
 | `src/auto_vectorize.cpp` | Auto-Vectorization | Compiler-friendly patterns |
 | `src/intrinsics_intro.cpp` | SIMD Intrinsics | Manual SSE/AVX/AVX-512 |
+| `src/runtime_dispatch.cpp` | Runtime Dispatch | One binary, best available path |
+| `src/dispatch_example_main.cpp` | Dispatch Demo | Runtime-gated array addition |
 | `include/simd_wrapper.hpp` | SIMD Wrapper | Readable abstractions |
 
 ## Key Concepts
@@ -157,6 +159,20 @@ void add_wrapped(float* a, const float* b, const float* c, size_t n) {
 }
 ```
 
+### Runtime Dispatch
+
+Keep one binary and pick the best available path at runtime:
+
+```bash
+cmake --preset=release
+cmake --build build/release --target dispatch_example
+./build/release/examples/04-simd-vectorization/dispatch_example
+```
+
+`dispatch_add_arrays()` selects AVX2, SSE2, or scalar code at runtime. The
+teaching goal is not to hide intrinsics, but to show how a small dispatch layer
+lets one executable stay portable across mixed x86 CPUs.
+
 ## Instruction Sets
 
 | ISA | Register Width | Floats/Op | Doubles/Op |
@@ -199,6 +215,40 @@ cat /proc/cpuinfo | grep flags
 
 # Look for: sse, sse2, sse4_1, avx, avx2, avx512f
 ```
+
+## Vectorization Diagnostics
+
+Use the repository-native vectorization report toggle so optimized targets emit
+compiler feedback while keeping the default presets unchanged:
+
+```bash
+cmake --preset=release -DHPC_VECTORIZE_REPORT=ON
+cmake --build build/release --target auto_vectorize 2>&1 | tee build/release/vectorization.log
+```
+
+`HPC_VECTORIZE_REPORT` expands to the compiler-specific flags used in the
+project:
+
+```bash
+# GCC
+-fopt-info-vec-optimized
+
+# Clang
+-Rpass=loop-vectorize
+```
+
+Sample output you should expect while compiling:
+
+```text
+# GCC
+auto_vectorize.cpp:37:26: optimized: loop vectorized using 32 byte vectors
+
+# Clang
+auto_vectorize.cpp:37:5: remark: vectorized loop (vectorization width: 8, interleaved count: 1) [-Rpass=loop-vectorize]
+```
+
+If you do not see vectorization remarks, confirm you are using an optimized
+preset (`release` or `relwithdebinfo`) rather than `debug`.
 
 ## Further Reading
 

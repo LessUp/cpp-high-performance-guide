@@ -186,6 +186,17 @@ Let the compiler do the work.
 -Rpass=loop-vectorize
 ```
 
+**Repository workflow:**
+```bash
+cmake --preset=release -DHPC_VECTORIZE_REPORT=ON
+cmake --build build/release --target auto_vectorize
+```
+
+`HPC_VECTORIZE_REPORT` enables the same compiler-specific diagnostics for the
+example target while keeping the default preset list stable. For sanitizer-led
+verification after SIMD changes, see
+[Validation & Sanitizers](./validation.md).
+
 ### 4.2 SIMD Intrinsics
 
 Manual vectorization for maximum control.
@@ -203,6 +214,7 @@ Readable SIMD code.
 - Abstracting intrinsics
 - Scalar fallback implementations
 - Type-safe SIMD operations
+- Runtime dispatch for mixed CPU fleets
 
 ---
 

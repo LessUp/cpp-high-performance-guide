@@ -4,6 +4,19 @@
 add_library(simd_utils INTERFACE)
 target_include_directories(simd_utils INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+add_library(simd_dispatch STATIC
+    src/runtime_dispatch.cpp
+)
+target_link_libraries(simd_dispatch PUBLIC simd_utils)
+hpc_set_compiler_options(simd_dispatch)
+hpc_enable_sanitizers(simd_dispatch)
+
+hpc_add_example(
+    NAME dispatch_example
+    SOURCES src/dispatch_example_main.cpp
+    LIBRARIES simd_dispatch
+)
+
 # Auto-vectorization example
 hpc_add_example(
     NAME auto_vectorize
