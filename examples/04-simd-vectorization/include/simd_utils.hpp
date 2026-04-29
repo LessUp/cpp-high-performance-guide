@@ -172,6 +172,11 @@ aligned_vector<T> make_aligned_vector(size_t size, const T& value) {
 enum class SIMDLevel { Scalar, SSE2, AVX, AVX2, AVX512 };
 
 /**
+ * @brief Add two arrays using the best available SIMD path at runtime.
+ */
+void dispatch_add_arrays(const float* a, const float* b, float* c, size_t n);
+
+/**
  * @brief Detect the highest available SIMD level
  */
 inline SIMDLevel detect_simd_level() {

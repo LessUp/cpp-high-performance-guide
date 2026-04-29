@@ -186,6 +186,16 @@ flowchart LR
 -Rpass=loop-vectorize
 ```
 
+**仓库内推荐工作流：**
+```bash
+cmake --preset=release -DHPC_VECTORIZE_REPORT=ON
+cmake --build build/release --target auto_vectorize
+```
+
+`HPC_VECTORIZE_REPORT` 会为示例目标开启同一套编译器向量化诊断，同时不新增
+默认 preset。若需要在 SIMD 修改后继续做 sanitizer 验证，请参考
+[验证与 Sanitizer](./validation.md)。
+
 ### 4.2 SIMD 内在函数
 
 手动向量化以获得最大控制力。
@@ -203,6 +213,7 @@ flowchart LR
 - 封装内在函数
 - 标量回退实现
 - 类型安全的 SIMD 操作
+- 面向混合 CPU 环境的运行时分发
 
 ---
 
