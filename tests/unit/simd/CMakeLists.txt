@@ -26,3 +26,22 @@ if(NOT HPC_IS_ARM)
 endif()
 
 gtest_add_tests(TARGET simd_utils_test)
+
+add_executable(simd_dispatch_test
+    simd_dispatch_test.cpp
+)
+
+target_include_directories(simd_dispatch_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/examples/04-simd-vectorization/include
+)
+
+target_link_libraries(simd_dispatch_test PRIVATE
+    GTest::gtest
+    GTest::gtest_main
+    simd_dispatch
+)
+
+hpc_set_compiler_options(simd_dispatch_test)
+hpc_enable_sanitizers(simd_dispatch_test)
+
+gtest_add_tests(TARGET simd_dispatch_test)
