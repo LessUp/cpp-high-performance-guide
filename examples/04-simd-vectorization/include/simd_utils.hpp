@@ -1,12 +1,22 @@
-#pragma once
-
 /**
  * @file simd_utils.hpp
  * @brief SIMD utility functions and feature detection
  *
  * This header provides common utilities for SIMD programming including
  * feature detection, alignment helpers, and basic SIMD operations.
+ *
+ * All functionality is header-only for ease of integration.
+ *
+ * Validates:
+ *   - Requirement 4.1: Automatic Vectorization Patterns
+ *   - Requirement 4.2: SIMD Intrinsics Introduction
+ *   - Requirement 4.3: SIMD Abstraction Wrappers
+ *   - Requirement 4.4: CPU Capability Detection
+ *   - Requirement 4.5: Scalar vs Vectorized Benchmark
+ *   - Requirement 4.6: Vectorization Reports
  */
+
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -15,25 +25,27 @@
 #include <new>
 #include <vector>
 
-// Feature detection macros
+// Intel SIMD intrinsics - always include on x86 for target attribute dispatch
+// The target attribute controls which instructions are actually used
+#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+#include <immintrin.h>
+#endif
+
+// Feature detection macros for compile-time checks
 #ifdef __SSE2__
 #define HPC_HAS_SSE2 1
-#include <emmintrin.h>
 #endif
 
 #ifdef __AVX__
 #define HPC_HAS_AVX 1
-#include <immintrin.h>
 #endif
 
 #ifdef __AVX2__
 #define HPC_HAS_AVX2 1
-#include <immintrin.h>
 #endif
 
 #ifdef __AVX512F__
 #define HPC_HAS_AVX512 1
-#include <immintrin.h>
 #endif
 
 namespace hpc::simd {
@@ -172,11 +184,6 @@ aligned_vector<T> make_aligned_vector(size_t size, const T& value) {
 enum class SIMDLevel { Scalar, SSE2, AVX, AVX2, AVX512 };
 
 /**
- * @brief Add two arrays using the best available SIMD path at runtime.
- */
-void dispatch_add_arrays(const float* a, const float* b, float* c, size_t n);
-
-/**
  * @brief Detect the highest available SIMD level
  */
 inline SIMDLevel detect_simd_level() {
@@ -231,6 +238,94 @@ inline size_t simd_vector_width(SIMDLevel level) {
         default:
             return sizeof(float);
     }
+}
+
+//------------------------------------------------------------------------------
+// Runtime SIMD Dispatch - Header-only implementation
+//------------------------------------------------------------------------------
+
+namespace detail {
+
+// 函数指针类型
+using AddArraysFn = void (*)(const float* a, const float* b, float* c, size_t n);
+
+// 标量实现
+inline void add_arrays_scalar(const float* a, const float* b, float* c, size_t n) {
+    for (size_t i = 0; i < n; ++i) {
+        c[i] = a[i] + b[i];
+    }
+}
+
+#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+
+// SSE2 实现
+__attribute__((target("sse2"))) inline void add_arrays_sse2(const float* a, const float* b, float* c,
+                                                            size_t n) {
+    size_t i = 0;
+    for (; i + 4 <= n; i += 4) {
+        const __m128 va = _mm_loadu_ps(&a[i]);
+        const __m128 vb = _mm_loadu_ps(&b[i]);
+        const __m128 vc = _mm_add_ps(va, vb);
+        _mm_storeu_ps(&c[i], vc);
+    }
+
+    for (; i < n; ++i) {
+        c[i] = a[i] + b[i];
+    }
+}
+
+// AVX2 实现
+__attribute__((target("avx2,avx"))) inline void add_arrays_avx2(const float* a, const float* b, float* c,
+                                                                size_t n) {
+    size_t i = 0;
+    for (; i + 8 <= n; i += 8) {
+        const __m256 va = _mm256_loadu_ps(&a[i]);
+        const __m256 vb = _mm256_loadu_ps(&b[i]);
+        const __m256 vc = _mm256_add_ps(va, vb);
+        _mm256_storeu_ps(&c[i], vc);
+    }
+
+    add_arrays_sse2(a + i, b + i, c + i, n - i);
+}
+
+// 运行时解析函数
+inline AddArraysFn resolve_add_arrays() {
+    __builtin_cpu_init();
+    if (__builtin_cpu_supports("avx2")) {
+        return &add_arrays_avx2;
+    }
+    if (__builtin_cpu_supports("sse2")) {
+        return &add_arrays_sse2;
+    }
+    return &add_arrays_scalar;
+}
+
+#else
+
+// 非 x86 平台：仅使用标量实现
+inline AddArraysFn resolve_add_arrays() {
+    return &add_arrays_scalar;
+}
+
+#endif
+
+}  // namespace detail
+
+/**
+ * @brief Add two arrays using the best available SIMD path at runtime.
+ *
+ * This function automatically selects the optimal SIMD implementation
+ * (AVX2, SSE2, or scalar) based on CPU capabilities detected at runtime.
+ *
+ * @param a First input array
+ * @param b Second input array
+ * @param c Output array (must have space for n elements)
+ * @param n Number of elements to process
+ */
+inline void dispatch_add_arrays(const float* a, const float* b, float* c, size_t n) {
+    // 使用 inline 静态变量确保线程安全的单次初始化
+    static const detail::AddArraysFn dispatch = detail::resolve_add_arrays();
+    dispatch(a, b, c, n);
 }
 
 }  // namespace hpc::simd

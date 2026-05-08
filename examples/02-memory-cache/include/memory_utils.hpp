@@ -1,11 +1,20 @@
-#pragma once
 /**
  * @file memory_utils.hpp
  * @brief Memory and cache optimization utilities
  *
  * This header provides utilities for memory alignment, cache-friendly
  * data structures, and performance measurement helpers.
+ *
+ * Validates:
+ *   - Requirement 2.1: AOS vs SOA Comparison
+ *   - Requirement 2.2: False Sharing Demonstration
+ *   - Requirement 2.3: Memory Alignment for SIMD
+ *   - Requirement 2.4: Prefetch Demonstration
  */
+
+#pragma once
+
+#include "hpc/core.hpp"  // 平台常量
 
 #include <cstddef>
 #include <cstdlib>
@@ -13,46 +22,13 @@
 #include <new>
 #include <vector>
 
-// POSIX headers for sysconf
-#if defined(__unix__) || defined(__APPLE__)
-#include <unistd.h>
-#endif
-
 namespace hpc::memory {
 
 //------------------------------------------------------------------------------
-// Constants
+// 使用核心头文件中的常量
 //------------------------------------------------------------------------------
 
-/// Cache line size - use std::hardware_destructive_interference_size when available
-#if defined(__cpp_lib_hardware_interference_size)
-constexpr std::size_t CACHE_LINE_SIZE = std::hardware_destructive_interference_size;
-#else
-/// Fallback: typical cache line size on x86/ARM (64 bytes)
-/// Note: Some ARM systems may have 128-byte cache lines
-constexpr std::size_t CACHE_LINE_SIZE = 64;
-#endif
-
-/// Page size - detected at runtime for portability
-/// Returns the system page size, with 4096 as fallback
-inline std::size_t get_page_size() {
-    static const std::size_t page_size = []() {
-#if defined(_WIN32)
-        SYSTEM_INFO sysInfo;
-        GetSystemInfo(&sysInfo);
-        return static_cast<std::size_t>(sysInfo.dwPageSize);
-#elif defined(__unix__) || defined(__APPLE__)
-        long ps = sysconf(_SC_PAGESIZE);
-        return ps > 0 ? static_cast<std::size_t>(ps) : 4096;
-#else
-        return 4096;  // Fallback
-#endif
-    }();
-    return page_size;
-}
-
-/// Default page size constant for compile-time use (most systems)
-constexpr std::size_t PAGE_SIZE = 4096;
+// CACHE_LINE_SIZE 和 PAGE_SIZE 已通过 hpc/core.hpp 的 using 声明导入
 
 //------------------------------------------------------------------------------
 // Aligned Memory Allocation

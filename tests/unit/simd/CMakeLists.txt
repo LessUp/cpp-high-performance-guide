@@ -27,6 +27,7 @@ endif()
 
 gtest_add_tests(TARGET simd_utils_test)
 
+# simd_dispatch_test - now uses header-only implementation
 add_executable(simd_dispatch_test
     simd_dispatch_test.cpp
 )
@@ -38,7 +39,6 @@ target_include_directories(simd_dispatch_test PRIVATE
 target_link_libraries(simd_dispatch_test PRIVATE
     GTest::gtest
     GTest::gtest_main
-    simd_dispatch
 )
 
 hpc_set_compiler_options(simd_dispatch_test)

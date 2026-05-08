@@ -5,6 +5,12 @@
  *
  * Provides helpers for preventing compiler optimizations and
  * exporting benchmark results.
+ *
+ * Validates:
+ *   - Requirement 1.1: Google Benchmark Integration
+ *   - Requirement 1.2: Parameterized Benchmarks
+ *   - Requirement 1.4: JSON Output Format
+ *   - Requirement 1.5: Comparison Charts
  */
 
 #include <benchmark/benchmark.h>

@@ -71,7 +71,7 @@ TEST(SpinLockTest, TryLockFailsWhenHeld) {
 TEST(SpinLockTest, GuardLocksAndUnlocks) {
     SpinLock lock;
     {
-        SpinLockGuard guard(lock);
+        std::lock_guard<SpinLock> guard(lock);
         EXPECT_FALSE(lock.try_lock());
     }
     // Lock should be released after guard goes out of scope
