@@ -6,11 +6,19 @@ add_executable(memory_properties_test
     memory_properties.cpp
 )
 
+target_include_directories(memory_properties_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/examples/02-memory-cache/include
+    ${CMAKE_SOURCE_DIR}/examples/05-concurrency/include
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/benchmarks/common
+)
+
 target_link_libraries(memory_properties_test PRIVATE
     GTest::gtest
     GTest::gtest_main
     rapidcheck
     rapidcheck_gtest
+    benchmark::benchmark
 )
 
 hpc_set_compiler_options(memory_properties_test)

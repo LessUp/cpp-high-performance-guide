@@ -1,29 +1,58 @@
+/**
+ * @file concurrency_utils.hpp
+ * @brief Concurrency and multithreading utilities
+ *
+ * This header provides utilities for concurrent programming including
+ * atomic operations, spin locks, and parallel execution helpers.
+ *
+ * Validates:
+ *   - Requirement 5.1: Atomic Memory Ordering
+ *   - Requirement 5.2: Lock-Free Data Structures
+ *   - Requirement 5.3: False Sharing Detection
+ *   - Requirement 5.4: OpenMP Integration
+ */
+
 #pragma once
+
+#include "hpc/core.hpp"  // 平台常量
 
 #include <atomic>
 #include <chrono>
+#include <concepts>  // C++20 concepts
 #include <functional>
-#include <new>  // for std::hardware_destructive_interference_size
+#include <mutex>  // for std::lock_guard, std::unique_lock
 #include <thread>
 #include <vector>
 
 namespace hpc::concurrency {
 
-/// Get the number of hardware threads
-inline unsigned int hardware_concurrency() {
-    unsigned int n = std::thread::hardware_concurrency();
-    return n > 0 ? n : 1;
-}
+//------------------------------------------------------------------------------
+// 使用核心头文件中的常量和函数
+//------------------------------------------------------------------------------
 
-/// Cache line size for alignment - use std::hardware_destructive_interference_size when available
-#if defined(__cpp_lib_hardware_interference_size)
-constexpr size_t CACHE_LINE_SIZE = std::hardware_destructive_interference_size;
-#else
-/// Fallback: typical cache line size on x86/ARM (64 bytes)
-constexpr size_t CACHE_LINE_SIZE = 64;
-#endif
+// CACHE_LINE_SIZE 已通过 hpc/core.hpp 的 using 声明导入
+// hardware_concurrency() 在 hpc::core 中定义
 
-/// Aligned atomic counter to avoid false sharing
+// 为了向后兼容，在当前命名空间中提供别名
+using hpc::core::hardware_concurrency;
+
+//------------------------------------------------------------------------------
+// Aligned Atomic Counter
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Cache-line aligned atomic counter to avoid false sharing
+ *
+ * This is equivalent to CacheLinePadded<std::atomic<int64_t>> but provides
+ * convenience methods for common atomic operations.
+ *
+ * For other types requiring cache-line alignment, use:
+ * - hpc::memory::CacheLinePadded<T> (from memory_utils.hpp)
+ * - alignas(CACHE_LINE_SIZE) directly
+ *
+ * Note: The UnalignedCounter type has been removed. For unaligned counters,
+ * use std::atomic<int64_t> directly to demonstrate the performance difference.
+ */
 struct alignas(CACHE_LINE_SIZE) AlignedCounter {
     std::atomic<int64_t> value{0};
 
@@ -40,26 +69,37 @@ struct alignas(CACHE_LINE_SIZE) AlignedCounter {
     }
 };
 
-/// Unaligned atomic counter (may suffer from false sharing)
-struct UnalignedCounter {
-    std::atomic<int64_t> value{0};
+//------------------------------------------------------------------------------
+// Spin Lock - 符合 C++ BasicLockable 和 Lockable 概念
+//------------------------------------------------------------------------------
 
-    void increment(std::memory_order order = std::memory_order_seq_cst) {
-        value.fetch_add(1, order);
-    }
-
-    int64_t load(std::memory_order order = std::memory_order_seq_cst) const {
-        return value.load(order);
-    }
-
-    void store(int64_t v, std::memory_order order = std::memory_order_seq_cst) {
-        value.store(v, order);
-    }
-};
-
-/// Simple spin lock using atomic flag
+/**
+ * @brief Simple spin lock using atomic flag
+ *
+ * This class satisfies both BasicLockable and Lockable C++ named requirements,
+ * allowing it to be used with std::lock_guard, std::unique_lock,
+ * and std::scoped_lock.
+ *
+ * BasicLockable requirements:
+ * - lock() blocks until the lock is acquired
+ * - unlock() releases the lock
+ *
+ * Lockable requirements (additional):
+ * - try_lock() attempts to acquire the lock without blocking
+ *
+ * @note Spin locks are appropriate for very short critical sections
+ *       where the overhead of mutex operations would be significant.
+ *       For longer critical sections, prefer std::mutex.
+ */
 class SpinLock {
 public:
+    SpinLock() noexcept = default;
+
+    // Non-copyable and non-movable
+    SpinLock(const SpinLock&) = delete;
+    SpinLock& operator=(const SpinLock&) = delete;
+
+    /// Acquire the lock (blocks until acquired)
     void lock() {
         while (flag_.test_and_set(std::memory_order_acquire)) {
 // Spin
@@ -71,27 +111,20 @@ public:
         }
     }
 
+    /// Release the lock
     void unlock() { flag_.clear(std::memory_order_release); }
 
+    /// Try to acquire the lock without blocking
+    /// @return true if the lock was acquired, false otherwise
     bool try_lock() { return !flag_.test_and_set(std::memory_order_acquire); }
 
 private:
     std::atomic_flag flag_ = ATOMIC_FLAG_INIT;
 };
 
-/// RAII lock guard for SpinLock
-class SpinLockGuard {
-public:
-    explicit SpinLockGuard(SpinLock& lock) : lock_(lock) { lock_.lock(); }
-
-    ~SpinLockGuard() { lock_.unlock(); }
-
-    SpinLockGuard(const SpinLockGuard&) = delete;
-    SpinLockGuard& operator=(const SpinLockGuard&) = delete;
-
-private:
-    SpinLock& lock_;
-};
+//------------------------------------------------------------------------------
+// Parallel Execution Helper
+//------------------------------------------------------------------------------
 
 /// Run a function on multiple threads and measure time
 template <typename Func>
