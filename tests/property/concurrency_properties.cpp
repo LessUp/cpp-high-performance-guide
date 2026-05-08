@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <mutex>  // for std::lock_guard
 #include <numeric>
 #include <thread>
 #include <vector>
@@ -229,7 +230,7 @@ RC_GTEST_PROP(AtomicProperties, SpinLockMutualExclusion, ()) {
 
     auto increment_task = [&](int) {
         for (int i = 0; i < increments_per_thread; ++i) {
-            hpc::concurrency::SpinLockGuard guard(lock);
+            std::lock_guard<hpc::concurrency::SpinLock> guard(lock);
             ++counter;
         }
     };
