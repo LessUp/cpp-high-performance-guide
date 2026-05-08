@@ -4,6 +4,11 @@
  *
  * Uses RapidCheck for property-based testing to verify that optimizations
  * maintain correctness and provide expected performance characteristics.
+ *
+ * Validates:
+ *   - Requirement 2.1: AOS vs SOA Comparison
+ *   - Requirement 2.2: False Sharing Demonstration
+ *   - Requirement 2.3: Memory Alignment for SIMD
  */
 
 #include <gtest/gtest.h>
@@ -12,56 +17,29 @@
 
 #include <algorithm>
 #include <atomic>
-#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <thread>
 #include <vector>
 
+// 使用共享的粒子类型定义，确保测试与示例代码一致
+#include "particle_types.hpp"
+// 使用核心平台常量
+#include "hpc/core.hpp"
+// 使用并发工具（AlignedCounter）
+#include "concurrency_utils.hpp"
+// 使用基准测试计时工具
+#include "benchmark_utils.hpp"
+
 namespace {
 
-//------------------------------------------------------------------------------
-// AOS vs SOA structures (duplicated for test isolation)
-//------------------------------------------------------------------------------
-
-struct ParticleAOS {
-    float x, y, z;
-    float vx, vy, vz;
-};
-
-struct ParticleSOA {
-    std::vector<float> x, y, z;
-    std::vector<float> vx, vy, vz;
-
-    void resize(size_t n) {
-        x.resize(n);
-        y.resize(n);
-        z.resize(n);
-        vx.resize(n);
-        vy.resize(n);
-        vz.resize(n);
-    }
-
-    size_t size() const { return x.size(); }
-};
-
-void update_aos(std::vector<ParticleAOS>& particles, float dt) {
-    for (auto& p : particles) {
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.z += p.vz * dt;
-    }
-}
-
-void update_soa(ParticleSOA& particles, float dt) {
-    const size_t n = particles.size();
-    for (size_t i = 0; i < n; ++i)
-        particles.x[i] += particles.vx[i] * dt;
-    for (size_t i = 0; i < n; ++i)
-        particles.y[i] += particles.vy[i] * dt;
-    for (size_t i = 0; i < n; ++i)
-        particles.z[i] += particles.vz[i] * dt;
-}
+using hpc::memory::ParticleAOS;
+using hpc::memory::ParticleSOA;
+using hpc::memory::update_particles_aos;
+using hpc::memory::update_particles_soa;
+using hpc::core::CACHE_LINE_SIZE;
+using hpc::concurrency::AlignedCounter;
+using hpc::bench::Timer;
 
 //------------------------------------------------------------------------------
 // Property 3: SOA Performance Advantage for Sequential Access
@@ -85,45 +63,34 @@ RC_GTEST_PROP(MemoryProperties, SOAPerformanceAdvantage, ()) {
     constexpr float dt = 0.01f;
 
     // Initialize AOS
-    std::vector<ParticleAOS> aos(n);
-    for (size_t i = 0; i < n; ++i) {
-        aos[i] = {
-            static_cast<float>(i), static_cast<float>(i), static_cast<float>(i), 1.0f, 1.0f, 1.0f};
-    }
+    std::vector<ParticleAOS> aos;
+    hpc::memory::initialize_particles(aos, n);
 
     // Initialize SOA with same data
     ParticleSOA soa;
-    soa.resize(n);
-    for (size_t i = 0; i < n; ++i) {
-        soa.x[i] = static_cast<float>(i);
-        soa.y[i] = static_cast<float>(i);
-        soa.z[i] = static_cast<float>(i);
-        soa.vx[i] = 1.0f;
-        soa.vy[i] = 1.0f;
-        soa.vz[i] = 1.0f;
-    }
+    hpc::memory::initialize_particles(soa, n);
 
     // Warm up caches
-    update_aos(aos, dt);
-    update_soa(soa, dt);
+    update_particles_aos(aos, dt);
+    update_particles_soa(soa, dt);
 
-    // Measure AOS time
-    auto aos_start = std::chrono::high_resolution_clock::now();
+    // Measure AOS time using hpc::bench::Timer
+    Timer aos_timer;
+    aos_timer.start();
     for (int i = 0; i < iterations; ++i) {
-        update_aos(aos, dt);
+        update_particles_aos(aos, dt);
     }
-    auto aos_end = std::chrono::high_resolution_clock::now();
-    auto aos_time =
-        std::chrono::duration_cast<std::chrono::microseconds>(aos_end - aos_start).count();
+    aos_timer.stop();
+    const auto aos_time = aos_timer.elapsed_us();  // 微秒
 
-    // Measure SOA time
-    auto soa_start = std::chrono::high_resolution_clock::now();
+    // Measure SOA time using hpc::bench::Timer
+    Timer soa_timer;
+    soa_timer.start();
     for (int i = 0; i < iterations; ++i) {
-        update_soa(soa, dt);
+        update_particles_soa(soa, dt);
     }
-    auto soa_end = std::chrono::high_resolution_clock::now();
-    auto soa_time =
-        std::chrono::duration_cast<std::chrono::microseconds>(soa_end - soa_start).count();
+    soa_timer.stop();
+    const auto soa_time = soa_timer.elapsed_us();  // 微秒
 
     // SOA should be faster (or at least not significantly slower)
     // Allow 20% tolerance for system noise
@@ -144,22 +111,10 @@ RC_GTEST_PROP(MemoryProperties, SOAPerformanceAdvantage, ()) {
 // Validates: Requirements 2.2, 5.3
 //------------------------------------------------------------------------------
 
-constexpr size_t CACHE_LINE_SIZE = 64;
+// 使用 hpc::concurrency::AlignedCounter 和 std::atomic<int> 进行对比测试
+// 注意：UnalignedCounter 已被删除，因为它没有任何价值
+// 对于未对齐的情况，直接使用 std::atomic<int>
 
-struct UnalignedCounter {
-    std::atomic<int> value{0};
-};
-
-struct alignas(CACHE_LINE_SIZE) AlignedCounter {
-    std::atomic<int> value{0};
-};
-
-template <typename Counter>
-void increment_counter(Counter& counter, int increments) {
-    for (int i = 0; i < increments; ++i) {
-        counter.value.fetch_add(1, std::memory_order_relaxed);
-    }
-}
 
 RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
     // Feature: hpc-optimization-guide, Property 4: Cache-Line Aligned Counters
@@ -169,47 +124,51 @@ RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
     const int increments = *rc::gen::inRange(10000, 100001);
 
     // Test with unaligned counters (false sharing)
-    std::vector<UnalignedCounter> unaligned(static_cast<size_t>(num_threads));
+    // 直接使用 std::atomic<int64_t> 来演示未对齐的情况
+    std::vector<std::atomic<int64_t>> unaligned(static_cast<size_t>(num_threads));
 
-    auto unaligned_start = std::chrono::high_resolution_clock::now();
+    Timer unaligned_timer;
+    unaligned_timer.start();
     {
         std::vector<std::thread> threads;
         for (int t = 0; t < num_threads; ++t) {
             threads.emplace_back([&unaligned, t, increments]() {
-                increment_counter(unaligned[static_cast<size_t>(t)], increments);
+                for (int i = 0; i < increments; ++i) {
+                    unaligned[static_cast<size_t>(t)].fetch_add(1, std::memory_order_relaxed);
+                }
             });
         }
         for (auto& thread : threads) {
             thread.join();
         }
     }
-    auto unaligned_end = std::chrono::high_resolution_clock::now();
-    auto unaligned_time =
-        std::chrono::duration_cast<std::chrono::microseconds>(unaligned_end - unaligned_start)
-            .count();
+    unaligned_timer.stop();
+    const auto unaligned_time = unaligned_timer.elapsed_us();  // 微秒
 
     // Test with aligned counters (no false sharing)
     std::vector<AlignedCounter> aligned(static_cast<size_t>(num_threads));
 
-    auto aligned_start = std::chrono::high_resolution_clock::now();
+    Timer aligned_timer;
+    aligned_timer.start();
     {
         std::vector<std::thread> threads;
         for (int t = 0; t < num_threads; ++t) {
             threads.emplace_back([&aligned, t, increments]() {
-                increment_counter(aligned[static_cast<size_t>(t)], increments);
+                for (int i = 0; i < increments; ++i) {
+                    aligned[static_cast<size_t>(t)].value.fetch_add(1, std::memory_order_relaxed);
+                }
             });
         }
         for (auto& thread : threads) {
             thread.join();
         }
     }
-    auto aligned_end = std::chrono::high_resolution_clock::now();
-    auto aligned_time =
-        std::chrono::duration_cast<std::chrono::microseconds>(aligned_end - aligned_start).count();
+    aligned_timer.stop();
+    const auto aligned_time = aligned_timer.elapsed_us();  // 微秒
 
     // Verify correctness
     for (int t = 0; t < num_threads; ++t) {
-        RC_ASSERT(unaligned[static_cast<size_t>(t)].value.load() == increments);
+        RC_ASSERT(unaligned[static_cast<size_t>(t)].load() == increments);
         RC_ASSERT(aligned[static_cast<size_t>(t)].value.load() == increments);
     }
 

@@ -50,6 +50,10 @@ struct PackedCounters {
  *
  * Using alignas(64) ensures each counter occupies its own cache line,
  * preventing false sharing between threads.
+ *
+ * This is equivalent to CacheLinePadded<std::atomic<int64_t>>.
+ * For a convenience wrapper with common operations, see
+ * hpc::concurrency::AlignedCounter.
  */
 struct alignas(CACHE_LINE_SIZE) PaddedCounter {
     std::atomic<int64_t> value{0};
