@@ -12,6 +12,7 @@ hpc_add_example(
 hpc_add_example(
     NAME compile_time
     SOURCES src/compile_time.cpp
+    INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # Vector reserve example
@@ -19,6 +20,7 @@ hpc_add_example(
     NAME vector_reserve
     SOURCES src/vector_reserve.cpp
     BENCHMARK_SOURCES bench/vector_reserve_bench.cpp
+    INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # Ranges vs loops example
@@ -26,4 +28,5 @@ hpc_add_example(
     NAME ranges_vs_loops
     SOURCES src/ranges_vs_loops.cpp
     BENCHMARK_SOURCES bench/ranges_bench.cpp
+    INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

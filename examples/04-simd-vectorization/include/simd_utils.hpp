@@ -151,6 +151,22 @@ public:
 };
 
 /**
+ * @brief Alias for aligned_allocator with clearer SIMD-specific naming
+ *
+ * This alias provides a more intuitive name for the SIMD-aligned allocator,
+ * distinguishing it from hpc::memory::AlignedAllocator which uses cache-line
+ * alignment (compile-time constant).
+ *
+ * Key differences from hpc::memory::AlignedAllocator:
+ * - Uses runtime SIMD detection for alignment (16/32/64 bytes based on CPU)
+ * - hpc::memory::AlignedAllocator uses compile-time CACHE_LINE_SIZE
+ *
+ * Both names (aligned_allocator and simd_allocator) are equivalent.
+ */
+template <typename T>
+using simd_allocator = aligned_allocator<T>;
+
+/**
  * @brief Aligned vector type for SIMD operations
  */
 template <typename T>

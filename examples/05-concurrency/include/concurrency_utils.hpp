@@ -30,7 +30,7 @@ namespace hpc::concurrency {
 // 使用核心头文件中的常量和函数
 //------------------------------------------------------------------------------
 
-// CACHE_LINE_SIZE 已通过 hpc/core.hpp 的 using 声明导入
+// CACHE_LINE_SIZE 来自 hpc::core 命名空间
 // hardware_concurrency() 在 hpc::core 中定义
 
 // 为了向后兼容，在当前命名空间中提供别名
@@ -48,12 +48,12 @@ using hpc::core::hardware_concurrency;
  *
  * For other types requiring cache-line alignment, use:
  * - hpc::memory::CacheLinePadded<T> (from memory_utils.hpp)
- * - alignas(CACHE_LINE_SIZE) directly
+ * - alignas(hpc::core::CACHE_LINE_SIZE) directly
  *
  * Note: The UnalignedCounter type has been removed. For unaligned counters,
  * use std::atomic<int64_t> directly to demonstrate the performance difference.
  */
-struct alignas(CACHE_LINE_SIZE) AlignedCounter {
+struct alignas(hpc::core::CACHE_LINE_SIZE) AlignedCounter {
     std::atomic<int64_t> value{0};
 
     void increment(std::memory_order order = std::memory_order_seq_cst) {

@@ -9,6 +9,8 @@
 
 #include <numeric>
 
+using hpc::core::CACHE_LINE_SIZE;
+
 namespace hpc::concurrency::test {
 
 // ---------------------------------------------------------------------------

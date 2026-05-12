@@ -106,19 +106,3 @@ inline unsigned int hardware_concurrency() {
 }
 
 }  // namespace hpc::core
-
-//------------------------------------------------------------------------------
-// Backward Compatibility
-//------------------------------------------------------------------------------
-
-// Backward compatibility: bring into hpc::memory namespace
-// Note: New code should use hpc::core::CACHE_LINE_SIZE and hpc::core::PAGE_SIZE directly
-namespace hpc::memory {
-using hpc::core::CACHE_LINE_SIZE;
-using hpc::core::PAGE_SIZE;
-}  // namespace hpc::memory
-
-// Backward compatibility: bring into hpc::concurrency namespace
-namespace hpc::concurrency {
-using hpc::core::CACHE_LINE_SIZE;
-}  // namespace hpc::concurrency

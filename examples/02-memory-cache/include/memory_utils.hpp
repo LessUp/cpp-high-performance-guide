@@ -28,7 +28,7 @@ namespace hpc::memory {
 // 使用核心头文件中的常量
 //------------------------------------------------------------------------------
 
-// CACHE_LINE_SIZE 和 PAGE_SIZE 已通过 hpc/core.hpp 的 using 声明导入
+// CACHE_LINE_SIZE 和 PAGE_SIZE 来自 hpc::core 命名空间
 
 //------------------------------------------------------------------------------
 // Aligned Memory Allocation
@@ -81,7 +81,7 @@ using aligned_unique_ptr = std::unique_ptr<T, AlignedDeleter>;
  * @brief Create aligned unique pointer
  */
 template <typename T>
-aligned_unique_ptr<T> make_aligned(std::size_t count, std::size_t alignment = CACHE_LINE_SIZE) {
+aligned_unique_ptr<T> make_aligned(std::size_t count, std::size_t alignment = hpc::core::CACHE_LINE_SIZE) {
     void* ptr = aligned_alloc(count * sizeof(T), alignment);
     if (!ptr) {
         throw std::bad_alloc();
@@ -96,7 +96,7 @@ aligned_unique_ptr<T> make_aligned(std::size_t count, std::size_t alignment = CA
 /**
  * @brief STL-compatible allocator with custom alignment
  */
-template <typename T, std::size_t Alignment = CACHE_LINE_SIZE>
+template <typename T, std::size_t Alignment = hpc::core::CACHE_LINE_SIZE>
 class AlignedAllocator {
 public:
     using value_type = T;
@@ -144,7 +144,7 @@ bool operator!=(const AlignedAllocator<T, A>&, const AlignedAllocator<U, A>&) no
  * @brief Vector with cache-line aligned storage
  */
 template <typename T>
-using aligned_vector = std::vector<T, AlignedAllocator<T, CACHE_LINE_SIZE>>;
+using aligned_vector = std::vector<T, AlignedAllocator<T, hpc::core::CACHE_LINE_SIZE>>;
 
 //------------------------------------------------------------------------------
 // Cache Line Padding
@@ -154,7 +154,7 @@ using aligned_vector = std::vector<T, AlignedAllocator<T, CACHE_LINE_SIZE>>;
  * @brief Pad a type to cache line size to prevent false sharing
  */
 template <typename T>
-struct alignas(CACHE_LINE_SIZE) CacheLinePadded {
+struct alignas(hpc::core::CACHE_LINE_SIZE) CacheLinePadded {
     T value;
 
     CacheLinePadded() = default;
