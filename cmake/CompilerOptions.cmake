@@ -15,7 +15,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(HPC_IS_GCC TRUE)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(HPC_IS_CLANG TRUE)
-    # Detect Apple Clang (has different warning behavior)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
         set(HPC_IS_APPLE_CLANG TRUE)
     endif()
@@ -23,82 +22,67 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(HPC_IS_MSVC TRUE)
 endif()
 
-# Detect ARM architecture (Apple Silicon, Raspberry Pi, etc.)
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|ARM")
     set(HPC_IS_ARM TRUE)
 endif()
+
+#------------------------------------------------------------------------------
+# Helper: Add compile options for specific configurations
+#------------------------------------------------------------------------------
+function(_hpc_add_config_options target)
+    cmake_parse_arguments(ARG "" "RELEASE;RELWITHDEBINFO;DEBUG" "" ${ARGN})
+    
+    if(ARG_RELEASE)
+        target_compile_options(${target} PRIVATE "$<$<CONFIG:Release>:${ARG_RELEASE}>")
+    endif()
+    if(ARG_RELWITHDEBINFO)
+        target_compile_options(${target} PRIVATE "$<$<CONFIG:RelWithDebInfo>:${ARG_RELWITHDEBINFO}>")
+    endif()
+    if(ARG_DEBUG)
+        target_compile_options(${target} PRIVATE "$<$<CONFIG:Debug>:${ARG_DEBUG}>")
+    endif()
+endfunction()
 
 #------------------------------------------------------------------------------
 # hpc_set_compiler_options(target)
 # Sets warning levels and optimization flags for a target
 #------------------------------------------------------------------------------
 function(hpc_set_compiler_options target)
-    # Parse arguments
     cmake_parse_arguments(ARG "DISABLE_WARNINGS;ENABLE_FAST_MATH" "" "" ${ARGN})
 
-    # Warning flags
     if(NOT ARG_DISABLE_WARNINGS)
         if(HPC_IS_GCC OR HPC_IS_CLANG)
             target_compile_options(${target} PRIVATE
-                -Wall
-                -Wextra
-                -Wpedantic
-                -Wconversion
-                -Wshadow
-                -Wunused
-                -Wnon-virtual-dtor
-                -Wold-style-cast
-                -Wcast-align
-                -Woverloaded-virtual
-                -Wformat=2
+                -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wunused
+                -Wnon-virtual-dtor -Wold-style-cast -Wcast-align
+                -Woverloaded-virtual -Wformat=2
             )
-            # Apple Clang has stricter sign-conversion warnings that trigger
-            # in third-party libraries like RapidCheck. Suppress them.
             if(HPC_IS_APPLE_CLANG)
-                target_compile_options(${target} PRIVATE
-                    -Wno-sign-conversion
-                )
+                target_compile_options(${target} PRIVATE -Wno-sign-conversion)
             endif()
         elseif(HPC_IS_MSVC)
-            target_compile_options(${target} PRIVATE
-                /W4
-                /permissive-
-            )
+            target_compile_options(${target} PRIVATE /W4 /permissive-)
         endif()
     endif()
     
-    # Release optimization flags
     if(HPC_IS_ARM)
-        # ARM uses -mcpu=native instead of -march=native
-        target_compile_options(${target} PRIVATE
-            $<$<CONFIG:Release>:-O3>
-            $<$<CONFIG:Release>:-mcpu=native>
-            $<$<CONFIG:RelWithDebInfo>:-O2>
-            $<$<CONFIG:RelWithDebInfo>:-g>
+        _hpc_add_config_options(${target}
+            RELEASE "-O3;-mcpu=native"
+            RELWITHDEBINFO "-O2;-g"
         )
     elseif(HPC_IS_GCC OR HPC_IS_CLANG)
-        target_compile_options(${target} PRIVATE
-            $<$<CONFIG:Release>:-O3>
-            $<$<CONFIG:Release>:-march=native>
-            $<$<CONFIG:Release>:-mtune=native>
-            $<$<CONFIG:RelWithDebInfo>:-O2>
-            $<$<CONFIG:RelWithDebInfo>:-g>
-            $<$<CONFIG:RelWithDebInfo>:-march=native>
+        _hpc_add_config_options(${target}
+            RELEASE "-O3;-march=native;-mtune=native"
+            RELWITHDEBINFO "-O2;-g;-march=native"
         )
         
-        # Fast math (use with caution - breaks IEEE compliance)
         if(ARG_ENABLE_FAST_MATH)
-            target_compile_options(${target} PRIVATE
-                $<$<CONFIG:Release>:-ffast-math>
-            )
+            _hpc_add_config_options(${target} RELEASE "-ffast-math")
         endif()
         
-        # Enable vectorization reports (opt-in to avoid noisy builds)
         if(HPC_VECTORIZE_REPORT)
             if(HPC_IS_GCC)
-                target_compile_options(${target} PRIVATE
-                    $<$<CONFIG:Release>:-fopt-info-vec-optimized>
-                )
+                _hpc_add_config_options(${target} RELEASE "-fopt-info-vec-optimized")
             elseif(HPC_IS_CLANG)
                 target_compile_options(${target} PRIVATE
                     $<$<CONFIG:Release>:-Rpass=loop-vectorize>
@@ -108,17 +92,13 @@ function(hpc_set_compiler_options target)
         endif()
         
     elseif(HPC_IS_MSVC)
-        target_compile_options(${target} PRIVATE
-            $<$<CONFIG:Release>:/O2>
-            $<$<CONFIG:Release>:/arch:AVX2>
-            $<$<CONFIG:RelWithDebInfo>:/O2>
-            $<$<CONFIG:RelWithDebInfo>:/Zi>
+        _hpc_add_config_options(${target}
+            RELEASE "/O2;/arch:AVX2"
+            RELWITHDEBINFO "/O2;/Zi"
         )
         
         if(ARG_ENABLE_FAST_MATH)
-            target_compile_options(${target} PRIVATE
-                $<$<CONFIG:Release>:/fp:fast>
-            )
+            _hpc_add_config_options(${target} RELEASE "/fp:fast")
         endif()
     endif()
 endfunction()
@@ -131,25 +111,25 @@ function(hpc_enable_simd target)
     cmake_parse_arguments(ARG "SSE;AVX;AVX2;AVX512" "" "" ${ARGN})
 
     if(HPC_IS_ARM)
-        # ARM uses NEON instead of x86 SIMD
         if(HPC_IS_CLANG OR HPC_IS_GCC)
-            # NEON is enabled by default on AArch64, but we can add march flag
-            target_compile_options(${target} PRIVATE
-                $<$<CONFIG:Release>:-mcpu=native>
-            )
+            _hpc_add_config_options(${target} RELEASE "-mcpu=native")
         endif()
     elseif(HPC_IS_GCC OR HPC_IS_CLANG)
+        set(simd_flags "")
         if(ARG_SSE)
-            target_compile_options(${target} PRIVATE -msse4.2)
+            list(APPEND simd_flags -msse4.2)
         endif()
         if(ARG_AVX)
-            target_compile_options(${target} PRIVATE -mavx)
+            list(APPEND simd_flags -mavx)
         endif()
         if(ARG_AVX2)
-            target_compile_options(${target} PRIVATE -mavx2 -mfma)
+            list(APPEND simd_flags -mavx2 -mfma)
         endif()
         if(ARG_AVX512)
-            target_compile_options(${target} PRIVATE -mavx512f -mavx512dq)
+            list(APPEND simd_flags -mavx512f -mavx512dq)
+        endif()
+        if(simd_flags)
+            target_compile_options(${target} PRIVATE ${simd_flags})
         endif()
     elseif(HPC_IS_MSVC)
         if(ARG_AVX)

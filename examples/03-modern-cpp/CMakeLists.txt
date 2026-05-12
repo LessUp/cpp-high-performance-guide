@@ -1,16 +1,17 @@
 # Modern C++ Features Optimization Examples
 
-# Compile-time computation example
-hpc_add_example(
-    NAME compile_time
-    SOURCES src/compile_time.cpp
-)
-
-# Move semantics example
+# Move semantics example (with shared buffer.hpp)
 hpc_add_example(
     NAME move_semantics
     SOURCES src/move_semantics.cpp
     BENCHMARK_SOURCES bench/move_semantics_bench.cpp
+    INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+# Compile-time computation example
+hpc_add_example(
+    NAME compile_time
+    SOURCES src/compile_time.cpp
 )
 
 # Vector reserve example
