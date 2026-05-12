@@ -36,6 +36,7 @@ export default withMermaid(defineConfig({
         nav: [
           {
             text: 'Start',
+            activeMatch: '/en/getting-started/',
             items: [
               { text: 'Docs landing', link: '/en/' },
               { text: 'Quick Start', link: '/en/getting-started/quickstart' },
@@ -44,6 +45,7 @@ export default withMermaid(defineConfig({
           },
           {
             text: 'Learn',
+            activeMatch: '/en/guides/',
             items: [
               { text: 'Learning Path', link: '/en/guides/learning-path' },
               { text: 'Optimization Decision Tree', link: '/en/guides/optimization-decision-tree' },
@@ -54,6 +56,7 @@ export default withMermaid(defineConfig({
           },
           {
             text: 'Reference',
+            activeMatch: '/en/reference/',
             items: [
               { text: 'FAQ', link: '/en/reference/faq' },
               { text: 'Troubleshooting', link: '/en/reference/troubleshooting' },
@@ -62,6 +65,7 @@ export default withMermaid(defineConfig({
           },
           {
             text: 'Contributing',
+            activeMatch: '/en/contributing/',
             items: [
               { text: 'AI Workflow', link: '/en/contributing/ai-workflow' },
               { text: 'Repository', link: 'https://github.com/LessUp/cpp-high-performance-guide' },
@@ -140,6 +144,7 @@ export default withMermaid(defineConfig({
         nav: [
           {
             text: '开始',
+            activeMatch: '/zh/getting-started/',
             items: [
               { text: '文档入口', link: '/zh/' },
               { text: '快速开始', link: '/zh/getting-started/quickstart' },
@@ -148,6 +153,7 @@ export default withMermaid(defineConfig({
           },
           {
             text: '学习',
+            activeMatch: '/zh/guides/',
             items: [
               { text: '学习路径', link: '/zh/guides/learning-path' },
               { text: '优化决策树', link: '/zh/guides/optimization-decision-tree' },
@@ -158,6 +164,7 @@ export default withMermaid(defineConfig({
           },
           {
             text: '参考',
+            activeMatch: '/zh/reference/',
             items: [
               { text: '常见问题', link: '/zh/reference/faq' },
               { text: '故障排查', link: '/zh/reference/troubleshooting' },
@@ -166,6 +173,7 @@ export default withMermaid(defineConfig({
           },
           {
             text: '贡献',
+            activeMatch: '/zh/contributing/',
             items: [
               { text: 'AI 开发流程', link: '/zh/contributing/ai-workflow' },
               { text: '仓库主页', link: 'https://github.com/LessUp/cpp-high-performance-guide' },
