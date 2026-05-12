@@ -215,6 +215,12 @@
   color: var(--vp-c-brand-1);
 }
 
+/* === Search Bar - Right Aligned === */
+.VPNavBarSearch {
+  display: flex;
+  justify-content: flex-end;
+}
+
 /* === Sidebar Styling === */
 .VPSidebar {
   padding: var(--spacing-lg) var(--spacing-md) 96px;
