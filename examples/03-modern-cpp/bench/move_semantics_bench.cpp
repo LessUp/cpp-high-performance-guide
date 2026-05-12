@@ -8,55 +8,13 @@
 
 #include <benchmark/benchmark.h>
 
-#include <cstring>
 #include <vector>
+
+#include "buffer.hpp"
 
 namespace {
 
-class Buffer {
-public:
-    explicit Buffer(size_t size) : data_(new char[size]), size_(size) {
-        std::memset(data_, 'x', size_);
-    }
-
-    ~Buffer() { delete[] data_; }
-
-    Buffer(const Buffer& other) : data_(new char[other.size_]), size_(other.size_) {
-        std::memcpy(data_, other.data_, size_);
-    }
-
-    Buffer(Buffer&& other) noexcept : data_(other.data_), size_(other.size_) {
-        other.data_ = nullptr;
-        other.size_ = 0;
-    }
-
-    Buffer& operator=(const Buffer& other) {
-        if (this != &other) {
-            delete[] data_;
-            size_ = other.size_;
-            data_ = new char[size_];
-            std::memcpy(data_, other.data_, size_);
-        }
-        return *this;
-    }
-
-    Buffer& operator=(Buffer&& other) noexcept {
-        if (this != &other) {
-            delete[] data_;
-            data_ = other.data_;
-            size_ = other.size_;
-            other.data_ = nullptr;
-            other.size_ = 0;
-        }
-        return *this;
-    }
-
-    size_t size() const { return size_; }
-
-private:
-    char* data_;
-    size_t size_;
-};
+using hpc::move_semantics::Buffer;
 
 static void BM_Copy_Construction(benchmark::State& state) {
     const size_t size = static_cast<size_t>(state.range(0));

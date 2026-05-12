@@ -14,13 +14,13 @@
 
 #pragma once
 
-#include "hpc/core.hpp"  // 平台常量
-
 #include <cstddef>
 #include <cstdlib>
 #include <memory>
 #include <new>
 #include <vector>
+
+#include "hpc/core.hpp"  // 平台常量
 
 namespace hpc::memory {
 

@@ -26,6 +26,7 @@ add_executable(lock_free_queue_test
 
 target_include_directories(lock_free_queue_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/examples/05-concurrency/include
 )
 
 target_link_libraries(lock_free_queue_test PRIVATE

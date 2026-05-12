@@ -3,9 +3,10 @@
  * @brief Unit tests for lock-free SPSC and MPMC queues
  *
  * These tests verify the correctness of lock-free queue implementations.
- * The queue implementations are copied from examples/05-concurrency/src/lock_free_queue.cpp
- * for testing purposes.
+ * The queue implementations are now in lock_free_queue.hpp for reuse.
  */
+
+#include "lock_free_queue.hpp"
 
 #include <gtest/gtest.h>
 
@@ -14,80 +15,7 @@
 #include <thread>
 #include <vector>
 
-#include "hpc/core.hpp"
-
 namespace hpc::concurrency::test {
-
-//------------------------------------------------------------------------------
-// SPSCQueue implementation for testing
-//------------------------------------------------------------------------------
-
-template <typename T, size_t Capacity>
-class SPSCQueue {
-    static_assert((Capacity & (Capacity - 1)) == 0, "Capacity must be power of 2");
-    static_assert(Capacity >= 2, "Capacity must be at least 2");
-
-public:
-    SPSCQueue() : head_(0), tail_(0) {}
-
-    bool push(const T& value) {
-        const size_t current_tail = tail_.load(std::memory_order_relaxed);
-        const size_t next_tail = (current_tail + 1) & MASK;
-
-        if (next_tail == head_.load(std::memory_order_acquire)) {
-            return false;
-        }
-
-        buffer_[current_tail].emplace(value);
-        tail_.store(next_tail, std::memory_order_release);
-        return true;
-    }
-
-    bool push(T&& value) {
-        const size_t current_tail = tail_.load(std::memory_order_relaxed);
-        const size_t next_tail = (current_tail + 1) & MASK;
-
-        if (next_tail == head_.load(std::memory_order_acquire)) {
-            return false;
-        }
-
-        buffer_[current_tail].emplace(std::move(value));
-        tail_.store(next_tail, std::memory_order_release);
-        return true;
-    }
-
-    std::optional<T> pop() {
-        const size_t current_head = head_.load(std::memory_order_relaxed);
-
-        if (current_head == tail_.load(std::memory_order_acquire)) {
-            return std::nullopt;
-        }
-
-        T value = std::move(*buffer_[current_head]);
-        buffer_[current_head].reset();
-        head_.store((current_head + 1) & MASK, std::memory_order_release);
-        return value;
-    }
-
-    bool empty() const {
-        return head_.load(std::memory_order_relaxed) == tail_.load(std::memory_order_relaxed);
-    }
-
-    size_t size() const {
-        const size_t head = head_.load(std::memory_order_relaxed);
-        const size_t tail = tail_.load(std::memory_order_relaxed);
-        return (tail - head) & MASK;
-    }
-
-    constexpr size_t capacity() const { return Capacity - 1; }
-
-private:
-    static constexpr size_t MASK = Capacity - 1;
-
-    alignas(CACHE_LINE_SIZE) std::atomic<size_t> head_;
-    alignas(CACHE_LINE_SIZE) std::atomic<size_t> tail_;
-    alignas(CACHE_LINE_SIZE) std::optional<T> buffer_[Capacity];
-};
 
 //------------------------------------------------------------------------------
 // SPSCQueue Tests
@@ -137,7 +65,6 @@ TEST(SPSCQueueTest, FIFOOrder) {
 TEST(SPSCQueueTest, WrapAround) {
     SPSCQueue<int, 8> queue;  // capacity = 7
 
-    // Fill and drain multiple times to test wrap-around
     for (int round = 0; round < 3; ++round) {
         for (int i = 0; i < 5; ++i) {
             EXPECT_TRUE(queue.push(round * 100 + i));
@@ -184,7 +111,6 @@ TEST(SPSCQueueTest, ConcurrentProducerConsumer) {
     producer.join();
     consumer.join();
 
-    // Verify correctness
     EXPECT_EQ(received.size(), NUM_ITEMS);
     for (int i = 0; i < NUM_ITEMS; ++i) {
         EXPECT_EQ(received[i], i);
@@ -194,6 +120,95 @@ TEST(SPSCQueueTest, ConcurrentProducerConsumer) {
 TEST(SPSCQueueTest, CapacityReport) {
     SPSCQueue<int, 16> queue;
     EXPECT_EQ(queue.capacity(), 15);  // One slot is always empty
+}
+
+//------------------------------------------------------------------------------
+// MPMCQueue Tests
+//------------------------------------------------------------------------------
+
+TEST(MPMCQueueTest, PushPopSingleElement) {
+    MPMCQueue<int, 16> queue;
+    EXPECT_TRUE(queue.push(42));
+
+    auto value = queue.pop();
+    EXPECT_TRUE(value.has_value());
+    EXPECT_EQ(*value, 42);
+}
+
+TEST(MPMCQueueTest, EmptyQueueReturnsNullopt) {
+    MPMCQueue<int, 16> queue;
+
+    auto value = queue.pop();
+    EXPECT_FALSE(value.has_value());
+}
+
+TEST(MPMCQueueTest, FIFOOrder) {
+    MPMCQueue<int, 64> queue;
+
+    for (int i = 0; i < 10; ++i) {
+        EXPECT_TRUE(queue.push(i));
+    }
+
+    for (int i = 0; i < 10; ++i) {
+        auto value = queue.pop();
+        EXPECT_TRUE(value.has_value());
+        EXPECT_EQ(*value, i);
+    }
+}
+
+TEST(MPMCQueueTest, ConcurrentMultipleProducersConsumers) {
+    MPMCQueue<int, 1024> queue;
+    constexpr int NUM_PRODUCERS = 4;
+    constexpr int NUM_CONSUMERS = 4;
+    constexpr int ITEMS_PER_PRODUCER = 1000;
+
+    std::atomic<int> items_produced{0};
+    std::atomic<int> items_consumed{0};
+    std::atomic<bool> done{false};
+
+    std::vector<std::thread> producers;
+    std::vector<std::thread> consumers;
+
+    for (int p = 0; p < NUM_PRODUCERS; ++p) {
+        producers.emplace_back([&, p]() {
+            for (int i = 0; i < ITEMS_PER_PRODUCER; ++i) {
+                int value = p * ITEMS_PER_PRODUCER + i;
+                while (!queue.push(value)) {
+                    std::this_thread::yield();
+                }
+                items_produced.fetch_add(1, std::memory_order_relaxed);
+            }
+        });
+    }
+
+    for (int c = 0; c < NUM_CONSUMERS; ++c) {
+        consumers.emplace_back([&]() {
+            while (!done.load(std::memory_order_acquire)) {
+                if (queue.pop()) {
+                    items_consumed.fetch_add(1, std::memory_order_relaxed);
+                } else {
+                    std::this_thread::yield();
+                }
+            }
+            while (queue.pop()) {
+                items_consumed.fetch_add(1, std::memory_order_relaxed);
+            }
+        });
+    }
+
+    for (auto& t : producers) {
+        t.join();
+    }
+
+    done.store(true, std::memory_order_release);
+
+    for (auto& t : consumers) {
+        t.join();
+    }
+
+    int expected = NUM_PRODUCERS * ITEMS_PER_PRODUCER;
+    EXPECT_EQ(items_produced.load(), expected);
+    EXPECT_EQ(items_consumed.load(), expected);
 }
 
 }  // namespace hpc::concurrency::test

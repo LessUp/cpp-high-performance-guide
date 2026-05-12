@@ -1,58 +1,32 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
+import llmstxt from 'vitepress-plugin-llms'
 
-// Site configuration constants - single source of truth
-const BASE_PATH = '/cpp-high-performance-guide/'
-const DEFAULT_LOCALE = 'en'
-const LOCALE_MAP: Record<string, string> = {
-  zh: 'zh', // Chinese -> /zh/
-  // All other languages default to /en/
-}
+const rawBase = process.env.VITEPRESS_BASE
+const base = rawBase
+  ? rawBase.startsWith('/')
+    ? rawBase.endsWith('/') ? rawBase : `${rawBase}/`
+    : `/${rawBase}/`
+  : '/'
 
-// Generate locale redirect script with dynamic base path
-function generateLocaleRedirectScript(): string {
-  return `(()=>{const b='${BASE_PATH}',k='lr',s=sessionStorage,p=location.pathname;if(s.getItem(k))return;if(p!==b&&p!==b.slice(0,-1))return;s.setItem(k,'1');const l=(navigator.language||'${DEFAULT_LOCALE}').toLowerCase().slice(0,2),t=LOCALE_MAP[l]||'${DEFAULT_LOCALE}';location.replace(b+t+'/'+location.search)})()`
-    .replace('LOCALE_MAP', JSON.stringify(LOCALE_MAP))
-}
-
-export default defineConfig({
+export default withMermaid(defineConfig({
   title: 'C++ High Performance Guide',
   description:
     'Runnable C++20 performance engineering examples covering CMake, memory layout, SIMD, concurrency, and profiling.',
-  base: BASE_PATH,
+  base: base || '/cpp-high-performance-guide/',
   cleanUrls: true,
   lastUpdated: true,
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${BASE_PATH}favicon.svg` }],
-    ['meta', { name: 'theme-color', content: '#5c7cfa' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    ['meta', { name: 'theme-color', content: '#3476f6' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: 'C++ High Performance Guide' }],
     ['meta', { property: 'og:title', content: 'C++ High Performance Guide' }],
     ['meta', { property: 'og:description', content: 'Runnable C++20 performance engineering examples and learning docs.' }],
-    ['meta', { property: 'og:image', content: `https://lessup.github.io${BASE_PATH}logo.svg` }],
+    ['meta', { property: 'og:image', content: 'https://lessup.github.io/cpp-high-performance-guide/logo.svg' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'keywords', content: 'C++, C++20, performance, SIMD, cache optimization, concurrency, CMake, benchmark' }],
-    // Auto-redirect based on browser language (runs before page renders)
-    ['script', {}, generateLocaleRedirectScript()],
   ],
-  themeConfig: {
-    logo: '/logo.svg',
-    siteTitle: 'C++ HPC Guide',
-    search: { provider: 'local' },
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/LessUp/cpp-high-performance-guide', ariaLabel: 'GitHub' },
-    ],
-    editLink: {
-      pattern: 'https://github.com/LessUp/cpp-high-performance-guide/edit/master/docs/:path',
-      text: 'Edit this page on GitHub',
-    },
-    footer: {
-      message: 'Released under the MIT License.',
-      copyright: `Copyright © ${new Date().getFullYear()} C++ HPC Guide Contributors`,
-    },
-    outline: {
-      level: [2, 3],
-    },
-  },
   locales: {
     root: {
       label: 'English',
@@ -259,10 +233,14 @@ export default defineConfig({
       },
     },
   },
-  markdown: {
-    theme: {
-      light: 'github-light',
-      dark: 'github-dark',
-    },
+  themeConfig: {
+    outline: [2, 3],
+    search: { provider: 'local' },
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/LessUp/cpp-high-performance-guide' },
+    ],
   },
-})
+  vite: {
+    plugins: [llmstxt()],
+  },
+}))

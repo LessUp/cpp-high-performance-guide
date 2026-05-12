@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include "hpc/core.hpp"  // 平台常量
-
 #include <atomic>
 #include <chrono>
 #include <concepts>  // C++20 concepts
@@ -23,6 +21,8 @@
 #include <mutex>  // for std::lock_guard, std::unique_lock
 #include <thread>
 #include <vector>
+
+#include "hpc/core.hpp"  // 平台常量
 
 namespace hpc::concurrency {
 

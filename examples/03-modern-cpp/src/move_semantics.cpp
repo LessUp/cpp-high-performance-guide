@@ -13,101 +13,13 @@
  */
 
 #include <chrono>
-#include <cstring>
 #include <iostream>
 #include <utility>
 #include <vector>
 
+#include "buffer.hpp"
+
 namespace hpc::move_semantics {
-
-//------------------------------------------------------------------------------
-// Buffer class demonstrating move semantics
-//------------------------------------------------------------------------------
-
-/**
- * @brief A buffer class with explicit copy and move operations
- *
- * This class owns a dynamically allocated buffer and demonstrates
- * the difference between copying (expensive) and moving (cheap).
- */
-class Buffer {
-public:
-    // Default constructor
-    Buffer() : data_(nullptr), size_(0) {}
-
-    // Constructor with size
-    explicit Buffer(size_t size) : data_(new char[size]), size_(size) {
-        std::memset(data_, 0, size_);
-    }
-
-    // Destructor
-    ~Buffer() { delete[] data_; }
-
-    // Copy constructor - EXPENSIVE
-    Buffer(const Buffer& other) : data_(nullptr), size_(other.size_) {
-        if (size_ > 0) {
-            data_ = new char[size_];
-            std::memcpy(data_, other.data_, size_);
-        }
-        ++copy_count_;
-    }
-
-    // Copy assignment - EXPENSIVE
-    Buffer& operator=(const Buffer& other) {
-        if (this != &other) {
-            delete[] data_;
-            size_ = other.size_;
-            if (size_ > 0) {
-                data_ = new char[size_];
-                std::memcpy(data_, other.data_, size_);
-            } else {
-                data_ = nullptr;
-            }
-            ++copy_count_;
-        }
-        return *this;
-    }
-
-    // Move constructor - CHEAP
-    Buffer(Buffer&& other) noexcept : data_(other.data_), size_(other.size_) {
-        other.data_ = nullptr;
-        other.size_ = 0;
-        ++move_count_;
-    }
-
-    // Move assignment - CHEAP
-    Buffer& operator=(Buffer&& other) noexcept {
-        if (this != &other) {
-            delete[] data_;
-            data_ = other.data_;
-            size_ = other.size_;
-            other.data_ = nullptr;
-            other.size_ = 0;
-            ++move_count_;
-        }
-        return *this;
-    }
-
-    size_t size() const { return size_; }
-    char* data() { return data_; }
-    const char* data() const { return data_; }
-
-    // Statistics
-    static size_t copy_count_;
-    static size_t move_count_;
-
-    static void reset_counts() {
-        copy_count_ = 0;
-        move_count_ = 0;
-    }
-
-private:
-    char* data_;
-    size_t size_;
-};
-
-size_t Buffer::copy_count_ = 0;
-size_t Buffer::move_count_ = 0;
 
 //------------------------------------------------------------------------------
 // Functions demonstrating copy vs move

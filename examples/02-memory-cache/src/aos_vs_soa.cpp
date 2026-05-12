@@ -16,10 +16,10 @@
  *   - Requirement 2.1: AOS vs SOA Comparison
  */
 
-#include "particle_types.hpp"
-
 #include <chrono>
 #include <iostream>
+
+#include "particle_types.hpp"
 
 namespace {
 

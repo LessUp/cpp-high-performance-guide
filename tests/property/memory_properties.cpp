@@ -33,13 +33,13 @@
 
 namespace {
 
+using hpc::bench::Timer;
+using hpc::concurrency::AlignedCounter;
+using hpc::core::CACHE_LINE_SIZE;
 using hpc::memory::ParticleAOS;
 using hpc::memory::ParticleSOA;
 using hpc::memory::update_particles_aos;
 using hpc::memory::update_particles_soa;
-using hpc::core::CACHE_LINE_SIZE;
-using hpc::concurrency::AlignedCounter;
-using hpc::bench::Timer;
 
 //------------------------------------------------------------------------------
 // Property 3: SOA Performance Advantage for Sequential Access
@@ -114,7 +114,6 @@ RC_GTEST_PROP(MemoryProperties, SOAPerformanceAdvantage, ()) {
 // 使用 hpc::concurrency::AlignedCounter 和 std::atomic<int> 进行对比测试
 // 注意：UnalignedCounter 已被删除，因为它没有任何价值
 // 对于未对齐的情况，直接使用 std::atomic<int>
-
 
 RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
     // Feature: hpc-optimization-guide, Property 4: Cache-Line Aligned Counters
