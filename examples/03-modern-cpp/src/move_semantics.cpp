@@ -23,6 +23,7 @@ namespace hpc::move_semantics {
 
 //------------------------------------------------------------------------------
 // Functions demonstrating copy vs move
+// Note: process_by_copy and process_by_ref are defined in buffer.hpp
 //------------------------------------------------------------------------------
 
 /**
@@ -31,24 +32,6 @@ namespace hpc::move_semantics {
 Buffer create_buffer(size_t size) {
     Buffer buf(size);
     return buf;  // NRVO may elide the copy/move
-}
-
-/**
- * @brief Process buffer by copy (expensive)
- */
-void process_by_copy(Buffer buf) {
-    // Do something with buf
-    volatile char c = buf.data()[0];
-    (void)c;
-}
-
-/**
- * @brief Process buffer by const reference (no copy)
- */
-void process_by_ref(const Buffer& buf) {
-    // Do something with buf
-    volatile char c = buf.data()[0];
-    (void)c;
 }
 
 /**

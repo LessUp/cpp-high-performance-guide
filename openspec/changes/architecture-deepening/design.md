@@ -202,3 +202,103 @@
 - ✅ 无锁队列已移至头文件，便于复用
 - ✅ MPMC 队列已有单元测试
 - ✅ 架构决策已记录在本文档中
+
+---
+
+## 2026-05-13 深化（第二轮）
+
+### 8. 创建 CONTEXT.md 领域词汇表
+
+**问题**：项目缺乏统一的领域术语定义，影响 AI 辅助开发的准确性。
+
+**解决方案**：
+- 创建 `CONTEXT.md` 定义核心领域术语
+- 包含：缓存行对齐、伪共享、AOS/SOA、无锁、内存序、SIMD、向量化等
+- 提供中英文对照
+
+**收益**：
+- AI 可导航性提升
+- 文档一致性
+- 新维护者快速上手
+
+**文件修改**：
+- 新增 `CONTEXT.md`
+
+### 9. 提取测试源文件到头文件
+
+**问题**：`modern_cpp_examples_test.cpp` 直接包含 `.cpp` 源文件，使用 `HPC_TEST_MODE` 宏切换行为。这是纯函数提取反模式——测试绑定实现细节而非接口。
+
+**解决方案**：
+- 创建 `vector_reserve.hpp`：提取 `CountingAllocator` 模板类
+- 创建 `compile_time.hpp`：提取 `factorial_*`、`fnv1a_hash`、`is_prime`、`FIRST_100_PRIMES`
+- 创建 `ranges_utils.hpp`：提取 `transform_*`、`filter_*`、`chain_*`、`sum_*`、`to_vector`
+- 修改测试包含头文件而非源文件
+- 更新 `buffer.hpp`：添加 `process_by_copy` 和 `process_by_ref` 函数
+
+**收益**：
+- 接口成为测试表面
+- 修改实现无需修改测试
+- 与已完成的 `buffer.hpp` 模式一致
+
+**文件修改**：
+- 新增 `examples/03-modern-cpp/include/vector_reserve.hpp`
+- 新增 `examples/03-modern-cpp/include/compile_time.hpp`
+- 新增 `examples/03-modern-cpp/include/ranges_utils.hpp`
+- 修改 `examples/03-modern-cpp/include/buffer.hpp`
+- 修改 `examples/03-modern-cpp/src/vector_reserve.cpp`
+- 修改 `examples/03-modern-cpp/src/compile_time.cpp`
+- 修改 `examples/03-modern-cpp/src/ranges_vs_loops.cpp`
+- 修改 `examples/03-modern-cpp/src/move_semantics.cpp`
+- 修改 `examples/03-modern-cpp/CMakeLists.txt`
+- 修改 `tests/unit/modern_cpp/modern_cpp_examples_test.cpp`
+
+### 10. 添加 simd_allocator 别名
+
+**问题**：`hpc::simd::aligned_allocator` 和 `hpc::memory::AlignedAllocator` 命名相似但语义不同，可能造成混淆。
+
+**解决方案**：
+- 在 `simd_utils.hpp` 中添加 `simd_allocator` 别名
+- 保留原有 `aligned_allocator` 名称（无破坏性）
+- 添加文档说明与 `hpc::memory::AlignedAllocator` 的区别
+
+**收益**：
+- 命名更直观
+- 无破坏性变更
+
+**文件修改**：
+- 修改 `examples/04-simd-vectorization/include/simd_utils.hpp`
+
+### 11. 删除向后兼容层并更新引用
+
+**问题**：`core.hpp` 包含向后兼容的 `using` 声明，将常量导入到 `hpc::memory` 和 `hpc::concurrency` 命名空间，增加认知负担。
+
+**解决方案**：
+- 删除 `core.hpp` 中的 `using` 声明
+- 更新所有使用 `CACHE_LINE_SIZE` 和 `PAGE_SIZE` 的文件，添加 `hpc::core::` 前缀
+- 在测试文件中添加 `using hpc::core::CACHE_LINE_SIZE;`
+
+**收益**：
+- 单一真实来源
+- 命名空间更清晰
+- 减少认知负荷
+
+**文件修改**：
+- 修改 `include/hpc/core.hpp`
+- 修改 `examples/05-concurrency/include/lock_free_queue.hpp`
+- 修改 `examples/05-concurrency/include/concurrency_utils.hpp`
+- 修改 `examples/02-memory-cache/include/memory_utils.hpp`
+- 修改 `examples/02-memory-cache/src/false_sharing.cpp`
+- 修改 `tests/unit/memory/memory_utils_test.cpp`
+- 修改 `tests/unit/concurrency/concurrency_utils_test.cpp`
+
+### 第二轮深化总结
+
+本次深化共：
+- 新增约 250 行（新头文件）
+- 修改约 20 个文件
+- 删除向后兼容层，统一命名空间
+- 创建领域词汇表
+
+测试验证：
+- Debug 构建：65/65 测试通过
+- ASAN 构建：65/65 测试通过

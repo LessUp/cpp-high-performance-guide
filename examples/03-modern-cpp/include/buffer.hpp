@@ -98,4 +98,26 @@ private:
 inline size_t Buffer::copy_count_ = 0;
 inline size_t Buffer::move_count_ = 0;
 
+//------------------------------------------------------------------------------
+// Functions demonstrating copy vs move
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Process buffer by copy (expensive)
+ */
+inline void process_by_copy(Buffer buf) {
+    // Do something with buf
+    volatile char c = buf.data()[0];
+    (void)c;
+}
+
+/**
+ * @brief Process buffer by const reference (no copy)
+ */
+inline void process_by_ref(const Buffer& buf) {
+    // Do something with buf
+    volatile char c = buf.data()[0];
+    (void)c;
+}
+
 }  // namespace hpc::move_semantics

@@ -55,7 +55,7 @@ struct PackedCounters {
  * For a convenience wrapper with common operations, see
  * hpc::concurrency::AlignedCounter.
  */
-struct alignas(CACHE_LINE_SIZE) PaddedCounter {
+struct alignas(hpc::core::CACHE_LINE_SIZE) PaddedCounter {
     std::atomic<int64_t> value{0};
     // Padding is implicit due to alignas
 };
@@ -170,7 +170,7 @@ int main() {
 
     std::cout << "=== False Sharing Demonstration ===\n\n";
 
-    std::cout << "Cache line size: " << CACHE_LINE_SIZE << " bytes\n";
+    std::cout << "Cache line size: " << hpc::core::CACHE_LINE_SIZE << " bytes\n";
     std::cout << "sizeof(PackedCounters): " << sizeof(PackedCounters) << " bytes\n";
     std::cout << "sizeof(PaddedCounters): " << sizeof(PaddedCounters) << " bytes\n\n";
 

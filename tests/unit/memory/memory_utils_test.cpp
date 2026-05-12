@@ -7,6 +7,9 @@
 
 #include <gtest/gtest.h>
 
+using hpc::core::CACHE_LINE_SIZE;
+using hpc::core::PAGE_SIZE;
+
 namespace hpc::memory::test {
 
 // ---------------------------------------------------------------------------

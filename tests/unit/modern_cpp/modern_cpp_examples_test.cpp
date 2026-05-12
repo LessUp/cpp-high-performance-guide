@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 
-#define HPC_TEST_MODE
-#include "../../../examples/03-modern-cpp/src/compile_time.cpp"
-#include "../../../examples/03-modern-cpp/src/move_semantics.cpp"
-#include "../../../examples/03-modern-cpp/src/ranges_vs_loops.cpp"
-#include "../../../examples/03-modern-cpp/src/vector_reserve.cpp"
+#include "buffer.hpp"
+#include "compile_time.hpp"
+#include "ranges_utils.hpp"
+#include "vector_reserve.hpp"
 
 TEST(CompileTimeExamplesTest, FactorialFunctionsMatch) {
     EXPECT_EQ(hpc::compile_time::factorial_runtime(10), 3628800);

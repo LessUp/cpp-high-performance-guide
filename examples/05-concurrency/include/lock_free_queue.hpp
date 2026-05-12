@@ -124,9 +124,9 @@ public:
 private:
     static constexpr size_t MASK = Capacity - 1;
 
-    alignas(CACHE_LINE_SIZE) std::atomic<size_t> head_;
-    alignas(CACHE_LINE_SIZE) std::atomic<size_t> tail_;
-    alignas(CACHE_LINE_SIZE) std::optional<T> buffer_[Capacity];
+    alignas(hpc::core::CACHE_LINE_SIZE) std::atomic<size_t> head_;
+    alignas(hpc::core::CACHE_LINE_SIZE) std::atomic<size_t> tail_;
+    alignas(hpc::core::CACHE_LINE_SIZE) std::optional<T> buffer_[Capacity];
 };
 
 //------------------------------------------------------------------------------
@@ -232,9 +232,9 @@ public:
 private:
     static constexpr size_t MASK = Capacity - 1;
 
-    alignas(CACHE_LINE_SIZE) Cell cells_[Capacity];
-    alignas(CACHE_LINE_SIZE) std::atomic<size_t> enqueue_pos_;
-    alignas(CACHE_LINE_SIZE) std::atomic<size_t> dequeue_pos_;
+    alignas(hpc::core::CACHE_LINE_SIZE) Cell cells_[Capacity];
+    alignas(hpc::core::CACHE_LINE_SIZE) std::atomic<size_t> enqueue_pos_;
+    alignas(hpc::core::CACHE_LINE_SIZE) std::atomic<size_t> dequeue_pos_;
 };
 
 }  // namespace hpc::concurrency
