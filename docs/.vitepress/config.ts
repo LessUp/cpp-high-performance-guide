@@ -17,6 +17,8 @@ export default defineConfig({
     ['meta', { property: 'og:image', content: 'https://lessup.github.io/cpp-high-performance-guide/logo.svg' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'keywords', content: 'C++, C++20, performance, SIMD, cache optimization, concurrency, CMake, benchmark' }],
+    // Auto-redirect based on browser language (runs before page renders)
+    ['script', {}, `(()=>{if(sessionStorage.getItem('locale-redirect-done'))return;const p=window.location.pathname;if(p==='/cpp-high-performance-guide/'||p==='/cpp-high-performance-guide'){sessionStorage.setItem('locale-redirect-done','true');const l=navigator.language.toLowerCase();window.location.replace(l.startsWith('zh')?'/cpp-high-performance-guide/zh/':'/cpp-high-performance-guide/en/')}})()`],
   ],
   themeConfig: {
     logo: '/logo.svg',
@@ -41,7 +43,6 @@ export default defineConfig({
     root: {
       label: 'English',
       lang: 'en',
-      link: '/en/',
       themeConfig: {
         nav: [
           {
