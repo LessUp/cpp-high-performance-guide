@@ -1,24 +1,38 @@
 import { defineConfig } from 'vitepress'
 
+// Site configuration constants - single source of truth
+const BASE_PATH = '/cpp-high-performance-guide/'
+const DEFAULT_LOCALE = 'en'
+const LOCALE_MAP: Record<string, string> = {
+  zh: 'zh', // Chinese -> /zh/
+  // All other languages default to /en/
+}
+
+// Generate locale redirect script with dynamic base path
+function generateLocaleRedirectScript(): string {
+  return `(()=>{const b='${BASE_PATH}',k='lr',s=sessionStorage,p=location.pathname;if(s.getItem(k))return;if(p!==b&&p!==b.slice(0,-1))return;s.setItem(k,'1');const l=(navigator.language||'${DEFAULT_LOCALE}').toLowerCase().slice(0,2),t=LOCALE_MAP[l]||'${DEFAULT_LOCALE}';location.replace(b+t+'/'+location.search)})()`
+    .replace('LOCALE_MAP', JSON.stringify(LOCALE_MAP))
+}
+
 export default defineConfig({
   title: 'C++ High Performance Guide',
   description:
     'Runnable C++20 performance engineering examples covering CMake, memory layout, SIMD, concurrency, and profiling.',
-  base: '/cpp-high-performance-guide/',
+  base: BASE_PATH,
   cleanUrls: true,
   lastUpdated: true,
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/cpp-high-performance-guide/favicon.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${BASE_PATH}favicon.svg` }],
     ['meta', { name: 'theme-color', content: '#5c7cfa' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: 'C++ High Performance Guide' }],
     ['meta', { property: 'og:title', content: 'C++ High Performance Guide' }],
     ['meta', { property: 'og:description', content: 'Runnable C++20 performance engineering examples and learning docs.' }],
-    ['meta', { property: 'og:image', content: 'https://lessup.github.io/cpp-high-performance-guide/logo.svg' }],
+    ['meta', { property: 'og:image', content: `https://lessup.github.io${BASE_PATH}logo.svg` }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'keywords', content: 'C++, C++20, performance, SIMD, cache optimization, concurrency, CMake, benchmark' }],
     // Auto-redirect based on browser language (runs before page renders)
-    ['script', {}, `(()=>{if(sessionStorage.getItem('locale-redirect-done'))return;const p=window.location.pathname;if(p==='/cpp-high-performance-guide/'||p==='/cpp-high-performance-guide'){sessionStorage.setItem('locale-redirect-done','true');const l=navigator.language.toLowerCase();window.location.replace(l.startsWith('zh')?'/cpp-high-performance-guide/zh/':'/cpp-high-performance-guide/en/')}})()`],
+    ['script', {}, generateLocaleRedirectScript()],
   ],
   themeConfig: {
     logo: '/logo.svg',
@@ -43,6 +57,7 @@ export default defineConfig({
     root: {
       label: 'English',
       lang: 'en',
+      link: '/en/',
       themeConfig: {
         nav: [
           {
