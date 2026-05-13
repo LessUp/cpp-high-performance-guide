@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <limits>
 #include <memory>
 #include <new>
 #include <vector>
@@ -93,27 +94,32 @@ inline size_t get_simd_alignment() {
  * different purposes: SIMD optimization vs cache-line alignment.
  */
 template <typename T>
-class aligned_allocator {
+class AlignedAllocator {
 public:
     using value_type = T;
-    using pointer = T*;
-    using const_pointer = const T*;
-    using reference = T&;
-    using const_reference = const T&;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
     template <typename U>
     struct rebind {
-        using other = aligned_allocator<U>;
+        using other = AlignedAllocator<U>;
     };
 
-    aligned_allocator() = default;
+    AlignedAllocator() = default;
 
     template <typename U>
-    aligned_allocator(const aligned_allocator<U>&) {}
+    AlignedAllocator(const AlignedAllocator<U>&) {}
 
-    pointer allocate(size_type n) {
+    T* allocate(size_type n) {
+        // Overflow protection
+        if (n > std::numeric_limits<size_type>::max() / sizeof(T)) {
+            throw std::bad_alloc();
+        }
+
+        if (n == 0) {
+            return nullptr;
+        }
+
         const size_t alignment = get_simd_alignment();
         const size_t size = n * sizeof(T);
 
@@ -128,10 +134,13 @@ public:
         if (!ptr) {
             throw std::bad_alloc();
         }
-        return static_cast<pointer>(ptr);
+        return static_cast<T*>(ptr);
     }
 
-    void deallocate(pointer p, size_type) {
+    void deallocate(T* p, size_type) {
+        if (p == nullptr) {
+            return;
+        }
 #if defined(_MSC_VER)
         _aligned_free(p);
 #else
@@ -140,37 +149,34 @@ public:
     }
 
     template <typename U>
-    bool operator==(const aligned_allocator<U>&) const {
+    bool operator==(const AlignedAllocator<U>&) const {
         return true;
     }
 
     template <typename U>
-    bool operator!=(const aligned_allocator<U>&) const {
+    bool operator!=(const AlignedAllocator<U>&) const {
         return false;
     }
 };
 
 /**
- * @brief Alias for aligned_allocator with clearer SIMD-specific naming
- *
- * This alias provides a more intuitive name for the SIMD-aligned allocator,
- * distinguishing it from hpc::memory::AlignedAllocator which uses cache-line
- * alignment (compile-time constant).
- *
- * Key differences from hpc::memory::AlignedAllocator:
- * - Uses runtime SIMD detection for alignment (16/32/64 bytes based on CPU)
- * - hpc::memory::AlignedAllocator uses compile-time CACHE_LINE_SIZE
- *
- * Both names (aligned_allocator and simd_allocator) are equivalent.
+ * @brief Backward-compatible alias for AlignedAllocator
+ * @deprecated Use AlignedAllocator<T> directly
  */
 template <typename T>
-using simd_allocator = aligned_allocator<T>;
+using aligned_allocator [[deprecated("Use AlignedAllocator<T> directly")]] = AlignedAllocator<T>;
+
+/**
+ * @brief Alias for AlignedAllocator with SIMD-specific naming
+ */
+template <typename T>
+using simd_allocator = AlignedAllocator<T>;
 
 /**
  * @brief Aligned vector type for SIMD operations
  */
 template <typename T>
-using aligned_vector = std::vector<T, aligned_allocator<T>>;
+using aligned_vector = std::vector<T, AlignedAllocator<T>>;
 
 /**
  * @brief Aligned buffer type alias for compatibility

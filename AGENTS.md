@@ -11,6 +11,7 @@ This repository is in **closure and hardening mode** (archive-ready for low-freq
 - **Memory safety**: prefer RAII, smart pointers, avoid raw `new/delete`
 - **Performance**: always measure with benchmarks before claiming improvement
 - **Concurrency**: use `std::atomic` with explicit memory ordering
+- **Header-only design**: all library code in `include/hpc/` and `examples/*/include/` is header-only. Platform-specific code (Windows/POSIX, compiler intrinsics) is hidden behind preprocessor conditionals within headers. This design choice prioritizes ease of integration over compilation speed.
 
 ## Canonical sources of truth
 

@@ -11,11 +11,11 @@
  * - Counting allocations with custom allocator
  */
 
+#include "vector_reserve.hpp"
+
 #include <chrono>
 #include <iostream>
 #include <vector>
-
-#include "vector_reserve.hpp"
 
 namespace hpc::vector_reserve {
 

@@ -2,6 +2,13 @@
  * @file particle_types.hpp
  * @brief Particle data structures for AOS vs SOA comparison
  *
+ * **Note: This is a teaching example module, not production-ready code.**
+ * The data structures and algorithms here are intentionally simple to
+ * demonstrate memory layout concepts. For production use, consider:
+ * - Adding bounds checking and validation
+ * - Using aligned allocators for SIMD operations
+ * - Implementing parallel processing for large datasets
+ *
  * Validates:
  *   - Requirement 2.1: AOS vs SOA Comparison
  *
