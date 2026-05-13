@@ -302,3 +302,223 @@
 测试验证：
 - Debug 构建：65/65 测试通过
 - ASAN 构建：65/65 测试通过
+
+---
+
+## 2026-05-13 深化（第三轮）
+
+### 12. 删除测试代码中的 SPSCQueue 重复定义
+
+**问题**：`tests/property/concurrency_properties.cpp` 定义了简化版 `SPSCQueue`，与 `lock_free_queue.hpp` 中的真实实现不同：
+- 测试版本使用 `T buffer_[Capacity]`，真实版本使用 `std::optional<T> buffer_[Capacity]`
+- 测试版本缺少 `push(T&&)`、`size()`、`capacity()` 方法
+- **测试可能测试的是错误实现**
+
+**解决方案**：
+- 删除测试文件中的重复定义（约50行）
+- 添加 `#include "lock_free_queue.hpp"` 包含真实实现
+
+**收益**：
+- 局部性：队列实现变更只需一处
+- 可测试性：确保测试真实实现
+- AI 可导航性：减少重复代码
+
+**文件修改**：
+- 修改 `tests/property/concurrency_properties.cpp`
+
+### 13. 统一分配器命名风格
+
+**问题**：`hpc::simd::aligned_allocator` 使用 snake_case，与 `hpc::memory::AlignedAllocator` 的 PascalCase 不一致。
+
+**解决方案**：
+- 将 `aligned_allocator` 重命名为 `AlignedAllocator`（PascalCase）
+- 添加 `aligned_allocator` 作为 `[[deprecated]]` 别名保持向后兼容
+- 简化 `AlignedAllocator` 接口（删除已弃用的 `pointer`、`reference` 等类型别名）
+
+**收益**：
+- 命名一致性
+- 向后兼容
+- 更简洁的接口
+
+**文件修改**：
+- 修改 `examples/04-simd-vectorization/include/simd_utils.hpp`
+
+### 14. 添加核心模块测试
+
+**问题**：`include/hpc/core.hpp` 没有独立测试文件，功能仅被其他模块隐式测试。
+
+**解决方案**：
+- 创建 `tests/unit/core/core_test.cpp`
+- 测试覆盖：
+  - `cache_line_size()` 返回值是 2 的幂且在合理范围（16-256）
+  - `page_size()` 返回值是 2 的幂且在合理范围（1024-65536）
+  - `hardware_concurrency()` 返回值 >= 1 且与 `std::thread::hardware_concurrency()` 一致
+  - 编译时常量与运行时函数的关系
+
+**收益**：
+- 可测试性：核心功能有独立测试覆盖
+- AI 可导航性：新贡献者可快速理解核心 API
+
+**文件修改**：
+- 新增 `tests/unit/core/core_test.cpp`
+- 新增 `tests/unit/core/CMakeLists.txt`
+- 修改 `tests/unit/CMakeLists.txt`
+
+### 15. 添加锁自由队列压力测试
+
+**问题**：当前测试覆盖基本操作和简单并发场景，缺少高竞争压力测试。
+
+**解决方案**：
+- 添加 `SPSCQueueStressTest.HighThroughputOneMillionOperations` - 100万次操作
+- 添加 `MPMCQueueStressTest.HighContentionMultipleProducersConsumers` - 4生产者×4消费者
+- 添加 `SPSCQueueStressTest.RandomInterleavingWithDelays` - 随机延迟测试
+- 添加 `SPSCQueueStressTest.NonTrivialTypeStress` - 非平凡类型（std::string）测试
+
+**收益**：
+- 可测试性：更高置信度的并发正确性
+- TSan 验证通过，无数据竞争
+
+**文件修改**：
+- 修改 `tests/unit/concurrency/lock_free_queue_test.cpp`
+
+### 16. 更新 particle_types 注释
+
+**问题**：模块过于浅层，但这是有意为之的教学示例。
+
+**解决方案**：
+- 添加注释明确说明"示例模块，非生产用途"
+- 列出生产使用应考虑的改进点
+
+**收益**：
+- 明确模块定位
+- 避免误用
+
+**文件修改**：
+- 修改 `examples/02-memory-cache/include/particle_types.hpp`
+
+### 17. 记录 header-only 设计决策
+
+**问题**：平台检测宏在头文件中可见，但这是有意的设计决策。
+
+**解决方案**：
+- 在 `AGENTS.md` 中记录 header-only 设计决策
+- 说明优先考虑集成便利性而非编译速度
+
+**收益**：
+- 设计决策有文档记录
+- 未来维护者理解设计意图
+
+**文件修改**：
+- 修改 `AGENTS.md`
+
+### 第三轮深化总结
+
+本次深化共：
+- 新增约 150 行（核心测试、压力测试）
+- 删除约 50 行（重复定义）
+- 修改 9 个文件
+- 测试数量从 65 增加到 84
+
+**附加修复**：修复 `compile_time.hpp` 缺少 `#include <cstddef>` 导致 ASan 构建失败的问题。
+
+测试验证：
+- Debug 构建：84/84 测试通过
+- ASan 构建：84/84 测试通过
+- TSan 构建：所有并发测试通过，无数据竞争
+- 格式检查：通过
+
+---
+
+## Code Review 修复（2026-05-13）
+
+对第三轮深化修改进行 code review 后发现以下问题并修复：
+
+### 问题 1：AlignedAllocator 缺少边界处理
+
+**问题**：`allocate(0)` 行为未定义，`deallocate(nullptr)` 可能导致问题。
+
+**修复**：
+- `allocate(0)` 返回 `nullptr`
+- `deallocate(nullptr)` 直接返回不做处理
+
+### 问题 2：AlignedAllocator 缺少 rebind 支持
+
+**问题**：删除了原有的 `rebind` 结构，可能与旧代码不兼容。
+
+**修复**：恢复 `rebind` 结构体。
+
+### 问题 3：MPMCQueueStressTest 缺少超时机制
+
+**问题**：主线程无限等待消费者完成，可能死锁。
+
+**修复**：添加 10 秒超时，超时后 FAIL 并报告进度。
+
+### 问题 4：吞吐量计算除零风险
+
+**问题**：如果测试执行太快（duration == 0），会导致除零。
+
+**修复**：添加除零保护，`duration > 0` 时才计算吞吐量。
+
+**文件修改**：
+- `examples/04-simd-vectorization/include/simd_utils.hpp`
+- `tests/unit/concurrency/lock_free_queue_test.cpp`
+
+---
+
+## 第二次 Code Review 修复（2026-05-13）
+
+对修复后的代码再次 review，核实并修复以下问题：
+
+### 问题 1：AlignedAllocator 缺少整数溢出保护 ✅ 真实问题
+
+**问题**：`n * sizeof(T)` 可能溢出，导致分配比预期小得多的内存。
+
+**修复**：添加溢出检查，与 `hpc::memory::AlignedAllocator` 保持一致：
+```cpp
+if (n > std::numeric_limits<size_type>::max() / sizeof(T)) {
+    throw std::bad_alloc();
+}
+```
+
+同时添加 `<limits>` 头文件。
+
+### 问题 2：冗余 return 语句 ✅ 代码清理
+
+**问题**：`FAIL()` 后的 `return` 永不执行（`FAIL()` 抛异常中止测试）。
+
+**修复**：删除冗余 `return;`。
+
+### 问题 3：allocate(0) 返回 nullptr - 不修改
+
+**分析**：C++ 标准未强制要求 `allocate(0)` 返回非空指针。当前实现返回 `nullptr`，配合 `deallocate(nullptr)` 的空指针保护，行为安全。
+
+### 问题 4：随机数生成器线程安全 - 不是问题
+
+**分析**：`rng` 只在 producer 线程中使用，主线程在 `join()` 后才继续，无并发访问。
+
+**文件修改**：
+- `examples/04-simd-vectorization/include/simd_utils.hpp`（添加溢出保护、`<limits>` 头文件）
+- `tests/unit/concurrency/lock_free_queue_test.cpp`（删除冗余 return）
+
+---
+
+## 第三次 Code Review 修复（2026-05-13）
+
+### 问题：`producers_done` 变量未使用（死代码）
+
+**发现**：`MPMCQueueStressTest` 中声明并递增了 `producers_done`，但从未读取。
+
+**修复**：删除未使用的变量和相关代码。
+
+**文件修改**：
+- `tests/unit/concurrency/lock_free_queue_test.cpp`
+
+---
+
+## 最终验证
+
+所有修改后：
+- Debug 构建：84/84 测试通过
+- ASan 构建：84/84 测试通过
+- TSan 构建：并发测试通过，无数据竞争
+- 格式检查：通过

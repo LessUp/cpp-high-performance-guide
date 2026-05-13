@@ -12,11 +12,11 @@
  * - Template metaprogramming vs constexpr
  */
 
+#include "compile_time.hpp"
+
 #include <chrono>
 #include <cmath>
 #include <iostream>
-
-#include "compile_time.hpp"
 
 namespace hpc::compile_time {
 

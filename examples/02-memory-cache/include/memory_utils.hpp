@@ -81,7 +81,8 @@ using aligned_unique_ptr = std::unique_ptr<T, AlignedDeleter>;
  * @brief Create aligned unique pointer
  */
 template <typename T>
-aligned_unique_ptr<T> make_aligned(std::size_t count, std::size_t alignment = hpc::core::CACHE_LINE_SIZE) {
+aligned_unique_ptr<T> make_aligned(std::size_t count,
+                                   std::size_t alignment = hpc::core::CACHE_LINE_SIZE) {
     void* ptr = aligned_alloc(count * sizeof(T), alignment);
     if (!ptr) {
         throw std::bad_alloc();

@@ -14,6 +14,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 
 namespace hpc::compile_time {
