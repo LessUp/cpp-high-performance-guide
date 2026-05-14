@@ -18,6 +18,8 @@
 #include <memory>
 #include <vector>
 
+#include "instrumentation.hpp"
+
 namespace hpc::vector_reserve {
 
 //------------------------------------------------------------------------------
@@ -25,10 +27,12 @@ namespace hpc::vector_reserve {
 //------------------------------------------------------------------------------
 
 /**
- * @brief Custom allocator that tracks allocation counts
+ * @brief Custom allocator that tracks allocation counts via injected metrics.
  *
- * This allocator is useful for demonstrating the impact of reserve()
- * on allocation patterns and for testing allocation behavior.
+ * Replaces the previous global-static design with an injectable
+ * instrumentation::OperationMetrics pointer. When metrics is nullptr,
+ * the allocator behaves like a plain wrapper around std::malloc/free
+ * with zero observation overhead.
  *
  * @tparam T The type of objects to allocate
  */
@@ -41,54 +45,48 @@ public:
 
     CountingAllocator() noexcept = default;
 
+    explicit CountingAllocator(instrumentation::OperationMetrics* metrics) noexcept
+        : metrics_(metrics) {}
+
     template <typename U>
-    CountingAllocator(const CountingAllocator<U>&) noexcept {}
+    CountingAllocator(const CountingAllocator<U>& other) noexcept : metrics_(other.metrics()) {}
 
     T* allocate(std::size_t n) {
-        ++allocation_count_;
-        total_bytes_allocated_ += n * sizeof(T);
+        if (metrics_) {
+            metrics_->record_allocation(n * sizeof(T));
+        }
         return static_cast<T*>(std::malloc(n * sizeof(T)));
     }
 
     void deallocate(T* ptr, std::size_t n) noexcept {
-        ++deallocation_count_;
-        total_bytes_deallocated_ += n * sizeof(T);
+        if (metrics_) {
+            metrics_->record_deallocation(n * sizeof(T));
+        }
         std::free(ptr);
     }
 
-    static void reset_counts() {
-        allocation_count_ = 0;
-        deallocation_count_ = 0;
-        total_bytes_allocated_ = 0;
-        total_bytes_deallocated_ = 0;
-    }
+    instrumentation::OperationMetrics* metrics() const noexcept { return metrics_; }
 
-    static size_t allocation_count_;
-    static size_t deallocation_count_;
-    static size_t total_bytes_allocated_;
-    static size_t total_bytes_deallocated_;
+    template <typename U>
+    struct rebind {
+        using other = CountingAllocator<U>;
+    };
+
+private:
+    instrumentation::OperationMetrics* metrics_ = nullptr;
+
+    template <typename U>
+    friend class CountingAllocator;
 };
 
-template <typename T>
-size_t CountingAllocator<T>::allocation_count_ = 0;
-
-template <typename T>
-size_t CountingAllocator<T>::deallocation_count_ = 0;
-
-template <typename T>
-size_t CountingAllocator<T>::total_bytes_allocated_ = 0;
-
-template <typename T>
-size_t CountingAllocator<T>::total_bytes_deallocated_ = 0;
-
 template <typename T, typename U>
-bool operator==(const CountingAllocator<T>&, const CountingAllocator<U>&) noexcept {
-    return true;
+bool operator==(const CountingAllocator<T>& lhs, const CountingAllocator<U>& rhs) noexcept {
+    return lhs.metrics() == rhs.metrics();
 }
 
 template <typename T, typename U>
-bool operator!=(const CountingAllocator<T>&, const CountingAllocator<U>&) noexcept {
-    return false;
+bool operator!=(const CountingAllocator<T>& lhs, const CountingAllocator<U>& rhs) noexcept {
+    return !(lhs == rhs);
 }
 
 //------------------------------------------------------------------------------

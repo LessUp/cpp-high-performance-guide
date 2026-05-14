@@ -522,3 +522,151 @@ if (n > std::numeric_limits<size_type>::max() / sizeof(T)) {
 - ASan 构建：84/84 测试通过
 - TSan 构建：并发测试通过，无数据竞争
 - 格式检查：通过
+
+---
+
+## 2026-05-14 深化（第四轮）—— 消除全局静态计数器污染
+
+### 18. 创建可注入的 OperationMetrics seam
+
+**问题**：`Buffer::copy_count_` / `move_count_` 和 `CountingAllocator` 的四重计数器都是 `inline static` 全局状态。
+- 测试必须在每个 `TEST` 开头显式 `reset_counts()`，否则状态泄漏到下一个测试。
+- 测试顺序依赖：一个测试忘记 reset，后续测试会失败。
+- 测试无法并行运行。
+- 这是全局状态污染反模式，破坏了 **locality** 和 **可测试性**。
+
+**解决方案**：
+- 创建 `examples/03-modern-cpp/include/instrumentation.hpp`，定义 `OperationMetrics` 类：
+  - 非静态、可注入的计数器容器（copy/move/allocation/deallocation/bytes）
+  - 内嵌 `Scope` RAII 类：构造时自动 `reset()`，析构无操作
+  - `Scope` 不可拷贝/不可移动，确保生命周期明确
+- `Buffer` 改造：
+  - 删除 `copy_count_`、`move_count_`、`reset_counts()`
+  - 构造函数添加 `OperationMetrics* metrics = nullptr` 参数
+  - 拷贝/移动构造自动继承源对象的 `metrics_`（也可由调用者显式覆盖）
+  - `metrics_ == nullptr` 时零开销
+- `CountingAllocator` 改造：
+  - 删除所有 `static` 计数器和 `reset_counts()`
+  - 构造函数接收 `OperationMetrics*` 并保存到实例中
+  - `allocate` / `deallocate` 通过实例指针报告
+  - `rebind` 结构体保留，支持 STL 容器要求
+
+**收益**：
+- **Locality**：计数行为集中到一处 `OperationMetrics`；修改计数逻辑只需改一个文件。
+- **可测试性**：测试之间零耦合，支持并行执行；不再需要手动 `reset_counts()`。
+- **零开销**：benchmark 中的 `Buffer` 默认 `metrics = nullptr`，无额外开销。
+- **接口成为 seam**：计数是可注入的行为，不是类的固有副作用。
+
+**文件修改**：
+- 新增 `examples/03-modern-cpp/include/instrumentation.hpp`
+- 修改 `examples/03-modern-cpp/include/buffer.hpp`
+- 修改 `examples/03-modern-cpp/include/vector_reserve.hpp`
+- 修改 `examples/03-modern-cpp/src/move_semantics.cpp`
+- 修改 `examples/03-modern-cpp/src/vector_reserve.cpp`
+- 修改 `tests/unit/modern_cpp/modern_cpp_examples_test.cpp`
+
+### 第四轮深化总结
+
+本次深化共：
+- 新增约 110 行（instrumentation.hpp）
+- 删除约 40 行（静态计数器定义和初始化）
+- 修改 6 个文件
+- 测试数量保持 84，全部通过
+
+**删除测试验证**：
+- 若删除 `OperationMetrics`，计数复杂性会在每个需要追踪的测试/演示处重现——说明 seam 在赚取它的位置。
+- 若删除 `Buffer` 或 `CountingAllocator` 的计数能力（即始终 `metrics = nullptr`），它们的核心行为（内存管理/分配）不受影响——说明计数是可分离的横切关注点。
+
+测试验证：
+- Debug 构建：84/84 测试通过
+- ASan 构建：84/84 测试通过
+
+---
+
+## 2026-05-14 深化（第五轮）—— 候选 2-5 实施
+
+### 19. 提取通用 SIMD 运行时分派器 seam
+
+**问题**：`dispatch_add_arrays` 的分派逻辑（`__builtin_cpu_init`、`__builtin_cpu_supports`）与 `add_arrays` 实现捆绑在 `detail` 命名空间中。当前只有一个分派函数，但如果需要为 `dot_product` 或 `scale_array` 做分派，必须复制整份 CPU 检测逻辑。
+
+**解决方案**：
+- 在 `hpc::simd` 命名空间中创建通用模板 `resolve_best<Func>(scalar, sse2, avx2, avx512)`
+- 该模板接收四个同类型的函数指针，返回运行时检测到的最佳实现
+- `dispatch_add_arrays` 简化为 `resolve_best<Fn>(&scalar, &sse2, &avx2, nullptr)` 的调用
+- `detail` 命名空间只保留具体实现，删除重复的 `resolve_add_arrays`
+
+**收益**：
+- **Leverage**：一套 CPU 检测逻辑服务任意数量的分派操作
+- **Locality**：分派策略集中在一处，新增 SIMD 分派时只需调用 `resolve_best`
+
+**删除测试**：删除 `resolve_best` 会让每个分派操作重复 CPU 检测代码——说明它有深度。
+
+**文件修改**：
+- 修改 `examples/04-simd-vectorization/include/simd_utils.hpp`
+
+### 20. 为两个 AlignedAllocator 建立文档 seam
+
+**问题**：两个 `AlignedAllocator` 名称相同但语义不同。当前的区别只在代码注释中，维护者必须跳转两个文件才能理解。
+
+**解决方案**：
+- 在 `CONTEXT.md` 中新增两个领域术语：cache-line allocator 和 SIMD-width allocator
+- 更新两个头文件的注释，指向 `CONTEXT.md`
+
+**收益**：
+- **Locality**：对齐策略的知识集中到一处文档
+- **AI 可导航性**：新维护者只需读一个定义即可理解 seam
+
+**文件修改**：
+- 修改 `CONTEXT.md`
+- 修改 `examples/02-memory-cache/include/memory_utils.hpp`
+- 修改 `examples/04-simd-vectorization/include/simd_utils.hpp`
+
+### 21. 标记 ranges_utils.hpp 为教学模块
+
+**问题**：`ranges_utils.hpp` 包含 9 个浅层函数，每个都是标准库算法的薄 wrapper。
+
+**解决方案**：
+- 保留所有函数（教学价值不可替代）
+- 更新文件头注释，明确标注"teaching example module, not production-ready code"
+
+**收益**：
+- 明确模块定位，避免未来的"过度抽象"尝试破坏教学价值
+
+**文件修改**：
+- 修改 `examples/03-modern-cpp/include/ranges_utils.hpp`
+
+### 22. 删除 prefetch_* 不可测试的浅层封装
+
+**问题**：`prefetch_read()` 等是编译器内置函数的薄包装。接口≈实现，行为不可观察。
+
+**解决方案**：
+- 从 `memory_utils.hpp` 中删除 `prefetch_read`、`prefetch_write`、`prefetch`
+- `prefetch.cpp` 示例源码直接使用 `__builtin_prefetch`
+- `CONTEXT.md` 中保留"prefetch / 预取"概念定义
+
+**收益**：
+- 减少约 47 行不可测试的浅层代码
+- **Locality**：预取知识只在文档和示例源码中出现
+
+**删除测试**：删除后复杂性不分散到 N 个调用方——说明是 pass-through。
+
+**文件修改**：
+- 修改 `examples/02-memory-cache/include/memory_utils.hpp`
+- 修改 `examples/02-memory-cache/src/prefetch.cpp`
+
+### 第五轮深化总结
+
+本次深化共：
+- 删除约 50 行
+- 新增约 15 行
+- 修改 6 个文件
+- 测试数量保持 84，全部通过
+
+**删除测试验证**：
+- `resolve_best`：删除后每个 SIMD 分派操作需重复 CPU 检测——有深度
+- prefetch 包装函数：删除后复杂性不分散——是 pass-through
+
+测试验证：
+- Debug 构建：84/84 测试通过
+- ASan 构建：84/84 测试通过
+- 格式检查：通过

@@ -18,8 +18,11 @@
 #include <vector>
 
 #include "buffer.hpp"
+#include "instrumentation.hpp"
 
 namespace hpc::move_semantics {
+
+using hpc::instrumentation::OperationMetrics;
 
 //------------------------------------------------------------------------------
 // Functions demonstrating copy vs move
@@ -29,8 +32,8 @@ namespace hpc::move_semantics {
 /**
  * @brief Returns a buffer by value (may use RVO)
  */
-Buffer create_buffer(size_t size) {
-    Buffer buf(size);
+Buffer create_buffer(size_t size, OperationMetrics* metrics = nullptr) {
+    Buffer buf(size, metrics);
     return buf;  // NRVO may elide the copy/move
 }
 
@@ -55,55 +58,58 @@ void demonstrate_vector_push_back() {
 
     // Push by copy
     {
-        Buffer::reset_counts();
+        OperationMetrics metrics;
+        OperationMetrics::Scope scope(metrics);
         std::vector<Buffer> vec;
         vec.reserve(NUM_BUFFERS);  // Prevent reallocation
 
         auto start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < NUM_BUFFERS; ++i) {
-            Buffer buf(BUFFER_SIZE);
+            Buffer buf(BUFFER_SIZE, &metrics);
             vec.push_back(buf);  // Copy
         }
         auto end = std::chrono::high_resolution_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-        std::cout << "push_back (copy): " << ms << " ms" << " (copies: " << Buffer::copy_count_
-                  << ", moves: " << Buffer::move_count_ << ")\n";
+        std::cout << "push_back (copy): " << ms << " ms" << " (copies: " << metrics.copy_count
+                  << ", moves: " << metrics.move_count << ")\n";
     }
 
     // Push by move
     {
-        Buffer::reset_counts();
+        OperationMetrics metrics;
+        OperationMetrics::Scope scope(metrics);
         std::vector<Buffer> vec;
         vec.reserve(NUM_BUFFERS);
 
         auto start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < NUM_BUFFERS; ++i) {
-            Buffer buf(BUFFER_SIZE);
+            Buffer buf(BUFFER_SIZE, &metrics);
             vec.push_back(std::move(buf));  // Move
         }
         auto end = std::chrono::high_resolution_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-        std::cout << "push_back (move): " << ms << " ms" << " (copies: " << Buffer::copy_count_
-                  << ", moves: " << Buffer::move_count_ << ")\n";
+        std::cout << "push_back (move): " << ms << " ms" << " (copies: " << metrics.copy_count
+                  << ", moves: " << metrics.move_count << ")\n";
     }
 
     // emplace_back (construct in place)
     {
-        Buffer::reset_counts();
+        OperationMetrics metrics;
+        OperationMetrics::Scope scope(metrics);
         std::vector<Buffer> vec;
         vec.reserve(NUM_BUFFERS);
 
         auto start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < NUM_BUFFERS; ++i) {
-            vec.emplace_back(BUFFER_SIZE);  // Construct in place
+            vec.emplace_back(BUFFER_SIZE, &metrics);  // Construct in place
         }
         auto end = std::chrono::high_resolution_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-        std::cout << "emplace_back:     " << ms << " ms" << " (copies: " << Buffer::copy_count_
-                  << ", moves: " << Buffer::move_count_ << ")\n";
+        std::cout << "emplace_back:     " << ms << " ms" << " (copies: " << metrics.copy_count
+                  << ", moves: " << metrics.move_count << ")\n";
     }
 }
 
@@ -115,8 +121,9 @@ void demonstrate_function_calls() {
 
     // By copy
     {
-        Buffer::reset_counts();
-        Buffer buf(BUFFER_SIZE);
+        OperationMetrics metrics;
+        OperationMetrics::Scope scope(metrics);
+        Buffer buf(BUFFER_SIZE, &metrics);
 
         auto start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
@@ -125,14 +132,14 @@ void demonstrate_function_calls() {
         auto end = std::chrono::high_resolution_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-        std::cout << "By copy:      " << ms << " ms" << " (copies: " << Buffer::copy_count_
-                  << ")\n";
+        std::cout << "By copy:      " << ms << " ms" << " (copies: " << metrics.copy_count << ")\n";
     }
 
     // By reference
     {
-        Buffer::reset_counts();
-        Buffer buf(BUFFER_SIZE);
+        OperationMetrics metrics;
+        OperationMetrics::Scope scope(metrics);
+        Buffer buf(BUFFER_SIZE, &metrics);
 
         auto start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
@@ -141,8 +148,7 @@ void demonstrate_function_calls() {
         auto end = std::chrono::high_resolution_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-        std::cout << "By reference: " << ms << " ms" << " (copies: " << Buffer::copy_count_
-                  << ")\n";
+        std::cout << "By reference: " << ms << " ms" << " (copies: " << metrics.copy_count << ")\n";
     }
 }
 
@@ -152,19 +158,20 @@ void demonstrate_return_value() {
     constexpr size_t BUFFER_SIZE = 1024 * 1024;
     constexpr int ITERATIONS = 100;
 
-    Buffer::reset_counts();
+    OperationMetrics metrics;
+    OperationMetrics::Scope scope(metrics);
 
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < ITERATIONS; ++i) {
-        Buffer buf = create_buffer(BUFFER_SIZE);
+        Buffer buf = create_buffer(BUFFER_SIZE, &metrics);
         volatile char c = buf.data()[0];
         (void)c;
     }
     auto end = std::chrono::high_resolution_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-    std::cout << "Return by value: " << ms << " ms" << " (copies: " << Buffer::copy_count_
-              << ", moves: " << Buffer::move_count_ << ")\n";
+    std::cout << "Return by value: " << ms << " ms" << " (copies: " << metrics.copy_count
+              << ", moves: " << metrics.move_count << ")\n";
     std::cout << "Note: With RVO/NRVO, copies and moves should be 0\n";
 }
 

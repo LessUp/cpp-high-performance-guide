@@ -2,8 +2,11 @@
 
 #include "buffer.hpp"
 #include "compile_time.hpp"
+#include "instrumentation.hpp"
 #include "ranges_utils.hpp"
 #include "vector_reserve.hpp"
+
+using hpc::instrumentation::OperationMetrics;
 
 TEST(CompileTimeExamplesTest, FactorialFunctionsMatch) {
     EXPECT_EQ(hpc::compile_time::factorial_runtime(10), 3628800);
@@ -24,13 +27,15 @@ TEST(CompileTimeExamplesTest, HashAndPrimeUtilitiesWork) {
 TEST(MoveSemanticsExamplesTest, MoveConstructorTransfersOwnership) {
     using hpc::move_semantics::Buffer;
 
-    Buffer::reset_counts();
-    Buffer source(128);
+    OperationMetrics metrics;
+    OperationMetrics::Scope scope(metrics);
+
+    Buffer source(128, &metrics);
     ASSERT_NE(source.data(), nullptr);
 
     Buffer moved(std::move(source));
-    EXPECT_EQ(Buffer::copy_count_, 0u);
-    EXPECT_EQ(Buffer::move_count_, 1u);
+    EXPECT_EQ(metrics.copy_count, 0u);
+    EXPECT_EQ(metrics.move_count, 1u);
     EXPECT_EQ(source.size(), 0u);
     EXPECT_EQ(source.data(), nullptr);
     EXPECT_EQ(moved.size(), 128u);
@@ -40,34 +45,38 @@ TEST(MoveSemanticsExamplesTest, MoveConstructorTransfersOwnership) {
 TEST(MoveSemanticsExamplesTest, ProcessByCopyAndRefCountDifferently) {
     using hpc::move_semantics::Buffer;
 
-    Buffer buffer(64);
-    Buffer::reset_counts();
-    hpc::move_semantics::process_by_copy(buffer);
-    EXPECT_EQ(Buffer::copy_count_, 1u);
+    OperationMetrics metrics;
+    Buffer buffer(64, &metrics);
 
-    Buffer::reset_counts();
+    OperationMetrics::Scope scope(metrics);
+    hpc::move_semantics::process_by_copy(buffer);
+    EXPECT_EQ(metrics.copy_count, 1u);
+
+    // A new scope auto-resets for the reference test
+    OperationMetrics::Scope scope2(metrics);
     hpc::move_semantics::process_by_ref(buffer);
-    EXPECT_EQ(Buffer::copy_count_, 0u);
+    EXPECT_EQ(metrics.copy_count, 0u);
 }
 
 TEST(VectorReserveExamplesTest, ReserveReducesAllocationCount) {
     using Alloc = hpc::vector_reserve::CountingAllocator<int>;
-    using Vec = std::vector<int, Alloc>;
 
-    Alloc::reset_counts();
-    Vec without_reserve;
+    OperationMetrics metrics;
+    OperationMetrics::Scope scope(metrics);
+    Alloc alloc(&metrics);
+    std::vector<int, Alloc> without_reserve(alloc);
     for (int i = 0; i < 128; ++i) {
         without_reserve.push_back(i);
     }
-    const auto allocations_without_reserve = Alloc::allocation_count_;
+    const auto allocations_without_reserve = metrics.allocation_count;
 
-    Alloc::reset_counts();
-    Vec with_reserve;
+    OperationMetrics::Scope scope2(metrics);
+    std::vector<int, Alloc> with_reserve(alloc);
     with_reserve.reserve(128);
     for (int i = 0; i < 128; ++i) {
         with_reserve.push_back(i);
     }
-    const auto allocations_with_reserve = Alloc::allocation_count_;
+    const auto allocations_with_reserve = metrics.allocation_count;
 
     EXPECT_GT(allocations_without_reserve, allocations_with_reserve);
     EXPECT_EQ(allocations_with_reserve, 1u);

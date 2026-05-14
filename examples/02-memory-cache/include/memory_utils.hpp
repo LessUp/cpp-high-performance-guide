@@ -2,14 +2,13 @@
  * @file memory_utils.hpp
  * @brief Memory and cache optimization utilities
  *
- * This header provides utilities for memory alignment, cache-friendly
- * data structures, and performance measurement helpers.
+ * This header provides utilities for memory alignment and cache-friendly
+ * data structures.
  *
  * Validates:
  *   - Requirement 2.1: AOS vs SOA Comparison
  *   - Requirement 2.2: False Sharing Demonstration
  *   - Requirement 2.3: Memory Alignment for SIMD
- *   - Requirement 2.4: Prefetch Demonstration
  */
 
 #pragma once
@@ -95,7 +94,13 @@ aligned_unique_ptr<T> make_aligned(std::size_t count,
 //------------------------------------------------------------------------------
 
 /**
- * @brief STL-compatible allocator with custom alignment
+ * @brief Cache-line aligned allocator for STL containers
+ *
+ * Uses a compile-time constant alignment (default: CACHE_LINE_SIZE).
+ * Designed for false-sharing elimination in multi-threaded code.
+ *
+ * See CONTEXT.md: cache-line allocator for the domain rationale.
+ * For SIMD-width alignment, see hpc::simd::AlignedAllocator in simd_utils.hpp.
  */
 template <typename T, std::size_t Alignment = hpc::core::CACHE_LINE_SIZE>
 class AlignedAllocator {
@@ -168,59 +173,5 @@ struct alignas(hpc::core::CACHE_LINE_SIZE) CacheLinePadded {
     T* operator->() { return &value; }
     const T* operator->() const { return &value; }
 };
-
-//------------------------------------------------------------------------------
-// Prefetch Hints
-//------------------------------------------------------------------------------
-
-/**
- * @brief Prefetch data for reading
- */
-template <typename T>
-inline void prefetch_read(const T* ptr) {
-#if defined(__GNUC__) || defined(__clang__)
-    __builtin_prefetch(ptr, 0, 3);  // Read, high temporal locality
-#elif defined(_MSC_VER)
-    _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T0);
-#endif
-}
-
-/**
- * @brief Prefetch data for writing
- */
-template <typename T>
-inline void prefetch_write(T* ptr) {
-#if defined(__GNUC__) || defined(__clang__)
-    __builtin_prefetch(ptr, 1, 3);  // Write, high temporal locality
-#elif defined(_MSC_VER)
-    _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T0);
-#endif
-}
-
-/**
- * @brief Prefetch with specified locality hint
- * @param locality 0 = non-temporal, 3 = high temporal locality
- */
-template <typename T>
-inline void prefetch(const T* ptr, int locality = 3) {
-#if defined(__GNUC__) || defined(__clang__)
-    __builtin_prefetch(ptr, 0, locality);
-#elif defined(_MSC_VER)
-    switch (locality) {
-        case 0:
-            _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_NTA);
-            break;
-        case 1:
-            _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T2);
-            break;
-        case 2:
-            _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T1);
-            break;
-        default:
-            _mm_prefetch(reinterpret_cast<const char*>(ptr), _MM_HINT_T0);
-            break;
-    }
-#endif
-}
 
 }  // namespace hpc::memory
