@@ -18,8 +18,6 @@
 #include <random>
 #include <vector>
 
-#include "memory_utils.hpp"
-
 namespace hpc::memory {
 
 //------------------------------------------------------------------------------
@@ -49,9 +47,11 @@ int64_t sum_with_prefetch(const int64_t* data, size_t n) {
 
     int64_t sum = 0;
     for (size_t i = 0; i < n; ++i) {
-        // Prefetch future data
+        // Prefetch future data (read, high temporal locality)
         if (i + PREFETCH_DISTANCE < n) {
-            prefetch_read(&data[i + PREFETCH_DISTANCE]);
+#if defined(__GNUC__) || defined(__clang__)
+            __builtin_prefetch(&data[i + PREFETCH_DISTANCE], 0, 3);
+#endif
         }
         sum += data[i];
     }
@@ -85,7 +85,9 @@ int64_t sum_random_with_prefetch(const int64_t* data, const size_t* indices, siz
     for (size_t i = 0; i < n; ++i) {
         // Prefetch data for future iterations
         if (i + PREFETCH_DISTANCE < n) {
-            prefetch_read(&data[indices[i + PREFETCH_DISTANCE]]);
+#if defined(__GNUC__) || defined(__clang__)
+            __builtin_prefetch(&data[indices[i + PREFETCH_DISTANCE]], 0, 3);
+#endif
         }
         sum += data[indices[i]];
     }
@@ -122,7 +124,9 @@ int64_t sum_list_with_prefetch(const Node* head) {
     for (const Node* node = head; node != nullptr; node = node->next) {
         // Prefetch next node
         if (node->next != nullptr) {
-            prefetch_read(node->next);
+#if defined(__GNUC__) || defined(__clang__)
+            __builtin_prefetch(node->next, 0, 3);
+#endif
         }
         sum += node->value;
     }

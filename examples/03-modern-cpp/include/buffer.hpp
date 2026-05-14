@@ -16,6 +16,8 @@
 #include <cstring>
 #include <utility>
 
+#include "instrumentation.hpp"
+
 namespace hpc::move_semantics {
 
 /**
@@ -29,41 +31,45 @@ namespace hpc::move_semantics {
  */
 class Buffer {
 public:
-    Buffer() : data_(nullptr), size_(0) {}
+    Buffer() : data_(nullptr), size_(0), metrics_(nullptr) {}
 
-    explicit Buffer(size_t size) : data_(new char[size]), size_(size) {
+    explicit Buffer(size_t size, instrumentation::OperationMetrics* metrics = nullptr)
+        : data_(new char[size]), size_(size), metrics_(metrics) {
         std::memset(data_, 0, size_);
     }
 
     ~Buffer() { delete[] data_; }
 
-    Buffer(const Buffer& other) : data_(nullptr), size_(other.size_) {
+    Buffer(const Buffer& other, instrumentation::OperationMetrics* metrics = nullptr)
+        : data_(nullptr), size_(other.size_), metrics_(metrics ? metrics : other.metrics_) {
         if (size_ > 0) {
             data_ = new char[size_];
             std::memcpy(data_, other.data_, size_);
         }
-        ++copy_count_;
+        notify_copy();
     }
 
     Buffer& operator=(const Buffer& other) {
         if (this != &other) {
             delete[] data_;
             size_ = other.size_;
+            metrics_ = other.metrics_;
             if (size_ > 0) {
                 data_ = new char[size_];
                 std::memcpy(data_, other.data_, size_);
             } else {
                 data_ = nullptr;
             }
-            ++copy_count_;
+            notify_copy();
         }
         return *this;
     }
 
-    Buffer(Buffer&& other) noexcept : data_(other.data_), size_(other.size_) {
+    Buffer(Buffer&& other) noexcept
+        : data_(other.data_), size_(other.size_), metrics_(other.metrics_) {
         other.data_ = nullptr;
         other.size_ = 0;
-        ++move_count_;
+        notify_move();
     }
 
     Buffer& operator=(Buffer&& other) noexcept {
@@ -71,9 +77,10 @@ public:
             delete[] data_;
             data_ = other.data_;
             size_ = other.size_;
+            metrics_ = other.metrics_;
             other.data_ = nullptr;
             other.size_ = 0;
-            ++move_count_;
+            notify_move();
         }
         return *this;
     }
@@ -82,21 +89,20 @@ public:
     char* data() { return data_; }
     const char* data() const { return data_; }
 
-    static size_t copy_count_;
-    static size_t move_count_;
-
-    static void reset_counts() {
-        copy_count_ = 0;
-        move_count_ = 0;
-    }
-
 private:
     char* data_;
     size_t size_;
-};
+    instrumentation::OperationMetrics* metrics_;
 
-inline size_t Buffer::copy_count_ = 0;
-inline size_t Buffer::move_count_ = 0;
+    void notify_copy() const {
+        if (metrics_)
+            metrics_->record_copy();
+    }
+    void notify_move() const {
+        if (metrics_)
+            metrics_->record_move();
+    }
+};
 
 //------------------------------------------------------------------------------
 // Functions demonstrating copy vs move

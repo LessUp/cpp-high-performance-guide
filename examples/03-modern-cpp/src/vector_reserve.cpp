@@ -19,6 +19,8 @@
 
 namespace hpc::vector_reserve {
 
+using hpc::instrumentation::OperationMetrics;
+
 //------------------------------------------------------------------------------
 // Demonstrations
 //------------------------------------------------------------------------------
@@ -46,14 +48,14 @@ void demonstrate_reserve_benefit() {
 
     constexpr size_t N = 1'000'000;
 
-    using CountingVector = std::vector<int, CountingAllocator<int>>;
-
     // Without reserve
     {
-        CountingAllocator<int>::reset_counts();
+        OperationMetrics metrics;
+        OperationMetrics::Scope scope(metrics);
+        CountingAllocator<int> alloc(&metrics);
+        std::vector<int, CountingAllocator<int>> vec(alloc);
 
         auto start = std::chrono::high_resolution_clock::now();
-        CountingVector vec;
         for (size_t i = 0; i < N; ++i) {
             vec.push_back(static_cast<int>(i));
         }
@@ -62,18 +64,20 @@ void demonstrate_reserve_benefit() {
 
         std::cout << "Without reserve:\n";
         std::cout << "  Time: " << ms << " ms\n";
-        std::cout << "  Allocations: " << CountingAllocator<int>::allocation_count_ << "\n";
-        std::cout << "  Total bytes allocated: "
-                  << CountingAllocator<int>::total_bytes_allocated_ / (1024 * 1024) << " MB\n";
+        std::cout << "  Allocations: " << metrics.allocation_count << "\n";
+        std::cout << "  Total bytes allocated: " << metrics.total_bytes_allocated / (1024 * 1024)
+                  << " MB\n";
     }
 
     // With reserve
     {
-        CountingAllocator<int>::reset_counts();
+        OperationMetrics metrics;
+        OperationMetrics::Scope scope(metrics);
+        CountingAllocator<int> alloc(&metrics);
+        std::vector<int, CountingAllocator<int>> vec(alloc);
+        vec.reserve(N);  // Pre-allocate
 
         auto start = std::chrono::high_resolution_clock::now();
-        CountingVector vec;
-        vec.reserve(N);  // Pre-allocate
         for (size_t i = 0; i < N; ++i) {
             vec.push_back(static_cast<int>(i));
         }
@@ -82,9 +86,9 @@ void demonstrate_reserve_benefit() {
 
         std::cout << "\nWith reserve(" << N << "):\n";
         std::cout << "  Time: " << ms << " ms\n";
-        std::cout << "  Allocations: " << CountingAllocator<int>::allocation_count_ << "\n";
-        std::cout << "  Total bytes allocated: "
-                  << CountingAllocator<int>::total_bytes_allocated_ / (1024 * 1024) << " MB\n";
+        std::cout << "  Allocations: " << metrics.allocation_count << "\n";
+        std::cout << "  Total bytes allocated: " << metrics.total_bytes_allocated / (1024 * 1024)
+                  << " MB\n";
     }
 }
 

@@ -1,11 +1,13 @@
 /**
  * @file ranges_utils.hpp
- * @brief C++20 Ranges utility functions
+ * @brief C++20 Ranges comparison utilities (teaching module)
  *
- * This header provides utility functions comparing C++20 ranges
- * with traditional raw loops for performance analysis.
+ * **Note: This is a teaching example module, not production-ready code.**
+ * Each function is intentionally shallow — its interface exposes the
+ * implementation strategy (raw_loop / algorithm / ranges). The value
+ * is in side-by-side comparison, not in abstraction depth.
  *
- * Key concepts:
+ * Key concepts demonstrated:
  * - std::ranges algorithms
  * - Range views (lazy evaluation)
  * - Compiler optimization of ranges

@@ -77,6 +77,16 @@ ARM 平台：NEON (128-bit)
 ### preset-driven build / 预设驱动构建
 使用 CMakePresets.json 统一构建配置，确保本地和 CI 环境一致。
 
+### cache-line allocator / 缓存行对齐分配器
+对齐到缓存行边界（通常 64 字节）的内存分配器，用于消除伪共享。
+参见 `hpc::memory::AlignedAllocator<T, Alignment>`，对齐策略为**编译时常量**。
+
+### SIMD-width allocator / SIMD 宽度对齐分配器
+对齐到 SIMD 向量宽度边界（16/32/64 字节）的内存分配器，用于 SIMD 加载/存储操作。
+参见 `hpc::simd::AlignedAllocator<T>`，对齐策略为**运行时 CPU 特性检测**。
+
+**关键区别**：缓存行分配器服务于多线程并发优化（伪共享消除），SIMD 宽度分配器服务于单线程向量化（对齐加载）。两者独立存在，不共享实现。
+
 ### sanitizer / 消毒器
 运行时检测工具，发现未定义行为和内存错误：
 - **ASAN (AddressSanitizer)**: 检测内存错误（越界、释放后使用等）

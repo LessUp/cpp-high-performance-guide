@@ -81,17 +81,13 @@ inline size_t get_simd_alignment() {
 }
 
 /**
- * @brief Aligned memory allocator for SIMD operations
+ * @brief SIMD-width aligned allocator for SIMD operations
  *
- * **Design Note**: This allocator is intentionally separate from
- * `hpc::memory::AlignedAllocator` to keep the SIMD module self-contained.
+ * Uses runtime CPU feature detection to pick the optimal alignment
+ * (16/32/64 bytes) for the current platform's SIMD width.
  *
- * Key differences from `hpc::memory::AlignedAllocator`:
- * - Uses **runtime SIMD detection** for alignment (16/32/64 bytes based on CPU)
- * - `hpc::memory::AlignedAllocator` uses a **compile-time constant** (CACHE_LINE_SIZE)
- *
- * This is NOT an ODR violation - they exist in separate namespaces and serve
- * different purposes: SIMD optimization vs cache-line alignment.
+ * See CONTEXT.md: SIMD-width allocator for the domain rationale.
+ * For cache-line alignment, see hpc::memory::AlignedAllocator in memory_utils.hpp.
  */
 template <typename T>
 class AlignedAllocator {
@@ -263,15 +259,40 @@ inline size_t simd_vector_width(SIMDLevel level) {
 }
 
 //------------------------------------------------------------------------------
-// Runtime SIMD Dispatch - Header-only implementation
+// Runtime SIMD Dispatch
 //------------------------------------------------------------------------------
+
+/**
+ * @brief Generic CPU capability resolver for multi-version functions.
+ *
+ * Given scalar, SSE2, AVX2 and AVX-512 function pointers, returns the
+ * best available one based on runtime CPU feature detection.
+ *
+ * @tparam Func Function pointer type (must be identical for all arguments)
+ * @return Best available implementation pointer
+ */
+template <typename Func>
+Func resolve_best(Func scalar, Func sse2, Func avx2, Func avx512) {
+#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+    __builtin_cpu_init();
+    if (avx512 && __builtin_cpu_supports("avx512f"))
+        return avx512;
+    if (avx2 && __builtin_cpu_supports("avx2"))
+        return avx2;
+    if (sse2 && __builtin_cpu_supports("sse2"))
+        return sse2;
+#else
+    (void)sse2;
+    (void)avx2;
+    (void)avx512;
+#endif
+    return scalar;
+}
 
 namespace detail {
 
-// 函数指针类型
 using AddArraysFn = void (*)(const float* a, const float* b, float* c, size_t n);
 
-// 标量实现
 inline void add_arrays_scalar(const float* a, const float* b, float* c, size_t n) {
     for (size_t i = 0; i < n; ++i) {
         c[i] = a[i] + b[i];
@@ -280,7 +301,6 @@ inline void add_arrays_scalar(const float* a, const float* b, float* c, size_t n
 
 #if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
 
-// SSE2 实现
 __attribute__((target("sse2"))) inline void add_arrays_sse2(const float* a, const float* b,
                                                             float* c, size_t n) {
     size_t i = 0;
@@ -290,13 +310,11 @@ __attribute__((target("sse2"))) inline void add_arrays_sse2(const float* a, cons
         const __m128 vc = _mm_add_ps(va, vb);
         _mm_storeu_ps(&c[i], vc);
     }
-
     for (; i < n; ++i) {
         c[i] = a[i] + b[i];
     }
 }
 
-// AVX2 实现
 __attribute__((target("avx2,avx"))) inline void add_arrays_avx2(const float* a, const float* b,
                                                                 float* c, size_t n) {
     size_t i = 0;
@@ -306,27 +324,7 @@ __attribute__((target("avx2,avx"))) inline void add_arrays_avx2(const float* a, 
         const __m256 vc = _mm256_add_ps(va, vb);
         _mm256_storeu_ps(&c[i], vc);
     }
-
     add_arrays_sse2(a + i, b + i, c + i, n - i);
-}
-
-// 运行时解析函数
-inline AddArraysFn resolve_add_arrays() {
-    __builtin_cpu_init();
-    if (__builtin_cpu_supports("avx2")) {
-        return &add_arrays_avx2;
-    }
-    if (__builtin_cpu_supports("sse2")) {
-        return &add_arrays_sse2;
-    }
-    return &add_arrays_scalar;
-}
-
-#else
-
-// 非 x86 平台：仅使用标量实现
-inline AddArraysFn resolve_add_arrays() {
-    return &add_arrays_scalar;
 }
 
 #endif
@@ -336,17 +334,19 @@ inline AddArraysFn resolve_add_arrays() {
 /**
  * @brief Add two arrays using the best available SIMD path at runtime.
  *
- * This function automatically selects the optimal SIMD implementation
- * (AVX2, SSE2, or scalar) based on CPU capabilities detected at runtime.
- *
- * @param a First input array
- * @param b Second input array
- * @param c Output array (must have space for n elements)
- * @param n Number of elements to process
+ * Automatically selects AVX2, SSE2, or scalar implementation based on
+ * CPU capabilities. The resolved function pointer is cached in a
+ * static local for thread-safe, single-shot initialization.
  */
 inline void dispatch_add_arrays(const float* a, const float* b, float* c, size_t n) {
-    // 使用 inline 静态变量确保线程安全的单次初始化
-    static const detail::AddArraysFn dispatch = detail::resolve_add_arrays();
+    using Fn = detail::AddArraysFn;
+    static const Fn dispatch = resolve_best<Fn>(&detail::add_arrays_scalar,
+#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+                                                &detail::add_arrays_sse2, &detail::add_arrays_avx2,
+#else
+                                                nullptr, nullptr,
+#endif
+                                                nullptr);
     dispatch(a, b, c, n);
 }
 
