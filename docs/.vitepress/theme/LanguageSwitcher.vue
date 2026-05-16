@@ -59,7 +59,6 @@ onBeforeUnmount(() => {
   <details ref="rootRef" class="language-switcher" @toggle="syncOpenState">
     <summary
       class="language-button"
-      :aria-expanded="String(isOpen)"
       :title="theme.langMenuLabel || 'Switch Language'"
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
@@ -73,10 +72,12 @@ onBeforeUnmount(() => {
       </svg>
     </summary>
 
-    <div class="language-dropdown" role="menu">
-      <a
+    <ul class="language-dropdown language-list">
+      <li
           v-for="lang in languageLinks"
           :key="lang.code"
+      >
+        <a
           class="language-option"
           :class="{ active: lang.isCurrent }"
           :href="lang.targetPath"
@@ -87,7 +88,8 @@ onBeforeUnmount(() => {
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </a>
-    </div>
+      </li>
+    </ul>
   </details>
 </template>
 
@@ -163,6 +165,12 @@ onBeforeUnmount(() => {
   background: var(--wp-surface-1);
   box-shadow: var(--wp-shadow-1);
   z-index: 100;
+}
+
+.language-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .language-option {
