@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 import llmstxt from 'vitepress-plugin-llms'
+import { futureSidebar } from './config-helpers.js'
 
 const rawBase = process.env.VITEPRESS_BASE
 const base = rawBase
@@ -26,15 +27,6 @@ function assetPath(path: string): string {
 function canonicalAssetUrl(path: string): string {
   const normalizedPath = path.replace(/^\/+/, '')
   return new URL(`${canonicalBase.replace(/^\/+/, '')}${normalizedPath}`, `${siteUrl}/`).toString()
-}
-
-function futureSidebar(prefix: '/en/' | '/zh/') {
-  return {
-    [`${prefix}academy/`]: [],
-    [`${prefix}architecture/`]: [],
-    [`${prefix}playbook/`]: [],
-    [`${prefix}research/`]: [],
-  }
 }
 
 export default withMermaid(defineConfig({
