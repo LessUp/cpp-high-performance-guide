@@ -11,7 +11,7 @@ function read(relativePath) {
   return fs.readFileSync(path.join(themeDir, relativePath), 'utf8')
 }
 
-test('style.css defines reusable whitepaper primitives for panels, figures, metadata, references, and section indexes', () => {
+test('style.css keeps tokenized selectors for the live homepage, Mermaid, and SVG surfaces', () => {
   const css = read('style.css')
 
   for (const token of [
@@ -30,13 +30,17 @@ test('style.css defines reusable whitepaper primitives for panels, figures, meta
   }
 
   for (const selector of [
-    '.wp-panel',
-    '.wp-figure',
-    '.wp-meta-strip',
-    '.wp-reference-list',
-    '.wp-section-index',
-    '.wp-pill-link',
-    '.wp-surface-figure',
+    '.home-header',
+    '.home-header-left',
+    '.home-logo',
+    '.home-title',
+    '.home-subtitle',
+    '.home-nav a',
+    '.home-intro-row',
+    '.home-intro',
+    '.home-stats',
+    '.feature-card',
+    '.quick-start',
     '.vp-doc .mermaid',
     ".vp-doc :where(svg [stroke='currentColor']",
   ]) {
@@ -56,18 +60,14 @@ test('style.css suppresses VitePress built-in translation widgets in favor of th
   }
 })
 
-test('theme index registers reusable whitepaper components', () => {
+test('theme index wires only the active language chrome', () => {
   const themeIndex = read('index.ts')
 
-  for (const componentName of [
-    'SectionHero',
-    'MetricStrip',
-    'FigureFrame',
-    'ReferenceList',
-    'SectionIndex',
-  ]) {
+  for (const componentName of ['LanguageRedirect', 'LanguageSwitcher']) {
     assert.match(themeIndex, new RegExp(componentName))
   }
+
+  assert.doesNotMatch(themeIndex, /FigureFrame|MetricStrip|ReferenceList|SectionIndex|SectionHero/)
 })
 
 test('bilingual landing pages retain the pre-theme-system content while theme primitives remain optional', () => {
