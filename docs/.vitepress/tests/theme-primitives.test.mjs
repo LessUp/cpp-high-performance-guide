@@ -20,8 +20,11 @@ test('style.css keeps tokenized selectors for the live homepage, Mermaid, and SV
     '--wp-panel-bg',
     '--wp-figure-bg',
     '--wp-meta-bg',
+    '--wp-section-index-bg',
+    '--wp-section-index-border',
     '--wp-surface-1',
     '--wp-surface-2',
+    '--wp-surface-section-index',
     '--wp-pill-bg',
     '--wp-diagram-stroke',
     '--wp-icon-muted',
@@ -30,17 +33,12 @@ test('style.css keeps tokenized selectors for the live homepage, Mermaid, and SV
   }
 
   for (const selector of [
-    '.home-header',
-    '.home-header-left',
-    '.home-logo',
-    '.home-title',
-    '.home-subtitle',
-    '.home-nav a',
-    '.home-intro-row',
-    '.home-intro',
-    '.home-stats',
-    '.feature-card',
-    '.quick-start',
+    '.wp-hero',
+    '.wp-metric-strip',
+    '.wp-section-index',
+    '.wp-figure-shell',
+    '.wp-meta-strip',
+    '.wp-reference-list',
     '.vp-doc .mermaid',
     ".vp-doc :where(svg [stroke='currentColor']",
   ]) {
@@ -71,28 +69,29 @@ test('language switcher markup keeps native navigation when JavaScript is unavai
 test('theme index wires only the active language chrome', () => {
   const themeIndex = read('index.ts')
 
-  for (const componentName of ['LanguageRedirect', 'LanguageSwitcher']) {
+  for (const componentName of ['LanguageRedirect', 'LanguageSwitcher', 'SectionHero', 'MetricStrip', 'SectionIndex']) {
     assert.match(themeIndex, new RegExp(componentName))
   }
-
-  assert.doesNotMatch(themeIndex, /FigureFrame|MetricStrip|ReferenceList|SectionIndex|SectionHero/)
 })
 
-test('bilingual landing pages retain the pre-theme-system content while theme primitives remain optional', () => {
+test('bilingual landing pages preserve copy while using shared whitepaper primitives', () => {
   const docsRoot = path.resolve(themeDir, '..', '..')
   const enIndex = fs.readFileSync(path.join(docsRoot, 'en', 'index.md'), 'utf8')
   const zhIndex = fs.readFileSync(path.join(docsRoot, 'zh', 'index.md'), 'utf8')
 
   for (const content of [enIndex, zhIndex]) {
-    assert.equal(/<SectionHero\b/.test(content), false)
-    assert.equal(/<MetricStrip\b/.test(content), false)
-    assert.equal(/<SectionIndex\b/.test(content), false)
+    assert.match(content, /<SectionHero\b/)
+    assert.match(content, /<MetricStrip\b/)
+    assert.match(content, /<SectionIndex\b/)
+    assert.doesNotMatch(content, /class="home-header"/)
+    assert.doesNotMatch(content, /class="home-intro-row"/)
+    assert.doesNotMatch(content, /class="feature-map"/)
   }
 
-  assert.match(enIndex, /<div class="home-header">/)
+  assert.match(enIndex, /title="C\+\+ High Performance Guide"/)
   assert.match(enIndex, /A practical C\+\+20 guide to builds, memory layout, SIMD, concurrency, benchmarking, and profiling\./)
-  assert.match(enIndex, /<div class="quick-start">/)
-  assert.match(zhIndex, /<div class="home-header">/)
+  assert.match(enIndex, /title="Quick Start"/)
+  assert.match(zhIndex, /title="C\+\+ 高性能指南"/)
   assert.match(zhIndex, /一份实用的 C\+\+20 指南，涵盖构建系统、内存布局、SIMD、并发、基准测试和性能分析。/)
-  assert.match(zhIndex, /<div class="quick-start">/)
+  assert.match(zhIndex, /title="快速开始"/)
 })
