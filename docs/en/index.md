@@ -88,6 +88,6 @@ layout: home
     <div class="wp-command-block">
       <code>cmake --preset=debug && cmake --build build/debug</code>
     </div>
-    After building, run <code>ctest --preset=debug</code> to verify. See the <a href="/en/getting-started/quickstart">Quick Start guide</a> for details.
+    After building, run <code>ctest --preset=debug</code> to verify. See the <BaseAwareLink href="/en/getting-started/quickstart">Quick Start guide</BaseAwareLink> for details.
   </div>
 </div>
