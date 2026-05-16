@@ -61,6 +61,26 @@ test('switching from an English-only exercise page to zh falls back to the zh la
   assert.equal(targetPath, '/cpp-high-performance-guide/zh/')
 })
 
+test('switching from a slashless English-only exercises index to zh falls back to the zh landing page', () => {
+  const targetPath = resolveLanguageTarget({
+    routePath: '/cpp-high-performance-guide/en/exercises',
+    siteBase: '/cpp-high-performance-guide/',
+    targetLangPath: '/zh/',
+  })
+
+  assert.equal(targetPath, '/cpp-high-performance-guide/zh/')
+})
+
+test('switching from a slashless English-only API index to zh falls back to the zh API hub', () => {
+  const targetPath = resolveLanguageTarget({
+    routePath: '/cpp-high-performance-guide/en/reference/api',
+    siteBase: '/cpp-high-performance-guide/',
+    targetLangPath: '/zh/',
+  })
+
+  assert.equal(targetPath, '/cpp-high-performance-guide/zh/reference/api-reference')
+})
+
 test('language switcher exposes real href targets for each locale', () => {
   const links = createLanguageSwitcherLinks({
     routePath: '/cpp-high-performance-guide/en/guides/validation',
@@ -83,6 +103,20 @@ test('language switcher exposes real href targets for each locale', () => {
       isCurrent: false,
     },
   ])
+})
+
+test('language switcher hrefs reuse locale fallbacks for slashless clean URLs under a Pages base', () => {
+  const exerciseLinks = createLanguageSwitcherLinks({
+    routePath: '/cpp-high-performance-guide/en/exercises',
+    siteBase: '/cpp-high-performance-guide/',
+  })
+  const apiLinks = createLanguageSwitcherLinks({
+    routePath: '/cpp-high-performance-guide/en/reference/api',
+    siteBase: '/cpp-high-performance-guide/',
+  })
+
+  assert.equal(exerciseLinks[1].targetPath, '/cpp-high-performance-guide/zh/')
+  assert.equal(apiLinks[1].targetPath, '/cpp-high-performance-guide/zh/reference/api-reference')
 })
 
 test('language switcher hrefs reuse locale fallbacks for untranslated destinations', () => {

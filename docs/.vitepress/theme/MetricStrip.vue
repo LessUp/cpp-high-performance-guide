@@ -11,7 +11,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="wp-metric-strip" :aria-label="ariaLabel">
+  <section class="wp-metric-strip" :aria-label="ariaLabel">
     <div
       v-for="item in items"
       :key="`${item.value}:${item.label}`"
@@ -20,5 +20,5 @@ defineProps<{
       <strong>{{ item.value }}</strong>
       <span>{{ item.label }}</span>
     </div>
-  </div>
+  </section>
 </template>
