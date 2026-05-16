@@ -14,6 +14,11 @@ function ensureLeadingSlash(path) {
   return path.startsWith('/') ? path : `/${path}`
 }
 
+function normalizeFallbackMatchPath(path) {
+  const normalizedPath = ensureLeadingSlash(path).replace(/\/+$/, '')
+  return normalizedPath === '' ? '/' : `${normalizedPath}/`
+}
+
 export function normalizeSiteBase(siteBase = '/') {
   return siteBase.endsWith('/') ? siteBase : `${siteBase}/`
 }
@@ -88,8 +93,10 @@ export function resolveLanguageTarget({
   const currentPath = stripBase(routePath, siteBase)
   const pathWithoutLang = stripLocale(currentPath, supportedLangs)
   const targetLang = supportedLangs.find(lang => lang.path === targetLangPath)
+  const normalizedFallbackPath = normalizeFallbackMatchPath(pathWithoutLang)
   const fallback = targetLang
-    ? LANGUAGE_FALLBACKS[targetLang.code]?.find(rule => pathWithoutLang.startsWith(rule.prefix))
+    ? LANGUAGE_FALLBACKS[targetLang.code]?.find(rule =>
+      normalizedFallbackPath.startsWith(normalizeFallbackMatchPath(rule.prefix)))
     : undefined
   const nextPath = fallback
     ? (fallback.target === '/'

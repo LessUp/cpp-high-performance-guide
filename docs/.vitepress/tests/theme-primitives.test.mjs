@@ -143,6 +143,7 @@ test('shared landing components render localized aria labels', async () => {
 
   assert.match(heroHtml, /aria-label="落地页链接"/)
   assert.doesNotMatch(heroHtml, /aria-label="Landing page links"/)
+  assert.match(metricHtml, /<section\b/)
   assert.match(metricHtml, /aria-label="项目指标"/)
   assert.doesNotMatch(metricHtml, /aria-label="Project metrics"/)
 })
