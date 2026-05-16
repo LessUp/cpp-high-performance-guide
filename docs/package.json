@@ -10,7 +10,7 @@
     "dev": "vitepress dev",
     "test": "node --test .vitepress/tests/*.test.mjs",
     "build": "vitepress build",
-    "build:pages": "npm run build",
+    "build:pages": "VITEPRESS_BASE=/cpp-high-performance-guide/ vitepress build",
     "preview": "vitepress preview"
   },
   "devDependencies": {
