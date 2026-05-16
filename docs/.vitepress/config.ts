@@ -9,29 +9,63 @@ const base = rawBase
     : `/${rawBase}/`
   : '/'
 
+const siteTitle = 'C++ High Performance Guide'
+const siteDescription =
+  'Runnable C++ performance engineering docs covering academy, architecture, playbooks, references, and research.'
+const siteUrl = 'https://lessup.github.io'
+const canonicalBase = '/cpp-high-performance-guide/'
+const currentYear = new Date().getFullYear()
+
+function assetPath(path: string): string {
+  const normalizedPath = path.replace(/^\/+/, '')
+  return `${base}${normalizedPath}`
+}
+
+function canonicalAssetUrl(path: string): string {
+  const normalizedPath = path.replace(/^\/+/, '')
+  return new URL(`${canonicalBase.replace(/^\/+/, '')}${normalizedPath}`, `${siteUrl}/`).toString()
+}
+
+function futureSidebar(prefix: '/en/' | '/zh/') {
+  return {
+    [`${prefix}academy/`]: [],
+    [`${prefix}architecture/`]: [],
+    [`${prefix}playbook/`]: [],
+    [`${prefix}research/`]: [],
+  }
+}
+
 export default withMermaid(defineConfig({
-  title: 'C++ High Performance Guide',
-  description:
-    'Runnable C++20 performance engineering examples covering CMake, memory layout, SIMD, concurrency, and profiling.',
-  base: base || '/cpp-high-performance-guide/',
+  title: siteTitle,
+  description: siteDescription,
+  base,
   cleanUrls: true,
   lastUpdated: true,
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: assetPath('/logo.svg') }],
     ['meta', { name: 'theme-color', content: '#3476f6' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:site_name', content: 'C++ High Performance Guide' }],
-    ['meta', { property: 'og:title', content: 'C++ High Performance Guide' }],
-    ['meta', { property: 'og:description', content: 'Runnable C++20 performance engineering examples and learning docs.' }],
-    ['meta', { property: 'og:image', content: 'https://lessup.github.io/cpp-high-performance-guide/logo.svg' }],
+    ['meta', { property: 'og:site_name', content: siteTitle }],
+    ['meta', { property: 'og:title', content: siteTitle }],
+    ['meta', { property: 'og:description', content: siteDescription }],
+    ['meta', { property: 'og:image', content: canonicalAssetUrl('/og-card.svg') }],
+    ['meta', { property: 'og:image:alt', content: 'C++ High Performance Guide documentation social card' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-    ['meta', { name: 'keywords', content: 'C++, C++20, performance, SIMD, cache optimization, concurrency, CMake, benchmark' }],
+    ['meta', { name: 'twitter:image', content: canonicalAssetUrl('/og-card.svg') }],
+    ['meta', { name: 'twitter:title', content: siteTitle }],
+    ['meta', { name: 'twitter:description', content: siteDescription }],
+    ['meta', { name: 'keywords', content: 'C++, performance, academy, architecture, playbook, reference, research, SIMD, concurrency, CMake, benchmark' }],
   ],
   locales: {
-    root: {
+    en: {
       label: 'English',
-      lang: 'en',
+      lang: 'en-US',
       link: '/en/',
+      title: siteTitle,
+      description: siteDescription,
+      head: [
+        ['meta', { property: 'og:locale', content: 'en_US' }],
+      ],
       themeConfig: {
         nav: [
           {
@@ -73,6 +107,7 @@ export default withMermaid(defineConfig({
           },
         ],
         sidebar: {
+          ...futureSidebar('/en/'),
           '/en/': [
             {
               text: 'Getting Started',
@@ -128,7 +163,8 @@ export default withMermaid(defineConfig({
       label: '简体中文',
       lang: 'zh-CN',
       link: '/zh/',
-      description: '可运行的 C++20 性能工程示例与学习文档。',
+      title: 'C++ 高性能指南',
+      description: '可运行的 C++ 性能工程文档，覆盖 academy、architecture、playbook、reference 与 research。',
       head: [
         ['meta', { property: 'og:locale', content: 'zh_CN' }],
       ],
@@ -139,7 +175,7 @@ export default withMermaid(defineConfig({
         },
         footer: {
           message: '基于 MIT 许可证发布。',
-          copyright: `版权所有 © ${new Date().getFullYear()} C++ HPC Guide 贡献者`,
+          copyright: `版权所有 © ${currentYear} C++ HPC Guide 贡献者`,
         },
         nav: [
           {
@@ -181,6 +217,7 @@ export default withMermaid(defineConfig({
           },
         ],
         sidebar: {
+          ...futureSidebar('/zh/'),
           '/zh/': [
             {
               text: '入门',
@@ -244,6 +281,18 @@ export default withMermaid(defineConfig({
   themeConfig: {
     outline: [2, 3],
     search: { provider: 'local' },
+    logo: {
+      light: assetPath('/logo.svg'),
+      dark: assetPath('/logo.svg'),
+    },
+    editLink: {
+      pattern: 'https://github.com/LessUp/cpp-high-performance-guide/edit/master/docs/:path',
+      text: 'Edit this page on GitHub',
+    },
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: `Copyright © ${currentYear} C++ HPC Guide contributors`,
+    },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/LessUp/cpp-high-performance-guide' },
     ],

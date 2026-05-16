@@ -55,6 +55,8 @@ cachegrind.out.*
 massif.out.*
 *.svg
 flamegraph*.svg
+!docs/public/logo.svg
+!docs/public/og-card.svg
 
 # Benchmark results
 *_bench.json

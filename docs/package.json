@@ -3,9 +3,13 @@
   "name": "cpp-hpc-guide-docs",
   "description": "Modern C++ High Performance Computing Guide Documentation",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
+    "build:pages": "npm run build",
     "preview": "vitepress preview"
   },
   "devDependencies": {
