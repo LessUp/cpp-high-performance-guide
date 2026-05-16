@@ -5,12 +5,13 @@ layout: home
 <SectionHero
   badge="C++"
   title="C++ High Performance Guide"
-  subtitle="Performance Engineering"
-  intro="A practical C++20 guide to builds, memory layout, SIMD, concurrency, benchmarking, and profiling. Every topic is backed by runnable code and benchmark-oriented validation paths."
+  subtitle="Technical Whitepaper"
+  intro="A practical C++20 guide to builds, memory layout, SIMD, concurrency, benchmarking, and profiling. The new whitepaper path moves from academy to architecture, playbook, reference, and research."
   links-aria-label="Landing page links"
   :links='[
-    { href: "/en/getting-started/quickstart", label: "Quick Start" },
-    { href: "/en/guides/learning-path", label: "Guides" },
+    { href: "/en/academy/", label: "Academy" },
+    { href: "/en/playbook/", label: "Playbook" },
+    { href: "/en/reference/api-reference", label: "Reference" },
     { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
     { href: "/zh/", label: "中文" },
   ]'
@@ -19,62 +20,88 @@ layout: home
     <MetricStrip
       aria-label="Project metrics"
       :items='[
-        { value: "C++20", label: "standard" },
-        { value: "5", label: "modules" },
-        { value: "Bilingual", label: "docs" },
+        { value: "5", label: "sections" },
+        { value: "Preset", label: "validation" },
+        { value: "Bilingual", label: "surface" },
       ]'
     />
   </template>
 </SectionHero>
 
-## Learning Path
+## Whitepaper map
 
 <SectionIndex
   :items='[
     {
-      title: "Memory Layout & Cache",
-      description: "Understand cache behavior, data locality, and memory alignment for optimal performance.",
+      title: "Academy",
+      description: "Start with the module map, learning posture, and the validation habits that frame the rest of the repository.",
       links: [
-        { href: "/en/guides/learning-path", label: "Learning Path" },
-        { href: "/en/exercises/module-02-memory", label: "Exercises" },
+        { href: "/en/academy/", label: "Academy overview" },
+        { href: "/en/academy/module-atlas", label: "Module Atlas" },
       ],
     },
     {
-      title: "SIMD Optimization",
-      description: "Leverage SIMD instructions for vectorized computation and data parallelism.",
+      title: "Architecture",
+      description: "Inspect repository topology, the major code surfaces, and the methodology behind performance claims.",
       links: [
-        { href: "/en/guides/learning-path", label: "Learning Path" },
-        { href: "/en/exercises/module-04-simd", label: "Exercises" },
+        { href: "/en/architecture/", label: "Architecture overview" },
+        { href: "/en/architecture/repository-topology", label: "Repository Topology" },
       ],
     },
     {
-      title: "Concurrency & Threading",
-      description: "Master std::atomic, memory ordering, and lock-free data structures.",
+      title: "Playbook",
+      description: "Run the practical guides without moving files: quick start, installation, profiling, validation, and best practices stay reachable here.",
       links: [
-        { href: "/en/guides/learning-path", label: "Learning Path" },
-        { href: "/en/exercises/module-05-concurrency", label: "Exercises" },
-      ],
-    },
-    {
-      title: "Build System (CMake)",
-      description: "Modern CMake with presets, sanitizers, and cross-platform build configuration.",
-      links: [
+        { href: "/en/playbook/", label: "Playbook overview" },
         { href: "/en/getting-started/quickstart", label: "Quick Start" },
-        { href: "/en/getting-started/prerequisites", label: "Prerequisites" },
       ],
     },
     {
-      title: "Profiling & Analysis",
-      description: "Performance analysis tools, benchmarking methodology, and optimization decision tree.",
+      title: "Reference",
+      description: "Use the FAQ, troubleshooting notes, and API hubs when you need exact commands or interfaces.",
       links: [
+        { href: "/en/reference/api-reference", label: "API Reference" },
+        { href: "/en/reference/faq", label: "FAQ" },
+      ],
+    },
+    {
+      title: "Research",
+      description: "Follow the related work, references, and evolution notes that position the repository as a durable technical artifact.",
+      links: [
+        { href: "/en/research/", label: "Research overview" },
+        { href: "/en/research/related-work", label: "Related Work" },
+      ],
+    },
+  ]'
+/>
+
+## Operational routes
+
+<SectionIndex
+  :items='[
+    {
+      title: "Learning Path",
+      description: "Keep the original study sequence and its linked exercises reachable through the new IA.",
+      links: [
+        { href: "/en/guides/learning-path", label: "Learning Path" },
+        { href: "/en/exercises/module-02-memory", label: "Memory exercise" },
+      ],
+    },
+    {
+      title: "SIMD & Concurrency",
+      description: "Reach the English-first exercises directly while keeping them secondary to the main narrative.",
+      links: [
+        { href: "/en/exercises/module-04-simd", label: "SIMD exercise" },
+        { href: "/en/exercises/module-05-concurrency", label: "Concurrency exercise" },
+      ],
+    },
+    {
+      title: "Validation & Analysis",
+      description: "Operational guides still anchor prerequisites, profiling, decision-making, and sanitizer-backed hardening.",
+      links: [
+        { href: "/en/getting-started/prerequisites", label: "Prerequisites" },
         { href: "/en/guides/profiling-guide", label: "Profiling" },
         { href: "/en/guides/optimization-decision-tree", label: "Decision Tree" },
-      ],
-    },
-    {
-      title: "Validation & Sanitizers",
-      description: "AddressSanitizer, ThreadSanitizer, UndefinedBehaviorSanitizer, and testing best practices.",
-      links: [
         { href: "/en/guides/validation", label: "Sanitizers" },
         { href: "/en/guides/best-practices", label: "Best Practices" },
       ],
@@ -91,3 +118,8 @@ layout: home
     After building, run <code>ctest --preset=debug</code> to verify. See the <BaseAwareLink href="/en/getting-started/quickstart">Quick Start guide</BaseAwareLink> for details.
   </div>
 </div>
+
+## Secondary routes
+
+- [Contributing workflow](/en/contributing/ai-workflow) remains available but sits outside the main reading sequence.
+- [Exercises](/en/exercises/README) stay reachable as a secondary, English-first practice surface.
