@@ -5,6 +5,7 @@ import './style.css'
 import FigureFrame from './components/FigureFrame.vue'
 import MetricStrip from './components/MetricStrip.vue'
 import ReferenceList from './components/ReferenceList.vue'
+import SectionIndex from './components/SectionIndex.vue'
 import SectionHero from './components/SectionHero.vue'
 import LanguageRedirect from './LanguageRedirect.vue'
 import LanguageSwitcher from './LanguageSwitcher.vue'
@@ -13,6 +14,7 @@ const whitepaperComponents = {
   FigureFrame,
   MetricStrip,
   ReferenceList,
+  SectionIndex,
   SectionHero,
 } as const
 

@@ -2,6 +2,7 @@
 :root {
   color-scheme: light;
 
+  --wp-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --wp-paper-1: oklch(0.985 0.004 248);
   --wp-paper-2: oklch(0.968 0.006 248);
   --wp-paper-3: oklch(0.945 0.01 248);
@@ -18,8 +19,21 @@
   --wp-figure-bg: color-mix(in oklch, var(--wp-paper-1) 68%, var(--wp-paper-3));
   --wp-meta-bg: color-mix(in oklch, var(--wp-paper-2) 80%, var(--wp-accent-1) 5%);
   --wp-reference-bg: color-mix(in oklch, var(--wp-paper-1) 90%, var(--wp-accent-1) 3%);
+  --wp-surface-1: var(--wp-panel-bg);
+  --wp-surface-2: var(--wp-panel-bg-strong);
+  --wp-surface-figure: var(--wp-figure-bg);
+  --wp-surface-meta: var(--wp-meta-bg);
+  --wp-surface-reference: var(--wp-reference-bg);
+  --wp-pill-bg: color-mix(in oklch, var(--wp-paper-1) 90%, var(--wp-accent-1) 4%);
+  --wp-pill-border: color-mix(in oklch, var(--wp-line-1) 76%, var(--wp-accent-1) 16%);
+  --wp-pill-text: var(--wp-ink-2);
+  --wp-diagram-stroke: color-mix(in oklch, var(--wp-ink-2) 68%, var(--wp-line-2));
+  --wp-diagram-node-fill: color-mix(in oklch, var(--wp-paper-1) 84%, var(--wp-accent-1) 8%);
+  --wp-icon-muted: color-mix(in oklch, var(--wp-ink-2) 88%, var(--wp-paper-2));
+  --wp-icon-strong: var(--wp-ink-1);
   --wp-shadow-1: 0 18px 40px color-mix(in oklch, var(--wp-ink-1) 10%, transparent);
   --wp-shadow-2: 0 10px 24px color-mix(in oklch, var(--wp-accent-1) 10%, transparent);
+  --wp-motion-1: 0.16s ease;
   --wp-radius-1: 8px;
   --wp-radius-2: 14px;
   --wp-radius-3: 20px;
@@ -71,6 +85,18 @@
   --wp-figure-bg: color-mix(in oklch, var(--wp-paper-2) 84%, var(--wp-paper-1));
   --wp-meta-bg: color-mix(in oklch, var(--wp-paper-3) 80%, var(--wp-accent-1) 6%);
   --wp-reference-bg: color-mix(in oklch, var(--wp-paper-2) 88%, var(--wp-accent-1) 4%);
+  --wp-surface-1: var(--wp-panel-bg);
+  --wp-surface-2: var(--wp-panel-bg-strong);
+  --wp-surface-figure: var(--wp-figure-bg);
+  --wp-surface-meta: var(--wp-meta-bg);
+  --wp-surface-reference: var(--wp-reference-bg);
+  --wp-pill-bg: color-mix(in oklch, var(--wp-paper-2) 88%, var(--wp-accent-1) 8%);
+  --wp-pill-border: color-mix(in oklch, var(--wp-line-1) 82%, var(--wp-accent-1) 22%);
+  --wp-pill-text: var(--wp-ink-2);
+  --wp-diagram-stroke: color-mix(in oklch, var(--wp-ink-2) 72%, var(--wp-line-2));
+  --wp-diagram-node-fill: color-mix(in oklch, var(--wp-paper-2) 82%, var(--wp-accent-1) 10%);
+  --wp-icon-muted: color-mix(in oklch, var(--wp-ink-2) 92%, var(--wp-paper-3));
+  --wp-icon-strong: var(--wp-ink-1);
   --wp-shadow-1: 0 22px 50px color-mix(in oklch, var(--wp-ink-1) 40%, transparent);
   --wp-shadow-2: 0 14px 32px color-mix(in oklch, var(--wp-accent-1) 16%, transparent);
 
@@ -98,7 +124,7 @@ body,
 
 body {
   color: var(--wp-ink-1);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--wp-font-sans);
   text-rendering: optimizeLegibility;
 }
 
@@ -270,7 +296,7 @@ body {
 .vp-doc div[class*='language-'],
 .vp-doc pre,
 .VPDoc pre {
-  background: var(--wp-panel-bg-strong);
+  background: var(--wp-surface-2);
   border: 1px solid var(--wp-line-1);
   border-radius: var(--wp-radius-2);
   box-shadow: inset 0 1px 0 color-mix(in oklch, var(--wp-paper-1) 36%, transparent);
@@ -284,7 +310,7 @@ body {
   padding: var(--wp-space-5);
   border: 1px solid var(--wp-line-1);
   border-radius: var(--wp-radius-2);
-  background: var(--wp-panel-bg);
+  background: var(--wp-surface-1);
 }
 
 .vp-doc blockquote p,
@@ -314,7 +340,7 @@ body {
   border: 1px solid var(--wp-line-1);
   border-radius: var(--wp-radius-2);
   overflow: hidden;
-  background: var(--wp-panel-bg);
+  background: var(--wp-surface-1);
 }
 
 .vp-doc th,
@@ -349,7 +375,7 @@ body {
 .VPLocalSearchBox .shell {
   border: 1px solid var(--wp-line-1);
   border-radius: var(--wp-radius-3);
-  background: var(--wp-panel-bg);
+  background: var(--wp-surface-1);
   box-shadow: var(--wp-shadow-1);
 }
 
@@ -364,6 +390,7 @@ body {
 }
 
 .wp-panel,
+.wp-surface-panel,
 .feature-card,
 .quick-start,
 .command-block,
@@ -371,7 +398,7 @@ body {
 .wp-section-index,
 .wp-section-hero,
 .wp-metric-strip {
-  background: var(--wp-panel-bg);
+  background: var(--wp-surface-1);
   border: 1px solid var(--wp-line-1);
   border-radius: var(--wp-radius-2);
   box-shadow: var(--wp-shadow-1);
@@ -438,24 +465,26 @@ body {
 }
 
 .home-nav-link,
-.feature-tag {
+.feature-tag,
+.wp-pill-link {
   display: inline-flex;
   align-items: center;
   gap: var(--wp-space-2);
   min-height: 2.5rem;
   padding: 0.55rem 0.9rem;
-  border: 1px solid var(--wp-line-1);
+  border: 1px solid var(--wp-pill-border);
   border-radius: 999px;
-  background: color-mix(in oklch, var(--wp-paper-1) 86%, var(--wp-accent-1) 4%);
-  color: var(--wp-ink-2);
+  background: var(--wp-pill-bg);
+  color: var(--wp-pill-text);
   font-size: 0.92rem;
   font-weight: 600;
   text-decoration: none;
-  transition: border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+  transition: border-color var(--wp-motion-1), color var(--wp-motion-1), transform var(--wp-motion-1);
 }
 
 .home-nav-link:hover,
-.feature-tag:hover {
+.feature-tag:hover,
+.wp-pill-link:hover {
   border-color: color-mix(in oklch, var(--wp-accent-1) 48%, var(--wp-line-2));
   color: var(--wp-accent-1);
   transform: translateY(-1px);
@@ -495,7 +524,7 @@ body {
   display: grid;
   gap: var(--wp-space-1);
   padding: 1rem;
-  background: var(--wp-panel-bg);
+  background: var(--wp-surface-1);
 }
 
 .wp-metric-strip__value,
@@ -526,7 +555,7 @@ body {
 .wp-meta-strip > * {
   min-height: 100%;
   padding: var(--wp-space-4);
-  background: var(--wp-meta-bg);
+  background: var(--wp-surface-meta);
 }
 
 .feature-map,
@@ -543,9 +572,9 @@ body {
   background: linear-gradient(
     180deg,
     color-mix(in oklch, var(--wp-paper-1) 92%, var(--wp-accent-1) 3%),
-    var(--wp-panel-bg)
+    var(--wp-surface-1)
   );
-  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+  transition: border-color var(--wp-motion-1), box-shadow var(--wp-motion-1), transform var(--wp-motion-1);
 }
 
 .feature-card:hover,
@@ -577,11 +606,18 @@ body {
   gap: var(--wp-space-2);
 }
 
+.wp-section-index__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wp-space-2);
+}
+
 .wp-figure,
+.wp-surface-figure,
 .quick-start {
   margin: var(--wp-space-6) 0;
   overflow: hidden;
-  background: var(--wp-figure-bg);
+  background: var(--wp-surface-figure);
 }
 
 .wp-figure__header {
@@ -591,7 +627,7 @@ body {
   align-items: baseline;
   padding: var(--wp-space-4) var(--wp-space-5);
   border-bottom: 1px solid var(--wp-line-1);
-  background: var(--wp-meta-bg);
+  background: var(--wp-surface-meta);
 }
 
 .wp-figure__label,
@@ -624,7 +660,7 @@ body {
 .command-block {
   margin: 0 0 var(--wp-space-4);
   padding: var(--wp-space-4);
-  background: color-mix(in oklch, var(--wp-panel-bg-strong) 88%, transparent);
+  background: color-mix(in oklch, var(--wp-surface-2) 88%, transparent);
   box-shadow: none;
 }
 
@@ -641,7 +677,7 @@ body {
 
 .wp-reference-list {
   padding: var(--wp-space-5);
-  background: var(--wp-reference-bg);
+  background: var(--wp-surface-reference);
 }
 
 .wp-reference-list__title {
@@ -698,7 +734,7 @@ body {
   overflow-x: auto;
   border: 1px solid var(--wp-line-1);
   border-radius: var(--wp-radius-2);
-  background: var(--wp-figure-bg);
+  background: var(--wp-surface-figure);
   box-shadow: inset 0 1px 0 color-mix(in oklch, var(--wp-paper-1) 38%, transparent);
 }
 
@@ -727,7 +763,7 @@ body {
 .vp-doc .vp-mermaid .labelBkg,
 .VPDoc .mermaid .labelBkg,
 .mermaid .labelBkg {
-  fill: var(--wp-figure-bg) !important;
+  fill: var(--wp-surface-figure) !important;
 }
 
 .vp-doc .mermaid .node rect,
@@ -739,7 +775,7 @@ body {
 .vp-doc .vp-mermaid .node rect,
 .VPDoc .mermaid .node rect,
 .mermaid .node rect {
-  fill: color-mix(in oklch, var(--wp-paper-1) 84%, var(--wp-accent-1) 8%) !important;
+  fill: var(--wp-diagram-node-fill) !important;
   stroke: color-mix(in oklch, var(--wp-accent-1) 42%, var(--wp-line-2)) !important;
 }
 
@@ -751,7 +787,12 @@ body {
 .vp-doc .vp-mermaid .edgePath path,
 .VPDoc .mermaid .edgePath path,
 .mermaid .edgePath path {
-  stroke: color-mix(in oklch, var(--wp-ink-2) 68%, var(--wp-line-2)) !important;
+  stroke: var(--wp-diagram-stroke) !important;
+}
+
+.vp-doc :where(svg),
+.VPDoc :where(svg) {
+  color: var(--wp-icon-strong);
 }
 
 .vp-doc :where(svg [fill='white'], svg [fill='#fff'], svg [fill='#ffffff'], svg [fill='rgb(255,255,255)']),
@@ -762,6 +803,26 @@ body {
 .vp-doc :where(svg [stroke='white'], svg [stroke='#fff'], svg [stroke='#ffffff'], svg [stroke='rgb(255,255,255)']),
 .VPDoc :where(svg [stroke='white'], svg [stroke='#fff'], svg [stroke='#ffffff'], svg [stroke='rgb(255,255,255)']) {
   stroke: color-mix(in oklch, var(--wp-paper-1) 92%, var(--wp-paper-2)) !important;
+}
+
+.vp-doc :where(svg [fill='black'], svg [fill='#000'], svg [fill='#000000'], svg [fill='rgb(0,0,0)']),
+.VPDoc :where(svg [fill='black'], svg [fill='#000'], svg [fill='#000000'], svg [fill='rgb(0,0,0)']) {
+  fill: var(--wp-icon-strong) !important;
+}
+
+.vp-doc :where(svg [stroke='black'], svg [stroke='#000'], svg [stroke='#000000'], svg [stroke='rgb(0,0,0)']),
+.VPDoc :where(svg [stroke='black'], svg [stroke='#000'], svg [stroke='#000000'], svg [stroke='rgb(0,0,0)']) {
+  stroke: var(--wp-icon-strong) !important;
+}
+
+.vp-doc :where(svg [fill='currentColor']),
+.VPDoc :where(svg [fill='currentColor']) {
+  fill: currentColor !important;
+}
+
+.vp-doc :where(svg [stroke='currentColor']),
+.VPDoc :where(svg [stroke='currentColor']) {
+  stroke: currentColor !important;
 }
 
 @media (max-width: 960px) {
