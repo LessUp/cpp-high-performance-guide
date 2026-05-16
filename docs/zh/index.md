@@ -2,32 +2,31 @@
 layout: home
 ---
 
-<div class="home-header">
-  <div class="home-header-left">
-    <div class="home-logo">C++</div>
-    <div>
-      <span class="home-title">C++ 高性能指南</span>
-      <span class="home-subtitle">性能工程</span>
-    </div>
-  </div>
-  <div class="home-nav">
-    <a href="./getting-started/quickstart">快速开始</a>
-    <a href="./guides/learning-path">学习路径</a>
-    <a href="https://github.com/LessUp/cpp-high-performance-guide">GitHub</a>
-    <a href="../en/">English</a>
-  </div>
-</div>
+<SectionHero
+  eyebrow="白皮书 / 工程专著"
+  title="C++ 高性能指南"
+  lede="一组可运行的 C++ 性能工程文档，把构建纪律、内存布局、SIMD、并发、性能分析与验证路径串成一条清晰的技术叙事。"
+>
+  这份仓库不仅提供可运行示例，也面向需要快速判断工程质量的读者：模块如何衔接、性能结论如何验证、以及在看到一条基准结果后应该继续读哪里。
 
-<div class="home-intro-row">
-  <div class="home-intro">
-    一份实用的 C++20 指南，涵盖构建系统、内存布局、SIMD、并发、基准测试和性能分析。每个主题都配有可运行的代码和面向基准测试的验证路径。
-  </div>
-  <div class="home-stats">
-    <span><strong>C++20</strong> 标准</span>
-    <span><strong>5</strong> 个模块</span>
-    <span><strong>双语</strong> 文档</span>
-  </div>
-</div>
+  <template #actions>
+    <a class="home-nav-link" href="./getting-started/quickstart">快速开始</a>
+    <a class="home-nav-link" href="./guides/learning-path">学习路径</a>
+    <a class="home-nav-link" href="https://github.com/LessUp/cpp-high-performance-guide">GitHub</a>
+    <a class="home-nav-link" href="../en/">English</a>
+  </template>
+
+  <template #aside>
+    <MetricStrip
+      label="验证信号"
+      :items='[
+        { "value": "C++20", "label": "基础语言标准" },
+        { "value": "5", "label": "核心模块" },
+        { "value": "双语", "label": "入口文档" }
+      ]'
+    />
+  </template>
+</SectionHero>
 
 ## 学习路径
 
@@ -35,40 +34,40 @@ layout: home
   <div class="feature-card">
     <div class="feature-card-title">内存布局与缓存</div>
     <div class="feature-card-desc">
-      理解缓存行为、数据局部性和内存对齐，以实现最佳性能。
+      从数据移动与缓存命中率出发理解优化，而不是只停留在“更快”这类抽象口号上。
     </div>
     <div class="feature-tags">
       <a href="./guides/learning-path" class="feature-tag">学习路径</a>
-      <a href="/en/exercises/module-02-memory" class="feature-tag">练习 (英文)</a>
+      <a href="../en/exercises/module-02-memory" class="feature-tag">练习（英文）</a>
     </div>
   </div>
 
   <div class="feature-card">
     <div class="feature-card-title">SIMD 优化</div>
     <div class="feature-card-desc">
-      利用 SIMD 指令实现向量化计算和数据并行。
+      结合向量化模式、封装权衡与基准方法，理解吞吐提升何时可信、何时只是噪声。
     </div>
     <div class="feature-tags">
       <a href="./guides/learning-path" class="feature-tag">学习路径</a>
-      <a href="/en/exercises/module-04-simd" class="feature-tag">练习 (英文)</a>
+      <a href="../en/exercises/module-04-simd" class="feature-tag">练习（英文）</a>
     </div>
   </div>
 
   <div class="feature-card">
     <div class="feature-card-title">并发与线程</div>
     <div class="feature-card-desc">
-      掌握 std::atomic、内存排序和无锁数据结构。
+      将并发章节视作执行模型指南：原子操作、内存序以及围绕争用成本的设计思维。
     </div>
     <div class="feature-tags">
       <a href="./guides/learning-path" class="feature-tag">学习路径</a>
-      <a href="/en/exercises/module-05-concurrency" class="feature-tag">练习 (英文)</a>
+      <a href="../en/exercises/module-05-concurrency" class="feature-tag">练习（英文）</a>
     </div>
   </div>
 
   <div class="feature-card">
-    <div class="feature-card-title">构建系统 (CMake)</div>
+    <div class="feature-card-title">构建系统（CMake）</div>
     <div class="feature-card-desc">
-      现代 CMake 预设、Sanitizer 和跨平台构建配置。
+      通过预设、Sanitizer 变体和统一入口命令，把构建配置也纳入性能工程的证据链。
     </div>
     <div class="feature-tags">
       <a href="./getting-started/quickstart" class="feature-tag">快速开始</a>
@@ -79,7 +78,7 @@ layout: home
   <div class="feature-card">
     <div class="feature-card-title">性能分析</div>
     <div class="feature-card-desc">
-      性能分析工具、基准测试方法论和优化决策树。
+      从测量搭建到结果解读，借助性能分析流程与决策树回答“瓶颈为什么在这里”。
     </div>
     <div class="feature-tags">
       <a href="./guides/profiling-guide" class="feature-tag">性能分析</a>
@@ -90,7 +89,7 @@ layout: home
   <div class="feature-card">
     <div class="feature-card-title">验证与 Sanitizer</div>
     <div class="feature-card-desc">
-      AddressSanitizer、ThreadSanitizer、UndefinedBehaviorSanitizer 和测试最佳实践。
+      用测试命令、Sanitizer 与可重复流程约束优化结论，让文档保持“先验证、后宣称”。
     </div>
     <div class="feature-tags">
       <a href="./guides/validation" class="feature-tag">Sanitizer</a>
@@ -99,12 +98,36 @@ layout: home
   </div>
 </div>
 
-<div class="quick-start">
-  <div class="quick-start-title">快速开始</div>
-  <div class="quick-start-content">
-    <div class="command-block">
-      <code>cmake --preset=debug && cmake --build build/debug</code>
-    </div>
-    构建完成后，运行 <code>ctest --preset=debug</code> 进行验证。详见<a href="./getting-started/quickstart">快速开始指南</a>。
+<FigureFrame
+  label="默认验证路径"
+  caption="先完成构建与测试，再进入基准阶段"
+  note="本地默认入口是 debug 预设；需要更深验证时，再切换到 sanitizer 或 release 预设。"
+>
+  <div class="command-block">
+    <code>cmake --preset=debug && cmake --build build/debug && ctest --preset=debug</code>
   </div>
-</div>
+</FigureFrame>
+
+<ReferenceList
+  title="参考脉络"
+  :items='[
+    {
+      "title": "验证与 Sanitizer",
+      "href": "./guides/validation",
+      "meta": "证据标准",
+      "description": "默认构建、测试与 sanitizer 路径，保证优化结论可复现。"
+    },
+    {
+      "title": "性能分析指南",
+      "href": "./guides/profiling-guide",
+      "meta": "测量流程",
+      "description": "在修改代码之前，先用工具和解读方法明确热点来源。"
+    },
+    {
+      "title": "API 入口",
+      "href": "./reference/api-reference",
+      "meta": "参考资料",
+      "description": "集中查看共享工具、包装层以及面向排障的参考内容。"
+    }
+  ]'
+/>

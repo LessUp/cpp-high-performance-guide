@@ -2,32 +2,31 @@
 layout: home
 ---
 
-<div class="home-header">
-  <div class="home-header-left">
-    <div class="home-logo">C++</div>
-    <div>
-      <span class="home-title">C++ High Performance Guide</span>
-      <span class="home-subtitle">Performance Engineering</span>
-    </div>
-  </div>
-  <div class="home-nav">
-    <a href="./getting-started/quickstart">Quick Start</a>
-    <a href="./guides/learning-path">Guides</a>
-    <a href="https://github.com/LessUp/cpp-high-performance-guide">GitHub</a>
-    <a href="../zh/">中文</a>
-  </div>
-</div>
+<SectionHero
+  eyebrow="Whitepaper / Engineering Monograph"
+  title="C++ High Performance Guide"
+  lede="Runnable C++ performance engineering docs that connect build discipline, memory layout, SIMD, concurrency, profiling, and validation into one archive-ready technical narrative."
+>
+  This repository teaches high-performance C++ with runnable examples, but the docs surface is written for readers who want evidence: how modules relate, how claims are verified, and where to go next when a benchmark result needs context.
 
-<div class="home-intro-row">
-  <div class="home-intro">
-    A practical C++20 guide to builds, memory layout, SIMD, concurrency, benchmarking, and profiling. Every topic is backed by runnable code and benchmark-oriented validation paths.
-  </div>
-  <div class="home-stats">
-    <span><strong>C++20</strong> standard</span>
-    <span><strong>5</strong> modules</span>
-    <span><strong>Bilingual</strong> docs</span>
-  </div>
-</div>
+  <template #actions>
+    <a class="home-nav-link" href="./getting-started/quickstart">Quick Start</a>
+    <a class="home-nav-link" href="./guides/learning-path">Learning Path</a>
+    <a class="home-nav-link" href="https://github.com/LessUp/cpp-high-performance-guide">GitHub</a>
+    <a class="home-nav-link" href="../zh/">中文</a>
+  </template>
+
+  <template #aside>
+    <MetricStrip
+      label="Validation signals"
+      :items='[
+        { "value": "C++20", "label": "baseline language" },
+        { "value": "5", "label": "core modules" },
+        { "value": "Bilingual", "label": "entry docs" }
+      ]'
+    />
+  </template>
+</SectionHero>
 
 ## Learning Path
 
@@ -35,7 +34,7 @@ layout: home
   <div class="feature-card">
     <div class="feature-card-title">Memory Layout & Cache</div>
     <div class="feature-card-desc">
-      Understand cache behavior, data locality, and memory alignment for optimal performance.
+      Understand cache behavior, data locality, and memory alignment so optimization starts with data movement rather than slogans.
     </div>
     <div class="feature-tags">
       <a href="./guides/learning-path" class="feature-tag">Learning Path</a>
@@ -46,7 +45,7 @@ layout: home
   <div class="feature-card">
     <div class="feature-card-title">SIMD Optimization</div>
     <div class="feature-card-desc">
-      Leverage SIMD instructions for vectorized computation and data parallelism.
+      Follow vectorization patterns, wrapper trade-offs, and benchmark discipline before claiming a throughput win.
     </div>
     <div class="feature-tags">
       <a href="./guides/learning-path" class="feature-tag">Learning Path</a>
@@ -57,7 +56,7 @@ layout: home
   <div class="feature-card">
     <div class="feature-card-title">Concurrency & Threading</div>
     <div class="feature-card-desc">
-      Master std::atomic, memory ordering, and lock-free data structures.
+      Read the repository’s concurrency material as an execution-model guide: atomics, memory ordering, and contention-aware design.
     </div>
     <div class="feature-tags">
       <a href="./guides/learning-path" class="feature-tag">Learning Path</a>
@@ -68,7 +67,7 @@ layout: home
   <div class="feature-card">
     <div class="feature-card-title">Build System (CMake)</div>
     <div class="feature-card-desc">
-      Modern CMake with presets, sanitizers, and cross-platform build configuration.
+      Use preset-driven builds, sanitizer variants, and repeatable test entry points as part of the performance story.
     </div>
     <div class="feature-tags">
       <a href="./getting-started/quickstart" class="feature-tag">Quick Start</a>
@@ -79,7 +78,7 @@ layout: home
   <div class="feature-card">
     <div class="feature-card-title">Profiling & Analysis</div>
     <div class="feature-card-desc">
-      Performance analysis tools, benchmarking methodology, and optimization decision tree.
+      Move from measurement setup to interpretation with profiling workflows and decision trees that explain why a result matters.
     </div>
     <div class="feature-tags">
       <a href="./guides/profiling-guide" class="feature-tag">Profiling</a>
@@ -90,7 +89,7 @@ layout: home
   <div class="feature-card">
     <div class="feature-card-title">Validation & Sanitizers</div>
     <div class="feature-card-desc">
-      AddressSanitizer, ThreadSanitizer, UndefinedBehaviorSanitizer, and testing best practices.
+      Keep optimizations honest with sanitizer passes, test commands, and a bias toward evidence over anecdote.
     </div>
     <div class="feature-tags">
       <a href="./guides/validation" class="feature-tag">Sanitizers</a>
@@ -99,12 +98,36 @@ layout: home
   </div>
 </div>
 
-<div class="quick-start">
-  <div class="quick-start-title">Quick Start</div>
-  <div class="quick-start-content">
-    <div class="command-block">
-      <code>cmake --preset=debug && cmake --build build/debug</code>
-    </div>
-    After building, run <code>ctest --preset=debug</code> to verify. See the <a href="./getting-started/quickstart">Quick Start guide</a> for details.
+<FigureFrame
+  label="Default verification path"
+  caption="Build first, then confirm behavior before benchmarking"
+  note="Use the preset-driven debug path as the default local safety net, then move to sanitizer or release presets when deeper validation is needed."
+>
+  <div class="command-block">
+    <code>cmake --preset=debug && cmake --build build/debug && ctest --preset=debug</code>
   </div>
-</div>
+</FigureFrame>
+
+<ReferenceList
+  title="Reference trail"
+  :items='[
+    {
+      "title": "Validation & Sanitizers",
+      "href": "./guides/validation",
+      "meta": "Evidence standard",
+      "description": "Default build, test, and sanitizer paths that keep optimization claims reproducible."
+    },
+    {
+      "title": "Profiling Guide",
+      "href": "./guides/profiling-guide",
+      "meta": "Measurement workflow",
+      "description": "Tooling and interpretation guidance for tracing hotspots before changing code."
+    },
+    {
+      "title": "API Reference",
+      "href": "./reference/api-reference",
+      "meta": "Reference surface",
+      "description": "Entry points for reusable helpers, wrappers, and troubleshooting-oriented reference material."
+    }
+  ]'
+/>
