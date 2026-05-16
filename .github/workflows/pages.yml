@@ -57,6 +57,10 @@ jobs:
         working-directory: docs
         run: npm ci
 
+      - name: Run docs regression tests
+        working-directory: docs
+        run: npm test
+
       - name: Build docs
         working-directory: docs
         run: npm run build:pages

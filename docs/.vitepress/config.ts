@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 import llmstxt from 'vitepress-plugin-llms'
-import { futureSidebar } from './config-helpers.js'
+import { englishReferenceHub, futureSidebar } from './config-helpers.js'
 
 const rawBase = process.env.VITEPRESS_BASE
 const base = rawBase
@@ -249,7 +249,7 @@ export default withMermaid(defineConfig({
                 { text: '常见问题', link: '/zh/reference/faq' },
                 { text: '故障排查', link: '/zh/reference/troubleshooting' },
                 { text: 'API 入口', link: '/zh/reference/api-reference' },
-                { text: 'API 参考（英文）', link: '/en/reference/api/memory-utils' },
+                { text: 'API 入口（英文）', link: englishReferenceHub },
               ],
             },
             {
