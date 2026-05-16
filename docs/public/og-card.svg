@@ -1,0 +1,30 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="og-title og-desc">
+  <title id="og-title">C++ High Performance Guide social card</title>
+  <desc id="og-desc">A whitepaper-style social card for the C++ High Performance Guide documentation site.</desc>
+  <rect width="1200" height="630" rx="36" fill="#09111F"/>
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="url(#surface)" stroke="#2A4274"/>
+  <path d="M86 158H1114" stroke="#20365E" stroke-width="2"/>
+  <path d="M86 472H1114" stroke="#20365E" stroke-width="2"/>
+  <rect x="96" y="92" width="160" height="160" rx="32" fill="#0E1C34" stroke="#8EB8FF" stroke-width="3"/>
+  <path d="M138 132H202C234.033 132 260 157.967 260 190C260 222.033 234.033 248 202 248H138V132Z" fill="#EAF2FF" fill-opacity="0.08" stroke="#8EB8FF" stroke-width="10"/>
+  <path d="M164 170H206" stroke="#EAF2FF" stroke-width="12" stroke-linecap="round"/>
+  <path d="M164 210H190" stroke="#EAF2FF" stroke-width="12" stroke-linecap="round"/>
+  <path d="M238 168V214" stroke="#8EB8FF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M215 191H261" stroke="#8EB8FF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M284 168V214" stroke="#8EB8FF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M261 191H307" stroke="#8EB8FF" stroke-width="8" stroke-linecap="round"/>
+  <text x="312" y="162" fill="#F8FBFF" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="700">C++ High Performance Guide</text>
+  <text x="312" y="226" fill="#A8C7FF" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="500">Academy · Architecture · Playbook · Reference · Research</text>
+  <text x="96" y="338" fill="#D7E6FF" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="600">Runnable C++ performance engineering docs with explicit validation.</text>
+  <text x="96" y="388" fill="#91A9CC" font-family="Inter, Arial, sans-serif" font-size="24">CMake presets · Sanitizers · Profiling · SIMD · Concurrency · Benchmark evidence</text>
+  <rect x="96" y="504" width="238" height="42" rx="21" fill="#17315F"/>
+  <text x="128" y="532" fill="#EAF2FF" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="600">lessup.github.io</text>
+  <rect x="860" y="504" width="244" height="42" rx="21" fill="#102446" stroke="#355C9B"/>
+  <text x="894" y="532" fill="#BFD6FF" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="600">Archive-ready docs</text>
+  <defs>
+    <linearGradient id="surface" x1="120" y1="72" x2="1088" y2="558" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0C162A"/>
+      <stop offset="1" stop-color="#0F1F3E"/>
+    </linearGradient>
+  </defs>
+</svg>
