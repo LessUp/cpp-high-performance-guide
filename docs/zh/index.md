@@ -30,73 +30,58 @@ layout: home
 
 ## 学习路径
 
-<div class="feature-map">
-  <div class="feature-card">
-    <div class="feature-card-title">内存布局与缓存</div>
-    <div class="feature-card-desc">
-      从数据移动与缓存命中率出发理解优化，而不是只停留在“更快”这类抽象口号上。
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/learning-path" class="feature-tag">学习路径</a>
-      <a href="../en/exercises/module-02-memory" class="feature-tag">练习（英文）</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">SIMD 优化</div>
-    <div class="feature-card-desc">
-      结合向量化模式、封装权衡与基准方法，理解吞吐提升何时可信、何时只是噪声。
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/learning-path" class="feature-tag">学习路径</a>
-      <a href="../en/exercises/module-04-simd" class="feature-tag">练习（英文）</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">并发与线程</div>
-    <div class="feature-card-desc">
-      将并发章节视作执行模型指南：原子操作、内存序以及围绕争用成本的设计思维。
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/learning-path" class="feature-tag">学习路径</a>
-      <a href="../en/exercises/module-05-concurrency" class="feature-tag">练习（英文）</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">构建系统（CMake）</div>
-    <div class="feature-card-desc">
-      通过预设、Sanitizer 变体和统一入口命令，把构建配置也纳入性能工程的证据链。
-    </div>
-    <div class="feature-tags">
-      <a href="./getting-started/quickstart" class="feature-tag">快速开始</a>
-      <a href="./getting-started/prerequisites" class="feature-tag">先决条件</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">性能分析</div>
-    <div class="feature-card-desc">
-      从测量搭建到结果解读，借助性能分析流程与决策树回答“瓶颈为什么在这里”。
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/profiling-guide" class="feature-tag">性能分析</a>
-      <a href="./guides/optimization-decision-tree" class="feature-tag">决策树</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">验证与 Sanitizer</div>
-    <div class="feature-card-desc">
-      用测试命令、Sanitizer 与可重复流程约束优化结论，让文档保持“先验证、后宣称”。
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/validation" class="feature-tag">Sanitizer</a>
-      <a href="./guides/best-practices" class="feature-tag">最佳实践</a>
-    </div>
-  </div>
-</div>
+<SectionIndex
+  :items='[
+    {
+      "title": "内存布局与缓存",
+      "description": "从数据移动与缓存命中率出发理解优化，而不是只停留在“更快”这类抽象口号上。",
+      "links": [
+        { "label": "学习路径", "href": "./guides/learning-path" },
+        { "label": "练习（英文）", "href": "../en/exercises/module-02-memory" }
+      ]
+    },
+    {
+      "title": "SIMD 优化",
+      "description": "结合向量化模式、封装权衡与基准方法，理解吞吐提升何时可信、何时只是噪声。",
+      "links": [
+        { "label": "学习路径", "href": "./guides/learning-path" },
+        { "label": "练习（英文）", "href": "../en/exercises/module-04-simd" }
+      ]
+    },
+    {
+      "title": "并发与线程",
+      "description": "将并发章节视作执行模型指南：原子操作、内存序以及围绕争用成本的设计思维。",
+      "links": [
+        { "label": "学习路径", "href": "./guides/learning-path" },
+        { "label": "练习（英文）", "href": "../en/exercises/module-05-concurrency" }
+      ]
+    },
+    {
+      "title": "构建系统（CMake）",
+      "description": "通过预设、Sanitizer 变体和统一入口命令，把构建配置也纳入性能工程的证据链。",
+      "links": [
+        { "label": "快速开始", "href": "./getting-started/quickstart" },
+        { "label": "先决条件", "href": "./getting-started/prerequisites" }
+      ]
+    },
+    {
+      "title": "性能分析",
+      "description": "从测量搭建到结果解读，借助性能分析流程与决策树回答“瓶颈为什么在这里”。",
+      "links": [
+        { "label": "性能分析", "href": "./guides/profiling-guide" },
+        { "label": "决策树", "href": "./guides/optimization-decision-tree" }
+      ]
+    },
+    {
+      "title": "验证与 Sanitizer",
+      "description": "用测试命令、Sanitizer 与可重复流程约束优化结论，让文档保持“先验证、后宣称”。",
+      "links": [
+        { "label": "Sanitizer", "href": "./guides/validation" },
+        { "label": "最佳实践", "href": "./guides/best-practices" }
+      ]
+    }
+  ]'
+/>
 
 <FigureFrame
   label="默认验证路径"

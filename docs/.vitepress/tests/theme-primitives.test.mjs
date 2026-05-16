@@ -20,6 +20,11 @@ test('style.css defines reusable whitepaper primitives for panels, figures, meta
     '--wp-panel-bg',
     '--wp-figure-bg',
     '--wp-meta-bg',
+    '--wp-surface-1',
+    '--wp-surface-2',
+    '--wp-pill-bg',
+    '--wp-diagram-stroke',
+    '--wp-icon-muted',
   ]) {
     assert.match(css, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
@@ -30,7 +35,10 @@ test('style.css defines reusable whitepaper primitives for panels, figures, meta
     '.wp-meta-strip',
     '.wp-reference-list',
     '.wp-section-index',
+    '.wp-pill-link',
+    '.wp-surface-figure',
     '.vp-doc .mermaid',
+    ".vp-doc :where(svg [stroke='currentColor']",
   ]) {
     assert.match(css, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
@@ -44,6 +52,7 @@ test('theme index registers reusable whitepaper components', () => {
     'MetricStrip',
     'FigureFrame',
     'ReferenceList',
+    'SectionIndex',
   ]) {
     assert.match(themeIndex, new RegExp(componentName))
   }
@@ -57,5 +66,6 @@ test('bilingual landing pages use shared whitepaper theme components', () => {
   for (const content of [enIndex, zhIndex]) {
     assert.match(content, /<SectionHero\b/)
     assert.match(content, /<MetricStrip\b/)
+    assert.match(content, /<SectionIndex\b/)
   }
 })

@@ -30,73 +30,58 @@ layout: home
 
 ## Learning Path
 
-<div class="feature-map">
-  <div class="feature-card">
-    <div class="feature-card-title">Memory Layout & Cache</div>
-    <div class="feature-card-desc">
-      Understand cache behavior, data locality, and memory alignment so optimization starts with data movement rather than slogans.
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/learning-path" class="feature-tag">Learning Path</a>
-      <a href="./exercises/module-02-memory" class="feature-tag">Exercises</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">SIMD Optimization</div>
-    <div class="feature-card-desc">
-      Follow vectorization patterns, wrapper trade-offs, and benchmark discipline before claiming a throughput win.
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/learning-path" class="feature-tag">Learning Path</a>
-      <a href="./exercises/module-04-simd" class="feature-tag">Exercises</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">Concurrency & Threading</div>
-    <div class="feature-card-desc">
-      Read the repository’s concurrency material as an execution-model guide: atomics, memory ordering, and contention-aware design.
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/learning-path" class="feature-tag">Learning Path</a>
-      <a href="./exercises/module-05-concurrency" class="feature-tag">Exercises</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">Build System (CMake)</div>
-    <div class="feature-card-desc">
-      Use preset-driven builds, sanitizer variants, and repeatable test entry points as part of the performance story.
-    </div>
-    <div class="feature-tags">
-      <a href="./getting-started/quickstart" class="feature-tag">Quick Start</a>
-      <a href="./getting-started/prerequisites" class="feature-tag">Prerequisites</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">Profiling & Analysis</div>
-    <div class="feature-card-desc">
-      Move from measurement setup to interpretation with profiling workflows and decision trees that explain why a result matters.
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/profiling-guide" class="feature-tag">Profiling</a>
-      <a href="./guides/optimization-decision-tree" class="feature-tag">Decision Tree</a>
-    </div>
-  </div>
-
-  <div class="feature-card">
-    <div class="feature-card-title">Validation & Sanitizers</div>
-    <div class="feature-card-desc">
-      Keep optimizations honest with sanitizer passes, test commands, and a bias toward evidence over anecdote.
-    </div>
-    <div class="feature-tags">
-      <a href="./guides/validation" class="feature-tag">Sanitizers</a>
-      <a href="./guides/best-practices" class="feature-tag">Best Practices</a>
-    </div>
-  </div>
-</div>
+<SectionIndex
+  :items='[
+    {
+      "title": "Memory Layout & Cache",
+      "description": "Understand cache behavior, data locality, and memory alignment so optimization starts with data movement rather than slogans.",
+      "links": [
+        { "label": "Learning Path", "href": "./guides/learning-path" },
+        { "label": "Exercises", "href": "./exercises/module-02-memory" }
+      ]
+    },
+    {
+      "title": "SIMD Optimization",
+      "description": "Follow vectorization patterns, wrapper trade-offs, and benchmark discipline before claiming a throughput win.",
+      "links": [
+        { "label": "Learning Path", "href": "./guides/learning-path" },
+        { "label": "Exercises", "href": "./exercises/module-04-simd" }
+      ]
+    },
+    {
+      "title": "Concurrency & Threading",
+      "description": "Read the repository’s concurrency material as an execution-model guide: atomics, memory ordering, and contention-aware design.",
+      "links": [
+        { "label": "Learning Path", "href": "./guides/learning-path" },
+        { "label": "Exercises", "href": "./exercises/module-05-concurrency" }
+      ]
+    },
+    {
+      "title": "Build System (CMake)",
+      "description": "Use preset-driven builds, sanitizer variants, and repeatable test entry points as part of the performance story.",
+      "links": [
+        { "label": "Quick Start", "href": "./getting-started/quickstart" },
+        { "label": "Prerequisites", "href": "./getting-started/prerequisites" }
+      ]
+    },
+    {
+      "title": "Profiling & Analysis",
+      "description": "Move from measurement setup to interpretation with profiling workflows and decision trees that explain why a result matters.",
+      "links": [
+        { "label": "Profiling", "href": "./guides/profiling-guide" },
+        { "label": "Decision Tree", "href": "./guides/optimization-decision-tree" }
+      ]
+    },
+    {
+      "title": "Validation & Sanitizers",
+      "description": "Keep optimizations honest with sanitizer passes, test commands, and a bias toward evidence over anecdote.",
+      "links": [
+        { "label": "Sanitizers", "href": "./guides/validation" },
+        { "label": "Best Practices", "href": "./guides/best-practices" }
+      ]
+    }
+  ]'
+/>
 
 <FigureFrame
   label="Default verification path"

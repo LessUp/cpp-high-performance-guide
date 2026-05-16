@@ -121,14 +121,14 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
   min-height: 2.5rem;
   padding: 0.45rem 0.8rem;
-  border: 1px solid var(--wp-line-1);
+  border: 1px solid var(--wp-pill-border);
   border-radius: 999px;
-  background: color-mix(in oklch, var(--wp-paper-1) 86%, var(--wp-accent-1) 4%);
-  color: var(--wp-ink-2);
+  background: var(--wp-pill-bg);
+  color: var(--wp-pill-text);
   font-size: 0.86rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+  transition: border-color var(--wp-motion-1), color var(--wp-motion-1), transform var(--wp-motion-1);
   white-space: nowrap;
 }
 
@@ -136,6 +136,16 @@ onBeforeUnmount(() => {
   border-color: color-mix(in oklch, var(--wp-accent-1) 48%, var(--wp-line-2));
   color: var(--wp-accent-1);
   transform: translateY(-1px);
+}
+
+.language-button svg,
+.language-option svg {
+  color: var(--wp-icon-muted);
+}
+
+.language-button:hover svg,
+.language-option.active svg {
+  color: currentColor;
 }
 
 .language-label {
@@ -158,7 +168,7 @@ onBeforeUnmount(() => {
   padding: 0.35rem;
   border: 1px solid var(--wp-line-1);
   border-radius: 1rem;
-  background: var(--wp-panel-bg);
+  background: var(--wp-surface-1);
   box-shadow: var(--wp-shadow-1);
   z-index: 100;
 }
@@ -176,7 +186,7 @@ onBeforeUnmount(() => {
   font-size: 0.92rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background var(--wp-motion-1), color var(--wp-motion-1);
 }
 
 .language-option:hover,
@@ -187,7 +197,7 @@ onBeforeUnmount(() => {
 
 .dropdown-enter-active,
 .dropdown-leave-active {
-  transition: opacity 0.16s ease, transform 0.16s ease;
+  transition: opacity var(--wp-motion-1), transform var(--wp-motion-1);
 }
 
 .dropdown-enter-from,
