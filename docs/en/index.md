@@ -3,11 +3,11 @@ layout: home
 ---
 
 <SectionHero
-  eyebrow="Whitepaper / Engineering Monograph"
+  eyebrow="Performance Engineering"
   title="C++ High Performance Guide"
-  lede="Runnable C++ performance engineering docs that connect build discipline, memory layout, SIMD, concurrency, profiling, and validation into one archive-ready technical narrative."
+  lede="A practical C++20 guide to builds, memory layout, SIMD, concurrency, benchmarking, and profiling. Every topic is backed by runnable code and benchmark-oriented validation paths."
 >
-  This repository teaches high-performance C++ with runnable examples, but the docs surface is written for readers who want evidence: how modules relate, how claims are verified, and where to go next when a benchmark result needs context.
+  Runnable examples, preset-driven builds, and verification guidance stay close together so readers can move from concept to measurement without leaving the docs.
 
   <template #actions>
     <a class="home-nav-link" href="./getting-started/quickstart">Quick Start</a>
@@ -20,9 +20,9 @@ layout: home
     <MetricStrip
       label="Validation signals"
       :items='[
-        { "value": "C++20", "label": "baseline language" },
-        { "value": "5", "label": "core modules" },
-        { "value": "Bilingual", "label": "entry docs" }
+        { "value": "C++20", "label": "standard" },
+        { "value": "5", "label": "modules" },
+        { "value": "Bilingual", "label": "docs" }
       ]'
     />
   </template>
@@ -34,7 +34,7 @@ layout: home
   :items='[
     {
       "title": "Memory Layout & Cache",
-      "description": "Understand cache behavior, data locality, and memory alignment so optimization starts with data movement rather than slogans.",
+      "description": "Understand cache behavior, data locality, and memory alignment for optimal performance.",
       "links": [
         { "label": "Learning Path", "href": "./guides/learning-path" },
         { "label": "Exercises", "href": "./exercises/module-02-memory" }
@@ -42,7 +42,7 @@ layout: home
     },
     {
       "title": "SIMD Optimization",
-      "description": "Follow vectorization patterns, wrapper trade-offs, and benchmark discipline before claiming a throughput win.",
+      "description": "Leverage SIMD instructions for vectorized computation and data parallelism.",
       "links": [
         { "label": "Learning Path", "href": "./guides/learning-path" },
         { "label": "Exercises", "href": "./exercises/module-04-simd" }
@@ -50,7 +50,7 @@ layout: home
     },
     {
       "title": "Concurrency & Threading",
-      "description": "Read the repository’s concurrency material as an execution-model guide: atomics, memory ordering, and contention-aware design.",
+      "description": "Master std::atomic, memory ordering, and lock-free data structures.",
       "links": [
         { "label": "Learning Path", "href": "./guides/learning-path" },
         { "label": "Exercises", "href": "./exercises/module-05-concurrency" }
@@ -58,7 +58,7 @@ layout: home
     },
     {
       "title": "Build System (CMake)",
-      "description": "Use preset-driven builds, sanitizer variants, and repeatable test entry points as part of the performance story.",
+      "description": "Modern CMake with presets, sanitizers, and cross-platform build configuration.",
       "links": [
         { "label": "Quick Start", "href": "./getting-started/quickstart" },
         { "label": "Prerequisites", "href": "./getting-started/prerequisites" }
@@ -66,7 +66,7 @@ layout: home
     },
     {
       "title": "Profiling & Analysis",
-      "description": "Move from measurement setup to interpretation with profiling workflows and decision trees that explain why a result matters.",
+      "description": "Performance analysis tools, benchmarking methodology, and optimization decision tree.",
       "links": [
         { "label": "Profiling", "href": "./guides/profiling-guide" },
         { "label": "Decision Tree", "href": "./guides/optimization-decision-tree" }
@@ -74,7 +74,7 @@ layout: home
     },
     {
       "title": "Validation & Sanitizers",
-      "description": "Keep optimizations honest with sanitizer passes, test commands, and a bias toward evidence over anecdote.",
+      "description": "AddressSanitizer, ThreadSanitizer, UndefinedBehaviorSanitizer, and testing best practices.",
       "links": [
         { "label": "Sanitizers", "href": "./guides/validation" },
         { "label": "Best Practices", "href": "./guides/best-practices" }
@@ -84,35 +84,35 @@ layout: home
 />
 
 <FigureFrame
-  label="Default verification path"
-  caption="Build first, then confirm behavior before benchmarking"
-  note="Use the preset-driven debug path as the default local safety net, then move to sanitizer or release presets when deeper validation is needed."
+  label="Quick Start"
+  caption="Build first, then verify with ctest"
+  note="After building, run ctest --preset=debug to verify. See the Quick Start guide for prerequisites and toolchain details."
 >
   <div class="command-block">
-    <code>cmake --preset=debug && cmake --build build/debug && ctest --preset=debug</code>
+    <code>cmake --preset=debug && cmake --build build/debug</code>
   </div>
 </FigureFrame>
 
 <ReferenceList
-  title="Reference trail"
+  title="Further Reading"
   :items='[
+    {
+      "title": "Quick Start",
+      "href": "./getting-started/quickstart",
+      "meta": "Setup",
+      "description": "Get the toolchain, presets, and first build steps in one place."
+    },
+    {
+      "title": "Learning Path",
+      "href": "./guides/learning-path",
+      "meta": "Overview",
+      "description": "Follow the repository topics in a suggested learning order."
+    },
     {
       "title": "Validation & Sanitizers",
       "href": "./guides/validation",
-      "meta": "Evidence standard",
-      "description": "Default build, test, and sanitizer paths that keep optimization claims reproducible."
-    },
-    {
-      "title": "Profiling Guide",
-      "href": "./guides/profiling-guide",
-      "meta": "Measurement workflow",
-      "description": "Tooling and interpretation guidance for tracing hotspots before changing code."
-    },
-    {
-      "title": "API Reference",
-      "href": "./reference/api-reference",
-      "meta": "Reference surface",
-      "description": "Entry points for reusable helpers, wrappers, and troubleshooting-oriented reference material."
+      "meta": "Validation",
+      "description": "Use tests and sanitizers before trusting performance claims."
     }
   ]'
 />

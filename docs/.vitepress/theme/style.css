@@ -151,6 +151,12 @@ body {
   color: var(--wp-ink-2);
 }
 
+.VPNavBarTranslations,
+.VPNavBarExtra .translations,
+.VPNavScreenTranslations {
+  display: none !important;
+}
+
 .VPNavBarMenuLink:hover,
 .VPNavBarMenuLink.active,
 .VPNavBarMenuGroup.open .button,

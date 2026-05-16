@@ -3,6 +3,13 @@ export const SUPPORTED_LANGS = [
   { code: 'zh', label: '中文', path: '/zh/' },
 ]
 
+const LANGUAGE_FALLBACKS = {
+  zh: [
+    { prefix: '/reference/api/', target: '/reference/api-reference' },
+    { prefix: '/exercises/', target: '/' },
+  ],
+}
+
 function ensureLeadingSlash(path) {
   return path.startsWith('/') ? path : `/${path}`
 }
@@ -72,9 +79,17 @@ export function resolveLanguageTarget({
 }) {
   const currentPath = stripBase(routePath, siteBase)
   const pathWithoutLang = stripLocale(currentPath, supportedLangs)
-  const nextPath = pathWithoutLang === '/'
-    ? targetLangPath
-    : `${targetLangPath}${pathWithoutLang.replace(/^\/+/, '')}`
+  const targetLang = supportedLangs.find(lang => lang.path === targetLangPath)
+  const fallback = targetLang
+    ? LANGUAGE_FALLBACKS[targetLang.code]?.find(rule => pathWithoutLang.startsWith(rule.prefix))
+    : undefined
+  const nextPath = fallback
+    ? (fallback.target === '/'
+      ? targetLangPath
+      : `${targetLangPath}${fallback.target.replace(/^\/+/, '')}`)
+    : (pathWithoutLang === '/'
+      ? targetLangPath
+      : `${targetLangPath}${pathWithoutLang.replace(/^\/+/, '')}`)
 
   return withBase(nextPath, siteBase)
 }
