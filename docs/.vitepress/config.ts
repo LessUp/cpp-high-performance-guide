@@ -12,6 +12,8 @@ const base = rawBase
 const siteTitle = 'C++ High Performance Guide'
 const siteDescription =
   'Runnable C++ performance engineering docs covering academy, architecture, playbooks, references, and research.'
+const zhSiteTitle = 'C++ 高性能指南'
+const zhSiteDescription = '可运行的 C++ 性能工程文档，覆盖学习路径、架构解析、实践手册、参考资料与研究内容。'
 const siteUrl = 'https://lessup.github.io'
 const canonicalBase = '/cpp-high-performance-guide/'
 const currentYear = new Date().getFullYear()
@@ -163,10 +165,15 @@ export default withMermaid(defineConfig({
       label: '简体中文',
       lang: 'zh-CN',
       link: '/zh/',
-      title: 'C++ 高性能指南',
-      description: '可运行的 C++ 性能工程文档，覆盖 academy、architecture、playbook、reference 与 research。',
+      title: zhSiteTitle,
+      description: zhSiteDescription,
       head: [
         ['meta', { property: 'og:locale', content: 'zh_CN' }],
+        ['meta', { property: 'og:title', content: zhSiteTitle }],
+        ['meta', { property: 'og:description', content: zhSiteDescription }],
+        ['meta', { property: 'og:image:alt', content: 'C++ 高性能指南文档社交卡片' }],
+        ['meta', { name: 'twitter:title', content: zhSiteTitle }],
+        ['meta', { name: 'twitter:description', content: zhSiteDescription }],
       ],
       themeConfig: {
         editLink: {
