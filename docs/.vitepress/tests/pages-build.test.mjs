@@ -45,6 +45,7 @@ test('build:pages prefixes homepage landing links with the GitHub Pages base', (
   const { en, zh } = readBuiltLandingPages()
 
   for (const href of [
+    '/cpp-high-performance-guide/en/reference/',
     '/cpp-high-performance-guide/en/getting-started/quickstart',
     '/cpp-high-performance-guide/en/guides/learning-path',
     '/cpp-high-performance-guide/en/exercises/module-02-memory',
@@ -61,6 +62,7 @@ test('build:pages prefixes homepage landing links with the GitHub Pages base', (
   }
 
   for (const href of [
+    '/cpp-high-performance-guide/zh/reference/',
     '/cpp-high-performance-guide/zh/getting-started/quickstart',
     '/cpp-high-performance-guide/zh/guides/learning-path',
     '/cpp-high-performance-guide/en/exercises/module-02-memory',
@@ -77,6 +79,7 @@ test('build:pages prefixes homepage landing links with the GitHub Pages base', (
   }
 
   for (const rawHref of [
+    'href="/en/reference/"',
     'href="/en/getting-started/quickstart"',
     'href="/en/guides/learning-path"',
     'href="/en/exercises/module-02-memory"',
@@ -93,6 +96,7 @@ test('build:pages prefixes homepage landing links with the GitHub Pages base', (
   }
 
   for (const rawHref of [
+    'href="/zh/reference/"',
     'href="/zh/getting-started/quickstart"',
     'href="/zh/guides/learning-path"',
     'href="/zh/getting-started/prerequisites"',

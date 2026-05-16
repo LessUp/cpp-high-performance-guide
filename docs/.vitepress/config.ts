@@ -54,6 +54,7 @@ const enPlaybookItems = [
 ]
 
 const enReferenceItems = [
+  { text: 'Reference Overview', link: '/en/reference/' },
   { text: 'API Reference', link: '/en/reference/api-reference' },
   { text: 'FAQ', link: '/en/reference/faq' },
   { text: 'Troubleshooting', link: '/en/reference/troubleshooting' },
@@ -106,10 +107,11 @@ const zhPlaybookItems = [
 ]
 
 const zhReferenceItems = [
+  { text: '参考概览', link: '/zh/reference/' },
   { text: 'API 入口', link: '/zh/reference/api-reference' },
   { text: '常见问题', link: '/zh/reference/faq' },
   { text: '故障排查', link: '/zh/reference/troubleshooting' },
-  { text: 'API 入口（英文）', link: englishReferenceHub },
+  { text: '参考概览（英文）', link: englishReferenceHub },
 ]
 
 const zhResearchItems = [
@@ -167,7 +169,7 @@ export default withMermaid(defineConfig({
           { text: 'Academy', link: '/en/academy/', activeMatch: '/en/academy/' },
           { text: 'Architecture', link: '/en/architecture/', activeMatch: '/en/architecture/' },
           { text: 'Playbook', link: '/en/playbook/', activeMatch: '/en/playbook/|/en/getting-started/|/en/guides/' },
-          { text: 'Reference', link: '/en/reference/api-reference', activeMatch: '/en/reference/' },
+          { text: 'Reference', link: '/en/reference/', activeMatch: '/en/reference/' },
           { text: 'Research', link: '/en/research/', activeMatch: '/en/research/' },
           { text: 'Contributing', link: '/en/contributing/ai-workflow', activeMatch: '/en/contributing/' },
         ],
@@ -238,7 +240,7 @@ export default withMermaid(defineConfig({
           { text: '学院', link: '/zh/academy/', activeMatch: '/zh/academy/' },
           { text: '架构', link: '/zh/architecture/', activeMatch: '/zh/architecture/' },
           { text: '实践手册', link: '/zh/playbook/', activeMatch: '/zh/playbook/|/zh/getting-started/|/zh/guides/' },
-          { text: '参考', link: '/zh/reference/api-reference', activeMatch: '/zh/reference/' },
+          { text: '参考', link: '/zh/reference/', activeMatch: '/zh/reference/' },
           { text: '研究', link: '/zh/research/', activeMatch: '/zh/research/' },
           { text: '贡献', link: '/zh/contributing/ai-workflow', activeMatch: '/zh/contributing/' },
         ],

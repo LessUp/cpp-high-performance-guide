@@ -143,6 +143,7 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   assert.match(read('SectionIndex.vue'), /BaseAwareLink/)
 
   for (const href of [
+    '/en/reference/',
     '/en/getting-started/quickstart',
     '/en/guides/learning-path',
     '/en/exercises/module-02-memory',
@@ -159,6 +160,7 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   }
 
   for (const href of [
+    '/zh/reference/',
     '/zh/getting-started/quickstart',
     '/zh/guides/learning-path',
     '/en/exercises/module-02-memory',

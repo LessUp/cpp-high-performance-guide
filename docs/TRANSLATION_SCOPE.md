@@ -10,7 +10,7 @@ corresponding page in `docs/zh/`:
 
 - `getting-started/`
 - `guides/`
-- `reference/` (top-level pages: `faq.md`, `troubleshooting.md`, `api-reference.md`)
+- `reference/` (top-level pages: `index.md`, `faq.md`, `troubleshooting.md`, `api-reference.md`)
 - `contributing/`
 
 ## English-only surfaces
