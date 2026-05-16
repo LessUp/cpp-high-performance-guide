@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { resolveLanguageTarget } from '../theme/language-routing.js'
+import { createLanguageSwitcherLinks, resolveLanguageTarget } from '../theme/language-routing.js'
 
 test('switching from no-trailing-slash Pages root to zh keeps a single base segment', () => {
   const targetPath = resolveLanguageTarget({
@@ -43,4 +43,52 @@ test('switching from an English-only exercise page to zh falls back to the zh la
   })
 
   assert.equal(targetPath, '/cpp-high-performance-guide/zh/')
+})
+
+test('language switcher exposes real href targets for each locale', () => {
+  const links = createLanguageSwitcherLinks({
+    routePath: '/cpp-high-performance-guide/en/guides/validation',
+    siteBase: '/cpp-high-performance-guide/',
+  })
+
+  assert.deepEqual(links, [
+    {
+      code: 'en',
+      label: 'English',
+      path: '/en/',
+      targetPath: '/cpp-high-performance-guide/en/guides/validation',
+      isCurrent: true,
+    },
+    {
+      code: 'zh',
+      label: '中文',
+      path: '/zh/',
+      targetPath: '/cpp-high-performance-guide/zh/guides/validation',
+      isCurrent: false,
+    },
+  ])
+})
+
+test('language switcher hrefs reuse locale fallbacks for untranslated destinations', () => {
+  const links = createLanguageSwitcherLinks({
+    routePath: '/cpp-high-performance-guide/en/reference/api/memory-utils',
+    siteBase: '/cpp-high-performance-guide/',
+  })
+
+  assert.deepEqual(links, [
+    {
+      code: 'en',
+      label: 'English',
+      path: '/en/',
+      targetPath: '/cpp-high-performance-guide/en/reference/api/memory-utils',
+      isCurrent: true,
+    },
+    {
+      code: 'zh',
+      label: '中文',
+      path: '/zh/',
+      targetPath: '/cpp-high-performance-guide/zh/reference/api-reference',
+      isCurrent: false,
+    },
+  ])
 })

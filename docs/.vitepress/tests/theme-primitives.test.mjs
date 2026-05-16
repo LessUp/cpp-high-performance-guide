@@ -60,6 +60,14 @@ test('style.css suppresses VitePress built-in translation widgets in favor of th
   }
 })
 
+test('language switcher markup keeps native navigation when JavaScript is unavailable', () => {
+  const switcher = read('LanguageSwitcher.vue')
+
+  assert.match(switcher, /<details\b/)
+  assert.match(switcher, /<a\b/)
+  assert.match(switcher, /:href=/)
+})
+
 test('theme index wires only the active language chrome', () => {
   const themeIndex = read('index.ts')
 
