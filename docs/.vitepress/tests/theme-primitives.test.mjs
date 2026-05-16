@@ -131,6 +131,47 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   assert.match(enIndex, /aria-label="Project metrics"/)
   assert.match(zhIndex, /links-aria-label="落地页链接"/)
   assert.match(zhIndex, /aria-label="项目指标"/)
+
+  for (const href of [
+    '/en/getting-started/quickstart',
+    '/en/guides/learning-path',
+    '/en/exercises/module-02-memory',
+    '/en/exercises/module-04-simd',
+    '/en/exercises/module-05-concurrency',
+    '/en/getting-started/prerequisites',
+    '/en/guides/profiling-guide',
+    '/en/guides/optimization-decision-tree',
+    '/en/guides/validation',
+    '/en/guides/best-practices',
+    '/zh/',
+  ]) {
+    assert.match(enIndex, new RegExp(`href: "${href.replaceAll('/', '\\/')}"`))
+  }
+
+  for (const href of [
+    '/zh/getting-started/quickstart',
+    '/zh/guides/learning-path',
+    '/en/exercises/module-02-memory',
+    '/en/exercises/module-04-simd',
+    '/en/exercises/module-05-concurrency',
+    '/zh/getting-started/prerequisites',
+    '/zh/guides/profiling-guide',
+    '/zh/guides/optimization-decision-tree',
+    '/zh/guides/validation',
+    '/zh/guides/best-practices',
+    '/en/',
+  ]) {
+    assert.match(zhIndex, new RegExp(`href: "${href.replaceAll('/', '\\/')}"`))
+  }
+
+  assert.match(enIndex, /<a href="\/en\/getting-started\/quickstart">Quick Start guide<\/a>/)
+  assert.match(zhIndex, /<a href="\/zh\/getting-started\/quickstart">快速开始指南<\/a>/)
+  assert.doesNotMatch(enIndex, /href: "\.\//)
+  assert.doesNotMatch(enIndex, /href: "\.\.\//)
+  assert.doesNotMatch(zhIndex, /href: "\.\//)
+  assert.doesNotMatch(zhIndex, /href: "\.\.\//)
+  assert.doesNotMatch(enIndex, /<a href="\.\//)
+  assert.doesNotMatch(zhIndex, /<a href="\.\//)
 })
 
 test('shared landing components render localized aria labels', async () => {
