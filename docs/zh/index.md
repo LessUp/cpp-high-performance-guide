@@ -11,7 +11,7 @@ layout: home
   :links='[
     { href: "/zh/academy/", label: "学院" },
     { href: "/zh/playbook/", label: "实践手册" },
-    { href: "/zh/reference/api-reference", label: "参考" },
+    { href: "/zh/reference/", label: "参考" },
     { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
     { href: "/en/", label: "English" },
   ]'
@@ -60,6 +60,7 @@ layout: home
       title: "参考",
       description: "需要精确命令、接口或常见问题答案时，从参考资料入口进入。",
       links: [
+        { href: "/zh/reference/", label: "参考概览" },
         { href: "/zh/reference/api-reference", label: "API 入口" },
         { href: "/zh/reference/faq", label: "常见问题" },
       ],

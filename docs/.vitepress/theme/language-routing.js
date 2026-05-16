@@ -5,7 +5,7 @@ export const SUPPORTED_LANGS = [
 
 const LANGUAGE_FALLBACKS = {
   zh: [
-    { prefix: '/reference/api/', target: '/reference/api-reference' },
+    { prefix: '/reference/api/', target: '/reference/' },
     { prefix: '/exercises/', target: '/' },
   ],
 }

@@ -48,7 +48,7 @@ test('switching from an English-only API detail page to zh falls back to the zh 
     targetLangPath: '/zh/',
   })
 
-  assert.equal(targetPath, '/cpp-high-performance-guide/zh/reference/api-reference')
+  assert.equal(targetPath, '/cpp-high-performance-guide/zh/reference/')
 })
 
 test('switching from an English-only exercise page to zh falls back to the zh landing page', () => {
@@ -78,7 +78,7 @@ test('switching from a slashless English-only API index to zh falls back to the 
     targetLangPath: '/zh/',
   })
 
-  assert.equal(targetPath, '/cpp-high-performance-guide/zh/reference/api-reference')
+  assert.equal(targetPath, '/cpp-high-performance-guide/zh/reference/')
 })
 
 test('language switcher exposes real href targets for each locale', () => {
@@ -116,7 +116,7 @@ test('language switcher hrefs reuse locale fallbacks for slashless clean URLs un
   })
 
   assert.equal(exerciseLinks[1].targetPath, '/cpp-high-performance-guide/zh/')
-  assert.equal(apiLinks[1].targetPath, '/cpp-high-performance-guide/zh/reference/api-reference')
+  assert.equal(apiLinks[1].targetPath, '/cpp-high-performance-guide/zh/reference/')
 })
 
 test('language switcher hrefs reuse locale fallbacks for untranslated destinations', () => {
@@ -137,7 +137,7 @@ test('language switcher hrefs reuse locale fallbacks for untranslated destinatio
       code: 'zh',
       label: '中文',
       path: '/zh/',
-      targetPath: '/cpp-high-performance-guide/zh/reference/api-reference',
+      targetPath: '/cpp-high-performance-guide/zh/reference/',
       isCurrent: false,
     },
   ])

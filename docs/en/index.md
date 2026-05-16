@@ -11,7 +11,7 @@ layout: home
   :links='[
     { href: "/en/academy/", label: "Academy" },
     { href: "/en/playbook/", label: "Playbook" },
-    { href: "/en/reference/api-reference", label: "Reference" },
+    { href: "/en/reference/", label: "Reference" },
     { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
     { href: "/zh/", label: "中文" },
   ]'
@@ -60,6 +60,7 @@ layout: home
       title: "Reference",
       description: "Use the FAQ, troubleshooting notes, and API hubs when you need exact commands or interfaces.",
       links: [
+        { href: "/en/reference/", label: "Reference overview" },
         { href: "/en/reference/api-reference", label: "API Reference" },
         { href: "/en/reference/faq", label: "FAQ" },
       ],
