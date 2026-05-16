@@ -14,8 +14,47 @@ const router = useRouter()
 const route = useRoute()
 const isOpen = ref(false)
 
+function getSiteBase() {
+  const configuredBase = site.value.base || '/'
+  return configuredBase.endsWith('/') ? configuredBase : `${configuredBase}/`
+}
+
+function stripBase(path: string) {
+  const base = getSiteBase()
+  if (base !== '/' && path.startsWith(base)) {
+    const stripped = path.slice(base.length - 1)
+    return stripped.startsWith('/') ? stripped : `/${stripped}`
+  }
+
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+function stripLocale(path: string) {
+  for (const { path: localePath } of SUPPORTED_LANGS) {
+    if (path === localePath || path === localePath.slice(0, -1)) {
+      return '/'
+    }
+
+    if (path.startsWith(localePath)) {
+      const stripped = path.slice(localePath.length)
+      return stripped ? `/${stripped.replace(/^\/+/, '')}` : '/'
+    }
+  }
+
+  return path
+}
+
+function withBase(path: string) {
+  const base = getSiteBase()
+  if (base === '/') {
+    return path
+  }
+
+  return `${base}${path.replace(/^\/+/, '')}`
+}
+
 const currentLang = computed(() => {
-  const path = route.path
+  const path = stripBase(route.path)
   const lang = SUPPORTED_LANGS.find(l => path.startsWith(l.path))
   return lang || SUPPORTED_LANGS[0]
 })
@@ -32,21 +71,13 @@ function switchLang(lang: typeof SUPPORTED_LANGS[0]) {
   }
 
   // Calculate target path
-  const base = site.value.base || '/'
-  const currentPath = route.path
-
-  // Remove current language prefix
-  let pathWithoutLang = currentPath
-  for (const l of SUPPORTED_LANGS) {
-    const langPath = base + l.path.substring(1)
-    if (currentPath.startsWith(langPath)) {
-      pathWithoutLang = currentPath.substring(langPath.length)
-      break
-    }
-  }
+  const currentPath = stripBase(route.path)
+  const pathWithoutLang = stripLocale(currentPath)
 
   // Build target path
-  const targetPath = base + lang.path.substring(1) + pathWithoutLang
+  const targetPath = withBase(
+    pathWithoutLang === '/' ? lang.path : `${lang.path}${pathWithoutLang.replace(/^\/+/, '')}`
+  )
 
   isOpen.value = false
   router.go(targetPath)
