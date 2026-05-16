@@ -44,6 +44,18 @@ test('style.css defines reusable whitepaper primitives for panels, figures, meta
   }
 })
 
+test('style.css suppresses VitePress built-in translation widgets in favor of the custom switcher', () => {
+  const css = read('style.css')
+
+  for (const selector of [
+    '.VPNavBarTranslations',
+    '.VPNavBarExtra .translations',
+    '.VPNavScreenTranslations',
+  ]) {
+    assert.match(css, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
+})
+
 test('theme index registers reusable whitepaper components', () => {
   const themeIndex = read('index.ts')
 
@@ -68,4 +80,9 @@ test('bilingual landing pages use shared whitepaper theme components', () => {
     assert.match(content, /<MetricStrip\b/)
     assert.match(content, /<SectionIndex\b/)
   }
+
+  assert.match(enIndex, /eyebrow="Performance Engineering"/)
+  assert.match(enIndex, /A practical C\+\+20 guide to builds, memory layout, SIMD, concurrency, benchmarking, and profiling\./)
+  assert.match(zhIndex, /eyebrow="性能工程"/)
+  assert.match(zhIndex, /一份实用的 C\+\+20 指南，涵盖构建系统、内存布局、SIMD、并发、基准测试和性能分析。/)
 })
