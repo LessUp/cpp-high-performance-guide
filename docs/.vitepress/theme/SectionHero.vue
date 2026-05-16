@@ -10,6 +10,7 @@ defineProps<{
   subtitle?: string
   intro: string
   links?: HeroLink[]
+  linksAriaLabel: string
 }>()
 </script>
 
@@ -24,7 +25,7 @@ defineProps<{
         </div>
       </div>
 
-      <nav v-if="links?.length" class="wp-hero-nav" aria-label="Landing page links">
+      <nav v-if="links?.length" class="wp-hero-nav" :aria-label="linksAriaLabel">
         <a
           v-for="link in links"
           :key="`${link.href}:${link.label}`"

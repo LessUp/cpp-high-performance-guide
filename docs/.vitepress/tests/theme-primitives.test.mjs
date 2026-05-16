@@ -3,12 +3,41 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { createSSRApp } from 'vue'
+import { renderToString } from 'vue/server-renderer'
+import { compileScript, compileTemplate, parse } from '@vue/compiler-sfc'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const themeDir = path.resolve(__dirname, '..', 'theme')
+const vueModuleUrl = import.meta.resolve('vue')
 
 function read(relativePath) {
   return fs.readFileSync(path.join(themeDir, relativePath), 'utf8')
+}
+
+async function renderComponent(relativePath, props) {
+  const source = read(relativePath)
+  const { descriptor } = parse(source, { filename: relativePath })
+  const script = compileScript(descriptor, {
+    id: relativePath,
+    inlineTemplate: false,
+  })
+  const template = compileTemplate({
+    id: relativePath,
+    source: descriptor.template.content,
+    filename: relativePath,
+  })
+  const moduleSource = `${script.content
+    .replace(/^type\s+\w+\s*=\s*\{[\s\S]*?^\}\n*/gm, '')
+    .replace(/__props:\s*any/g, '__props')
+    .replace('export default', 'const component =')}
+${template.code.replace('export function render', 'function render')}
+component.render = render
+export default component`.replaceAll("'vue'", `'${vueModuleUrl}'`).replaceAll('"vue"', `"${vueModuleUrl}"`)
+  const dataUrl = `data:text/javascript;base64,${Buffer.from(moduleSource).toString('base64')}`
+  const { default: component } = await import(dataUrl)
+  const app = createSSRApp(component, props)
+  return renderToString(app)
 }
 
 test('style.css keeps tokenized selectors for the live homepage, Mermaid, and SVG surfaces', () => {
@@ -94,4 +123,26 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   assert.match(zhIndex, /title="C\+\+ 高性能指南"/)
   assert.match(zhIndex, /一份实用的 C\+\+20 指南，涵盖构建系统、内存布局、SIMD、并发、基准测试和性能分析。/)
   assert.match(zhIndex, /title="快速开始"/)
+  assert.match(enIndex, /links-aria-label="Landing page links"/)
+  assert.match(enIndex, /aria-label="Project metrics"/)
+  assert.match(zhIndex, /links-aria-label="落地页链接"/)
+  assert.match(zhIndex, /aria-label="项目指标"/)
+})
+
+test('shared landing components render localized aria labels', async () => {
+  const heroHtml = await renderComponent('SectionHero.vue', {
+    title: 'C++ 高性能指南',
+    intro: '一份实用的 C++20 指南。',
+    linksAriaLabel: '落地页链接',
+    links: [{ href: '../en/', label: 'English' }],
+  })
+  const metricHtml = await renderComponent('MetricStrip.vue', {
+    ariaLabel: '项目指标',
+    items: [{ value: '双语', label: '文档' }],
+  })
+
+  assert.match(heroHtml, /aria-label="落地页链接"/)
+  assert.doesNotMatch(heroHtml, /aria-label="Landing page links"/)
+  assert.match(metricHtml, /aria-label="项目指标"/)
+  assert.doesNotMatch(metricHtml, /aria-label="Project metrics"/)
 })
