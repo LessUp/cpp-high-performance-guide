@@ -7,6 +7,7 @@ layout: home
   title="C++ 高性能指南"
   subtitle="性能工程"
   intro="一份实用的 C++20 指南，涵盖构建系统、内存布局、SIMD、并发、基准测试和性能分析。每个主题都配有可运行的代码和面向基准测试的验证路径。"
+  links-aria-label="落地页链接"
   :links='[
     { href: "./getting-started/quickstart", label: "快速开始" },
     { href: "./guides/learning-path", label: "学习路径" },
@@ -16,6 +17,7 @@ layout: home
 >
   <template #aside>
     <MetricStrip
+      aria-label="项目指标"
       :items='[
         { value: "C++20", label: "标准" },
         { value: "5", label: "个模块" },

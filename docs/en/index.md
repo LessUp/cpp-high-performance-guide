@@ -7,6 +7,7 @@ layout: home
   title="C++ High Performance Guide"
   subtitle="Performance Engineering"
   intro="A practical C++20 guide to builds, memory layout, SIMD, concurrency, benchmarking, and profiling. Every topic is backed by runnable code and benchmark-oriented validation paths."
+  links-aria-label="Landing page links"
   :links='[
     { href: "./getting-started/quickstart", label: "Quick Start" },
     { href: "./guides/learning-path", label: "Guides" },
@@ -16,6 +17,7 @@ layout: home
 >
   <template #aside>
     <MetricStrip
+      aria-label="Project metrics"
       :items='[
         { value: "C++20", label: "standard" },
         { value: "5", label: "modules" },

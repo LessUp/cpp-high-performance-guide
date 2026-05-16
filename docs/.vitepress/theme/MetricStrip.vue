@@ -6,11 +6,12 @@ type MetricItem = {
 
 defineProps<{
   items: MetricItem[]
+  ariaLabel: string
 }>()
 </script>
 
 <template>
-  <div class="wp-metric-strip" aria-label="Project metrics">
+  <div class="wp-metric-strip" :aria-label="ariaLabel">
     <div
       v-for="item in items"
       :key="`${item.value}:${item.label}`"
