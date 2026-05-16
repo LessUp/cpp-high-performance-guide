@@ -71,6 +71,11 @@ export function withBase(path, siteBase = '/') {
   return `${normalizedBase}${path.replace(/^\/+/, '')}`
 }
 
+export function resolveCurrentLanguage(routePath, siteBase = '/', supportedLangs = SUPPORTED_LANGS) {
+  const currentPath = stripBase(routePath, siteBase)
+  return supportedLangs.find(lang => currentPath.startsWith(lang.path)) ?? supportedLangs[0]
+}
+
 export function resolveLanguageTarget({
   routePath,
   siteBase = '/',
@@ -92,4 +97,23 @@ export function resolveLanguageTarget({
       : `${targetLangPath}${pathWithoutLang.replace(/^\/+/, '')}`)
 
   return withBase(nextPath, siteBase)
+}
+
+export function createLanguageSwitcherLinks({
+  routePath,
+  siteBase = '/',
+  supportedLangs = SUPPORTED_LANGS,
+}) {
+  const currentLang = resolveCurrentLanguage(routePath, siteBase, supportedLangs)
+
+  return supportedLangs.map(lang => ({
+    ...lang,
+    targetPath: resolveLanguageTarget({
+      routePath,
+      siteBase,
+      targetLangPath: lang.path,
+      supportedLangs,
+    }),
+    isCurrent: lang.code === currentLang.code,
+  }))
 }
