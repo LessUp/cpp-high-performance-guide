@@ -27,14 +27,14 @@ defineProps<{
         <p class="wp-section-card-desc">{{ item.description }}</p>
 
         <div v-if="item.links?.length" class="wp-section-card-links">
-          <a
+          <BaseAwareLink
             v-for="link in item.links"
             :key="`${item.title}:${link.href}:${link.label}`"
             class="wp-pill-link"
             :href="link.href"
           >
             {{ link.label }}
-          </a>
+          </BaseAwareLink>
         </div>
       </article>
     </div>

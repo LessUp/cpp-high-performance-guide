@@ -26,14 +26,14 @@ defineProps<{
       </div>
 
       <nav v-if="links?.length" class="wp-hero-nav" :aria-label="linksAriaLabel">
-        <a
+        <BaseAwareLink
           v-for="link in links"
           :key="`${link.href}:${link.label}`"
           class="wp-pill-link"
           :href="link.href"
         >
           {{ link.label }}
-        </a>
+        </BaseAwareLink>
       </nav>
     </div>
 

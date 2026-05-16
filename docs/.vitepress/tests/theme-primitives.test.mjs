@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { createSSRApp } from 'vue'
+import { createSSRApp, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { compileScript, compileTemplate, parse } from '@vue/compiler-sfc'
 
@@ -33,10 +33,18 @@ async function renderComponent(relativePath, props) {
     .replace('export default', 'const component =')}
 ${template.code.replace('export function render', 'function render')}
 component.render = render
-export default component`.replaceAll("'vue'", `'${vueModuleUrl}'`).replaceAll('"vue"', `"${vueModuleUrl}"`)
+export default component`
+    .replaceAll("'vue'", `'${vueModuleUrl}'`)
+    .replaceAll('"vue"', `"${vueModuleUrl}"`)
   const dataUrl = `data:text/javascript;base64,${Buffer.from(moduleSource).toString('base64')}`
   const { default: component } = await import(dataUrl)
   const app = createSSRApp(component, props)
+  app.component('BaseAwareLink', {
+    props: ['href'],
+    setup(linkProps, { slots, attrs }) {
+      return () => h('a', { ...attrs, href: linkProps.href }, slots.default?.())
+    },
+  })
   return renderToString(app)
 }
 
@@ -102,7 +110,7 @@ test('language switcher markup keeps native navigation when JavaScript is unavai
 test('theme index wires only the active language chrome', () => {
   const themeIndex = read('index.ts')
 
-  for (const componentName of ['LanguageRedirect', 'LanguageSwitcher', 'SectionHero', 'MetricStrip', 'SectionIndex']) {
+  for (const componentName of ['BaseAwareLink', 'LanguageRedirect', 'LanguageSwitcher', 'SectionHero', 'MetricStrip', 'SectionIndex']) {
     assert.match(themeIndex, new RegExp(componentName))
   }
 })
@@ -131,6 +139,8 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   assert.match(enIndex, /aria-label="Project metrics"/)
   assert.match(zhIndex, /links-aria-label="落地页链接"/)
   assert.match(zhIndex, /aria-label="项目指标"/)
+  assert.match(read('SectionHero.vue'), /BaseAwareLink/)
+  assert.match(read('SectionIndex.vue'), /BaseAwareLink/)
 
   for (const href of [
     '/en/getting-started/quickstart',
@@ -164,14 +174,14 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
     assert.match(zhIndex, new RegExp(`href: "${href.replaceAll('/', '\\/')}"`))
   }
 
-  assert.match(enIndex, /<a href="\/en\/getting-started\/quickstart">Quick Start guide<\/a>/)
-  assert.match(zhIndex, /<a href="\/zh\/getting-started\/quickstart">快速开始指南<\/a>/)
+  assert.match(enIndex, /<BaseAwareLink href="\/en\/getting-started\/quickstart">Quick Start guide<\/BaseAwareLink>/)
+  assert.match(zhIndex, /<BaseAwareLink href="\/zh\/getting-started\/quickstart">快速开始指南<\/BaseAwareLink>/)
   assert.doesNotMatch(enIndex, /href: "\.\//)
   assert.doesNotMatch(enIndex, /href: "\.\.\//)
   assert.doesNotMatch(zhIndex, /href: "\.\//)
   assert.doesNotMatch(zhIndex, /href: "\.\.\//)
-  assert.doesNotMatch(enIndex, /<a href="\.\//)
-  assert.doesNotMatch(zhIndex, /<a href="\.\//)
+  assert.doesNotMatch(enIndex, /<a href="\/en\//)
+  assert.doesNotMatch(zhIndex, /<a href="\/zh\//)
 })
 
 test('shared landing components render localized aria labels', async () => {
