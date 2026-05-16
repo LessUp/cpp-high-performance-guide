@@ -3,7 +3,8 @@ export function futureSidebar(prefix) {
     [`${prefix}academy/`]: [],
     [`${prefix}architecture/`]: [],
     [`${prefix}playbook/`]: [],
-    [`${prefix}reference/`]: [],
     [`${prefix}research/`]: [],
   }
 }
+
+export const englishReferenceHub = '/en/reference/api-reference'
