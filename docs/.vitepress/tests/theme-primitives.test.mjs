@@ -70,19 +70,21 @@ test('theme index registers reusable whitepaper components', () => {
   }
 })
 
-test('bilingual landing pages use shared whitepaper theme components', () => {
+test('bilingual landing pages retain the pre-theme-system content while theme primitives remain optional', () => {
   const docsRoot = path.resolve(themeDir, '..', '..')
   const enIndex = fs.readFileSync(path.join(docsRoot, 'en', 'index.md'), 'utf8')
   const zhIndex = fs.readFileSync(path.join(docsRoot, 'zh', 'index.md'), 'utf8')
 
   for (const content of [enIndex, zhIndex]) {
-    assert.match(content, /<SectionHero\b/)
-    assert.match(content, /<MetricStrip\b/)
-    assert.match(content, /<SectionIndex\b/)
+    assert.equal(/<SectionHero\b/.test(content), false)
+    assert.equal(/<MetricStrip\b/.test(content), false)
+    assert.equal(/<SectionIndex\b/.test(content), false)
   }
 
-  assert.match(enIndex, /eyebrow="Performance Engineering"/)
+  assert.match(enIndex, /<div class="home-header">/)
   assert.match(enIndex, /A practical C\+\+20 guide to builds, memory layout, SIMD, concurrency, benchmarking, and profiling\./)
-  assert.match(zhIndex, /eyebrow="性能工程"/)
+  assert.match(enIndex, /<div class="quick-start">/)
+  assert.match(zhIndex, /<div class="home-header">/)
   assert.match(zhIndex, /一份实用的 C\+\+20 指南，涵盖构建系统、内存布局、SIMD、并发、基准测试和性能分析。/)
+  assert.match(zhIndex, /<div class="quick-start">/)
 })
