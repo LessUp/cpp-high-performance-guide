@@ -1,7 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { createLanguageSwitcherLinks, resolveLanguageTarget } from '../theme/language-routing.js'
+import {
+  createLanguageSwitcherLinks,
+  resolveCurrentLanguage,
+  resolveLanguageTarget,
+} from '../theme/language-routing.js'
 
 test('switching from no-trailing-slash Pages root to zh keeps a single base segment', () => {
   const targetPath = resolveLanguageTarget({
@@ -23,6 +27,18 @@ test('switching from no-trailing-slash Pages root to en keeps a single base segm
   })
 
   assert.equal(targetPath, '/cpp-high-performance-guide/en/')
+})
+
+test('slashless zh locale root is detected correctly under a Pages base', () => {
+  const currentLanguage = resolveCurrentLanguage('/cpp-high-performance-guide/zh', '/cpp-high-performance-guide/')
+
+  assert.equal(currentLanguage.code, 'zh')
+})
+
+test('slashless en locale root is detected correctly under a Pages base', () => {
+  const currentLanguage = resolveCurrentLanguage('/cpp-high-performance-guide/en', '/cpp-high-performance-guide/')
+
+  assert.equal(currentLanguage.code, 'en')
 })
 
 test('switching from an English-only API detail page to zh falls back to the zh API hub', () => {

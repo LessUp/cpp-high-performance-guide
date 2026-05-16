@@ -73,7 +73,10 @@ export function withBase(path, siteBase = '/') {
 
 export function resolveCurrentLanguage(routePath, siteBase = '/', supportedLangs = SUPPORTED_LANGS) {
   const currentPath = stripBase(routePath, siteBase)
-  return supportedLangs.find(lang => currentPath.startsWith(lang.path)) ?? supportedLangs[0]
+  return supportedLangs.find((lang) => {
+    const slashlessLocaleRoot = lang.path.replace(/\/$/, '')
+    return currentPath === lang.path || currentPath === slashlessLocaleRoot || currentPath.startsWith(lang.path)
+  }) ?? supportedLangs[0]
 }
 
 export function resolveLanguageTarget({
