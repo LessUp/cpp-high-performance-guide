@@ -91,8 +91,12 @@ test('language switcher markup keeps native navigation when JavaScript is unavai
   const switcher = read('LanguageSwitcher.vue')
 
   assert.match(switcher, /<details\b/)
+  assert.match(switcher, /<summary\b/)
+  assert.match(switcher, /<ul\b/)
+  assert.match(switcher, /<li\b/)
   assert.match(switcher, /<a\b/)
   assert.match(switcher, /:href=/)
+  assert.doesNotMatch(switcher, /\brole="menu"/)
 })
 
 test('theme index wires only the active language chrome', () => {
