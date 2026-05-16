@@ -282,8 +282,8 @@ export default withMermaid(defineConfig({
     outline: [2, 3],
     search: { provider: 'local' },
     logo: {
-      light: assetPath('/logo.svg'),
-      dark: assetPath('/logo.svg'),
+      light: '/logo.svg',
+      dark: '/logo.svg',
     },
     editLink: {
       pattern: 'https://github.com/LessUp/cpp-high-performance-guide/edit/master/docs/:path',
