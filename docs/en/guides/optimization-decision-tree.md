@@ -13,7 +13,7 @@ Performance optimization is not random—it follows a systematic approach. This 
 ## The Golden Rule
 
 > **Always profile before optimizing!**
-> 
+>
 > Premature optimization is the root of all evil (or at least most of it) in programming.
 > — Donald Knuth
 
@@ -21,63 +21,46 @@ Performance optimization is not random—it follows a systematic approach. This 
 
 ## Decision Flowchart
 
+<DiagramCanvas title="Optimization Decision Flow" badge="Mermaid" caption="Semantic colors: yellow = decision, blue = action, green = complete, red = problem, gray = start.">
+
 ```mermaid
 flowchart TD
-    A[Code is slow] --> B{Did you profile?}
-    B -->|No| C[Profile first!<br/>perf/VTune/FlameGraph]
-    B -->|Yes| D{CPU or Memory bound?}
-    
-    D -->|CPU| E{Hotspot in loop?}
-    D -->|Memory| F{Cache miss rate?}
-    
-    E -->|Yes| G{Vectorizable?}
-    E -->|No| H[Algorithm optimization<br/>or data structure change]
-    
-    G -->|Yes| I{Auto-vectorized?}
-    G -->|No| J[Refactor for<br/>vectorization or<br/>algorithm change]
-    
-    I -->|Yes| K[✓ Done!<br/>Compiler did the work]
-    I -->|No| L[Manual SIMD<br/>intrinsics]
-    
-    F -->|High| M{Sequential access?}
-    F -->|Low| N[Consider prefetching<br/>or working set reduction]
-    
-    M -->|Yes| O[AOS → SOA<br/>data layout change]
-    M -->|No| P[Improve locality<br/>blocking/tiling]
-    
-    L --> Q[Verify with benchmarks]
+    A[Code is slow]:::start --> B{Did you profile?}:::decision
+    B -->|No| C[Profile first!<br/>perf/VTune/FlameGraph]:::action
+    B -->|Yes| D{CPU or Memory bound?}:::decision
+
+    D -->|CPU| E{Hotspot in loop?}:::decision
+    D -->|Memory| F{Cache miss rate?}:::decision
+
+    E -->|Yes| G{Vectorizable?}:::decision
+    E -->|No| H[Algorithm optimization<br/>or data structure change]:::action
+
+    G -->|Yes| I{Auto-vectorized?}:::decision
+    G -->|No| J[Refactor for<br/>vectorization or<br/>algorithm change]:::action
+
+    I -->|Yes| K[Done!<br/>Compiler did the work]:::complete
+    I -->|No| L[Manual SIMD<br/>intrinsics]:::action
+
+    F -->|High| M{Sequential access?}:::decision
+    F -->|Low| N[Consider prefetching<br/>or working set reduction]:::action
+
+    M -->|Yes| O[AOS to SOA<br/>data layout change]:::action
+    M -->|No| P[Improve locality<br/>blocking/tiling]:::action
+
+    L --> Q[Verify with benchmarks]:::action
     O --> Q
     P --> Q
     N --> Q
-    K --> R[Document & commit]
+    K --> R[Document & commit]:::complete
     H --> Q
-    Q --> S{Faster?}
+    Q --> S{Faster?}:::decision
     S -->|Yes| R
-    S -->|No| T[Re-profile and<br/>try different approach]
-    
+    S -->|No| T[Re-profile and<br/>try different approach]:::problem
+
     C --> D
-    
-    style A fill:#ff6b6b
-    style B fill:#ffd93d
-    style D fill:#ffd93d
-    style E fill:#ffd93d
-    style F fill:#ffd93d
-    style G fill:#ffd93d
-    style I fill:#ffd93d
-    style M fill:#ffd93d
-    style S fill:#ffd93d
-    style K fill:#6bcb77
-    style R fill:#6bcb77
-    style C fill:#4d96ff
-    style H fill:#4d96ff
-    style J fill:#4d96ff
-    style L fill:#4d96ff
-    style N fill:#4d96ff
-    style O fill:#4d96ff
-    style P fill:#4d96ff
-    style Q fill:#4d96ff
-    style T fill:#ff6b6b
 ```
+
+</DiagramCanvas>
 
 ---
 
@@ -107,7 +90,7 @@ flowchart TD
 
 | Indicator | Command | Detection |
 |-----------|---------|-----------|
-| Poor thread scaling | `OMP_NUM_THREADS` varying | Speedup < 0.5 × threads |
+| Poor thread scaling | `OMP_NUM_THREADS` varying | Speedup < 0.5 times threads |
 | Lock contention | `perf record -e lock:*` | High lock wait time |
 | Data races | `cmake --preset=tsan` | TSAN reports races |
 
@@ -119,21 +102,25 @@ flowchart TD
 
 ### SIMD Optimization
 
+<DiagramCanvas title="SIMD Optimization Flow" badge="Mermaid">
+
 ```mermaid
 flowchart LR
-    A[Vectorizable loop] --> B{Check vectorization}
-    B --> C[Compiler reports<br/>-fopt-info-vec]
-    C --> D{Vectorized?}
-    D -->|Yes| E[✓ Done]
-    D -->|No| F{Why not?}
-    F -->|Aliasing| G[Add __restrict]
-    F -->|Alignment| H[alignas alignment]
-    F -->|Complex| I[Manual intrinsics]
-    G --> J[Recheck]
+    A[Vectorizable loop]:::start --> B{Check vectorization}:::decision
+    B --> C[Compiler reports<br/>-fopt-info-vec]:::action
+    C --> D{Vectorized?}:::decision
+    D -->|Yes| E[Done]:::complete
+    D -->|No| F{Why not?}:::decision
+    F -->|Aliasing| G[Add __restrict]:::action
+    F -->|Alignment| H[alignas alignment]:::action
+    F -->|Complex| I[Manual intrinsics]:::action
+    G --> J[Recheck]:::action
     H --> J
     I --> E
     J --> D
 ```
+
+</DiagramCanvas>
 
 **Key Techniques:**
 1. **Auto-vectorization** - Let compiler do the work
@@ -145,26 +132,30 @@ flowchart LR
 
 ### Memory Optimization
 
+<DiagramCanvas title="Memory Optimization Flow" badge="Mermaid">
+
 ```mermaid
 flowchart TD
-    A[High cache misses] --> B{Access pattern?}
-    B -->|Sequential| C{Data layout?}
-    B -->|Random| D[Blocking/tiling<br/>or index restructuring]
-    
-    C -->|AOS| E[Convert to SOA]
-    C -->|SOA| F{Prefetching help?}
-    
-    E --> G[Verify speedup]
-    F -->|Yes| H[Add __builtin_prefetch]
-    F -->|No| I[Reduce working set<br/>or cache-aware algorithm]
-    
+    A[High cache misses]:::start --> B{Access pattern?}:::decision
+    B -->|Sequential| C{Data layout?}:::decision
+    B -->|Random| D[Blocking/tiling<br/>or index restructuring]:::action
+
+    C -->|AOS| E[Convert to SOA]:::action
+    C -->|SOA| F{Prefetching help?}:::decision
+
+    E --> G[Verify speedup]:::action
+    F -->|Yes| H[Add __builtin_prefetch]:::action
+    F -->|No| I[Reduce working set<br/>or cache-aware algorithm]:::action
+
     D --> G
     H --> G
     I --> G
 ```
 
+</DiagramCanvas>
+
 **Key Techniques:**
-1. **AOS → SOA** - Structure of Arrays for sequential access
+1. **AOS to SOA** - Structure of Arrays for sequential access
 2. **False sharing fix** - `alignas(64)` padding
 3. **Prefetching** - `__builtin_prefetch` for predictable patterns
 4. **Cache blocking** - Process data in cache-sized chunks
@@ -173,27 +164,31 @@ flowchart TD
 
 ### Concurrency Optimization
 
+<DiagramCanvas title="Concurrency Optimization Flow" badge="Mermaid">
+
 ```mermaid
 flowchart TD
-    A[Poor scaling] --> B{Lock contention?}
-    B -->|High| C{Critical section small?}
-    B -->|Low| D{False sharing?}
-    
-    C -->|Yes| E[Lock-free data structures]
-    C -->|No| F[Reduce lock scope<br/>or RCU pattern]
-    
-    D -->|Yes| G[alignas padding]
-    D -->|No| H{Load imbalance?}
-    
-    H -->|Yes| I[Work stealing<br/>or dynamic scheduling]
-    H -->|No| J[Check memory bandwidth]
-    
-    E --> K[Verify with TSAN]
+    A[Poor scaling]:::start --> B{Lock contention?}:::decision
+    B -->|High| C{Critical section small?}:::decision
+    B -->|Low| D{False sharing?}:::decision
+
+    C -->|Yes| E[Lock-free data structures]:::action
+    C -->|No| F[Reduce lock scope<br/>or RCU pattern]:::action
+
+    D -->|Yes| G[alignas padding]:::action
+    D -->|No| H{Load imbalance?}:::decision
+
+    H -->|Yes| I[Work stealing<br/>or dynamic scheduling]:::action
+    H -->|No| J[Check memory bandwidth]:::action
+
+    E --> K[Verify with TSAN]:::complete
     F --> K
     G --> K
     I --> K
     J --> K
 ```
+
+</DiagramCanvas>
 
 **Key Techniques:**
 1. **Atomic operations** - `std::atomic` with correct memory ordering
@@ -210,7 +205,7 @@ flowchart TD
 | Your Situation | First Try | Alternative |
 |----------------|-----------|-------------|
 | Loop runs many iterations | Auto-vectorization | Manual SIMD |
-| Sequential data access, high cache miss | AOS → SOA | Prefetching |
+| Sequential data access, high cache miss | AOS to SOA | Prefetching |
 | Multi-threaded, poor scaling | Check false sharing | Lock-free |
 | Random memory access | Blocking/tiling | B-tree structure |
 | High branch misprediction | Branchless code | Sort data |
@@ -220,13 +215,15 @@ flowchart TD
 
 ## Profiling Workflow
 
+<DiagramCanvas title="Profiling Workflow" badge="Mermaid">
+
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
     participant Perf as perf
     participant FG as FlameGraph
     participant Code as Code
-    
+
     Dev->>Perf: perf record -g ./benchmark
     Perf->>FG: perf script
     FG->>Dev: flamegraph.svg
@@ -237,11 +234,13 @@ sequenceDiagram
     Dev->>Dev: Faster?
 ```
 
+</DiagramCanvas>
+
 ---
 
 ## Common Pitfalls
 
-### ❌ Premature Optimization
+### Premature Optimization
 
 ```cpp
 // BAD: Optimizing without profiling
@@ -253,7 +252,7 @@ void process() {
 
 **Fix:** Profile first. Small loops may not matter.
 
-### ❌ Wrong Optimization for the Problem
+### Wrong Optimization for the Problem
 
 ```cpp
 // BAD: Using SIMD for memory-bound code
@@ -267,12 +266,12 @@ void process(float* data, size_t n) {
 
 **Fix:** Check if CPU or memory bound first.
 
-### ❌ Ignoring Algorithmic Complexity
+### Ignoring Algorithmic Complexity
 
 ```cpp
-// BAD: Optimizing O(n²) algorithm
+// BAD: Optimizing O(n^2) algorithm
 for (int i = 0; i < n; ++i) {
-    for (int j = 0; j < n; ++j) {  // O(n²)
+    for (int j = 0; j < n; ++j) {  // O(n^2)
         // SIMD won't save you here
     }
 }

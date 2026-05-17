@@ -1,12 +1,5 @@
 <script setup lang="ts">
-/**
- * Citation.vue - Academic citation system component
- *
- * Usage:
- * <Citation :references="[
- *   { id: 'drepper2007', author: 'Drepper, U.', title: 'What Every Programmer Should Know About Memory', year: 2007, url: '...' }
- * ]" />
- */
+import { ref } from 'vue'
 
 interface Reference {
   id: string
@@ -16,6 +9,7 @@ interface Reference {
   source?: string
   url?: string
   doi?: string
+  bibtex?: string
 }
 
 interface Props {
@@ -29,12 +23,27 @@ const props = withDefaults(defineProps<Props>(), {
   numbered: true,
 })
 
+const copiedId = ref<string | null>(null)
+
 function formatCitation(ref: Reference): string {
   const parts = [ref.author]
   if (ref.year) parts.push(`(${ref.year})`)
   parts.push(`*${ref.title}*`)
   if (ref.source) parts.push(ref.source)
   return parts.join('. ')
+}
+
+async function copyBibtex(ref: Reference) {
+  if (!ref.bibtex) return
+  try {
+    await navigator.clipboard.writeText(ref.bibtex)
+    copiedId.value = ref.id
+    setTimeout(() => {
+      if (copiedId.value === ref.id) copiedId.value = null
+    }, 2000)
+  } catch {
+    // Silent fail on clipboard errors
+  }
 }
 </script>
 
@@ -52,6 +61,21 @@ function formatCitation(ref: Reference): string {
             {{ ref.doi ? `DOI: ${ref.doi}` : 'Link' }}
           </a>
         </span>
+        <button
+          v-if="ref.bibtex"
+          class="citation-copy-btn"
+          @click="copyBibtex(ref)"
+          :title="copiedId === ref.id ? 'Copied!' : 'Copy BibTeX'"
+        >
+          <svg v-if="copiedId === ref.id" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          {{ copiedId === ref.id ? 'Copied' : 'BibTeX' }}
+        </button>
       </li>
     </ol>
     <ul v-else class="wp-citations-list">
@@ -65,75 +89,22 @@ function formatCitation(ref: Reference): string {
             {{ ref.doi ? `DOI: ${ref.doi}` : 'Link' }}
           </a>
         </span>
+        <button
+          v-if="ref.bibtex"
+          class="citation-copy-btn"
+          @click="copyBibtex(ref)"
+          :title="copiedId === ref.id ? 'Copied!' : 'Copy BibTeX'"
+        >
+          <svg v-if="copiedId === ref.id" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          {{ copiedId === ref.id ? 'Copied' : 'BibTeX' }}
+        </button>
       </li>
     </ul>
   </section>
 </template>
-
-<style scoped>
-.wp-citations {
-  margin: var(--wp-space-7, 3rem) 0;
-  padding: var(--wp-space-5, 1.5rem);
-  border: 1px solid var(--wp-line-1, #e0e0e0);
-  border-radius: var(--wp-radius-2, 14px);
-  background: var(--wp-surface-1, #f8f9fa);
-}
-
-.wp-citations h3 {
-  margin-top: 0;
-  margin-bottom: var(--wp-space-4, 1rem);
-  color: var(--wp-ink-1, #1a1a2e);
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.wp-citations-list {
-  margin: 0;
-  padding-left: var(--wp-space-5, 1.5rem);
-}
-
-.wp-citation-item {
-  margin-bottom: var(--wp-space-3, 0.75rem);
-  color: var(--wp-ink-2, #4a4a6a);
-  font-size: 0.95rem;
-  line-height: 1.7;
-}
-
-.wp-citation-item:last-child {
-  margin-bottom: 0;
-}
-
-.citation-author {
-  font-weight: 600;
-  color: var(--wp-ink-1, #1a1a2e);
-}
-
-.citation-year {
-  color: var(--wp-ink-3, #6a6a8a);
-}
-
-.citation-title {
-  font-style: italic;
-}
-
-.citation-source {
-  color: var(--wp-ink-3, #6a6a8a);
-}
-
-.citation-link {
-  margin-left: 0.5rem;
-}
-
-.citation-link a {
-  color: var(--wp-accent-primary, #3b6bdc);
-  font-size: 0.85rem;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.citation-link a:hover {
-  color: var(--wp-accent-secondary, #5a8bfc);
-  text-decoration: underline;
-}
-</style>

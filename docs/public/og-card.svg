@@ -14,7 +14,7 @@
   <path d="M284 168V214" stroke="#8EB8FF" stroke-width="8" stroke-linecap="round"/>
   <path d="M261 191H307" stroke="#8EB8FF" stroke-width="8" stroke-linecap="round"/>
   <text x="312" y="162" fill="#F8FBFF" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="700">C++ High Performance Guide</text>
-  <text x="312" y="226" fill="#A8C7FF" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="500">Academy · Architecture · Playbook · Reference · Research</text>
+  <text x="312" y="226" fill="#A8C7FF" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="500">Academy · Architecture · Algorithms · Playbook · Reference · Research</text>
   <text x="96" y="338" fill="#D7E6FF" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="600">Runnable C++ performance engineering docs with explicit validation.</text>
   <text x="96" y="388" fill="#91A9CC" font-family="Inter, Arial, sans-serif" font-size="24">CMake presets · Sanitizers · Profiling · SIMD · Concurrency · Benchmark evidence</text>
   <rect x="96" y="504" width="238" height="42" rx="21" fill="#17315F"/>

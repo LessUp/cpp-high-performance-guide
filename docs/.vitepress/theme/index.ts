@@ -11,6 +11,10 @@ import SectionIndex from './SectionIndex.vue'
 import Citation from './Citation.vue'
 import CodeCompare from './CodeCompare.vue'
 import ThemeAwareIcon from './ThemeAwareIcon.vue'
+import AlgorithmCard from './AlgorithmCard.vue'
+import ComplexityBadge from './ComplexityBadge.vue'
+import DiagramCanvas from './DiagramCanvas.vue'
+import ReferenceCard from './ReferenceCard.vue'
 
 export default {
   extends: DefaultTheme,
@@ -24,6 +28,11 @@ export default {
     app.component('Citation', Citation)
     app.component('CodeCompare', CodeCompare)
     app.component('ThemeAwareIcon', ThemeAwareIcon)
+    // Quantum Cobalt v3.0 components
+    app.component('AlgorithmCard', AlgorithmCard)
+    app.component('ComplexityBadge', ComplexityBadge)
+    app.component('DiagramCanvas', DiagramCanvas)
+    app.component('ReferenceCard', ReferenceCard)
   },
   Layout() {
     return h(DefaultTheme.Layout, null, {
