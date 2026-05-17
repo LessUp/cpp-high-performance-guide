@@ -137,7 +137,7 @@ export default withMermaid(defineConfig({
   title: siteTitle,
   description: siteDescription,
   base,
-  cleanUrls: true,
+  cleanUrls: false,
   lastUpdated: true,
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: assetPath('/logo.svg') }],
