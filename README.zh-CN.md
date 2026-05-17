@@ -42,7 +42,7 @@
 | `examples/03-modern-cpp/` | constexpr、移动语义、reserve、ranges |
 | `examples/04-simd-vectorization/` | 自动向量化、intrinsics、SIMD 封装 |
 | `examples/05-concurrency/` | 原子操作、无锁队列、OpenMP |
-| `docs/` | 双语学习路径、profiling、排障、参考文档 |
+| `docs/` | 双语 Pages 白皮书，覆盖学院 / 架构 / 实践手册 / 参考 / 研究 |
 | `openspec/` | 规格驱动开发流程与 change 历史 |
 
 ## 快速开始
@@ -61,8 +61,9 @@ cmake --build build/release
 ./build/release/examples/02-memory-cache/aos_soa_bench
 ```
 
-如果你想在快速开始之后直接使用 sanitizer，请查看
-[`docs/zh/guides/validation.md`](docs/zh/guides/validation.md)。
+如果你想在快速开始之后进入新的文档主路径，请先查看
+[`docs/zh/playbook/index.md`](docs/zh/playbook/index.md)，再进入
+[`docs/zh/guides/validation.md`](docs/zh/guides/validation.md) 了解 sanitizer 相关说明。
 
 ## 常用验证命令
 
@@ -75,13 +76,18 @@ cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
 cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 ```
 
-## 文档与学习路径
+## 文档入口
 
 - **文档站：** <https://lessup.github.io/cpp-high-performance-guide/>
-- **快速开始：** `docs/zh/getting-started/quickstart.md`
-- **学习路径：** `docs/zh/guides/learning-path.md`
-- **性能分析指南：** `docs/zh/guides/profiling-guide.md`
-- **验证与 Sanitizer：** `docs/zh/guides/validation.md`
+- **学院：** [`docs/zh/academy/index.md`](docs/zh/academy/index.md)
+- **架构：** [`docs/zh/architecture/index.md`](docs/zh/architecture/index.md)
+- **实践手册：** [`docs/zh/playbook/index.md`](docs/zh/playbook/index.md)
+- **参考：** [`docs/zh/reference/index.md`](docs/zh/reference/index.md)
+- **研究：** [`docs/zh/research/index.md`](docs/zh/research/index.md)
+- **实践手册内的快速开始：** [`docs/zh/getting-started/quickstart.md`](docs/zh/getting-started/quickstart.md)
+- **学习路径：** [`docs/zh/guides/learning-path.md`](docs/zh/guides/learning-path.md)
+- **性能分析指南：** [`docs/zh/guides/profiling-guide.md`](docs/zh/guides/profiling-guide.md)
+- **验证与 Sanitizer：** [`docs/zh/guides/validation.md`](docs/zh/guides/validation.md)
 - **英文入口：** `README.md` 与 `docs/en/`
 
 ## 开发流程

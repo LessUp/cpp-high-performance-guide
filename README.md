@@ -42,7 +42,7 @@ Every major topic is meant to be **readable, buildable, and measurable**.
 | `examples/03-modern-cpp/` | constexpr, move semantics, reserve, ranges |
 | `examples/04-simd-vectorization/` | auto-vectorization, intrinsics, SIMD wrappers |
 | `examples/05-concurrency/` | atomics, lock-free queue, OpenMP |
-| `docs/` | bilingual learning path, profiling guide, troubleshooting, reference |
+| `docs/` | bilingual Pages whitepaper covering academy, architecture, playbook, reference, research |
 | `openspec/` | spec-driven development workflow and change history |
 
 ## Quick start
@@ -61,8 +61,9 @@ Run one benchmark:
 ./build/release/examples/02-memory-cache/aos_soa_bench
 ```
 
-Need sanitizer-specific guidance after the quick start? See
-[`docs/en/guides/validation.md`](docs/en/guides/validation.md).
+Need the redesigned docs route after the quick start? Start with
+[`docs/en/playbook/index.md`](docs/en/playbook/index.md), then continue to
+[`docs/en/guides/validation.md`](docs/en/guides/validation.md) for sanitizer-specific guidance.
 
 ## Validation commands
 
@@ -75,13 +76,17 @@ cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
 cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 ```
 
-## Documentation and learning path
+## Documentation entry points
 
 - **Docs site:** <https://lessup.github.io/cpp-high-performance-guide/>
-- **Quick start:** `docs/en/getting-started/quickstart.md`
-- **Learning path:** `docs/en/guides/learning-path.md`
-- **Profiling guide:** `docs/en/guides/profiling-guide.md`
-- **Validation & sanitizers:** `docs/en/guides/validation.md`
+- **Academy:** [`docs/en/academy/index.md`](docs/en/academy/index.md)
+- **Architecture:** [`docs/en/architecture/index.md`](docs/en/architecture/index.md)
+- **Playbook:** [`docs/en/playbook/index.md`](docs/en/playbook/index.md)
+- **Reference:** [`docs/en/reference/index.md`](docs/en/reference/index.md)
+- **Research:** [`docs/en/research/index.md`](docs/en/research/index.md)
+- **Quick start inside the playbook:** [`docs/en/getting-started/quickstart.md`](docs/en/getting-started/quickstart.md)
+- **Profiling guide:** [`docs/en/guides/profiling-guide.md`](docs/en/guides/profiling-guide.md)
+- **Validation & sanitizers:** [`docs/en/guides/validation.md`](docs/en/guides/validation.md)
 - **Chinese entry:** `README.zh-CN.md` and `docs/zh/`
 
 ## Development workflow
