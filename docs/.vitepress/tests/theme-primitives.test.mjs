@@ -133,7 +133,7 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   assert.match(enIndex, /This repository treats performance advice as something to compile, test, benchmark, and falsify\./)
   assert.match(enIndex, /title="Quick Start"/)
   assert.match(zhIndex, /title="C\+\+ 高性能指南"/)
-  assert.match(zhIndex, /一份实用的 C\+\+20 指南，涵盖构建系统、内存布局、SIMD、并发、基准测试和性能分析。/)
+  assert.match(zhIndex, /这个仓库把性能建议视为必须能够编译、测试、基准比较并被证伪的对象。/)
   assert.match(zhIndex, /title="快速开始"/)
   assert.match(enIndex, /links-aria-label="Landing page links"/)
   assert.match(enIndex, /aria-label="Project metrics"/)
