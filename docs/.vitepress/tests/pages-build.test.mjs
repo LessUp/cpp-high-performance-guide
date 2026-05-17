@@ -8,32 +8,44 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const packageJsonPath = path.resolve(__dirname, '..', '..', 'package.json')
 const buildPagesScriptPath = path.resolve(__dirname, '..', 'scripts', 'build-pages.mjs')
+const configPath = path.resolve(__dirname, '..', 'config.ts')
 const docsRoot = path.resolve(__dirname, '..', '..')
 const distRoot = path.resolve(docsRoot, '.vitepress', 'dist')
 
-let cachedLandingPages
+const cachedLandingPages = new Map()
 
-function readBuiltLandingPages() {
-  if (!cachedLandingPages) {
+function readBuiltLandingPages(base = '/cpp-high-performance-guide/') {
+  if (!cachedLandingPages.has(base)) {
     const result = spawnSync(process.execPath, [buildPagesScriptPath], {
       cwd: docsRoot,
       encoding: 'utf8',
+      env: {
+        ...process.env,
+        VITEPRESS_BASE: base,
+      },
     })
 
     assert.equal(result.status, 0, result.stderr || result.stdout || 'build:pages failed')
 
-    cachedLandingPages = {
+    cachedLandingPages.set(base, {
       en: fs.readFileSync(path.join(distRoot, 'en', 'index.html'), 'utf8'),
       zh: fs.readFileSync(path.join(distRoot, 'zh', 'index.html'), 'utf8'),
       exercisesIndexExists: fs.existsSync(path.join(distRoot, 'en', 'exercises', 'index.html')),
       exercisesReadmeExists: fs.existsSync(path.join(distRoot, 'en', 'exercises', 'README.html')),
-    }
+    })
   }
 
-  return cachedLandingPages
+  return cachedLandingPages.get(base)
 }
 
-test('build:pages uses a cross-platform Node wrapper for the GitHub Pages base path', () => {
+test('docs config keeps clean URLs disabled for static hosting', () => {
+  const config = fs.readFileSync(configPath, 'utf8')
+
+  assert.match(config, /cleanUrls:\s*false/)
+  assert.doesNotMatch(config, /cleanUrls:\s*true/)
+})
+
+test('build:pages uses a cross-platform Node wrapper while preserving external base paths', () => {
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
   const buildPagesScript = fs.readFileSync(buildPagesScriptPath, 'utf8')
 
@@ -41,23 +53,18 @@ test('build:pages uses a cross-platform Node wrapper for the GitHub Pages base p
   assert.match(buildPagesScript, /VITEPRESS_BASE/)
   assert.match(buildPagesScript, /\/cpp-high-performance-guide\//)
   assert.match(buildPagesScript, /vitepress/)
+  assert.match(buildPagesScript, /process\.env\.VITEPRESS_BASE\s*\|\|/)
 })
 
-test('build:pages prefixes homepage landing links with the GitHub Pages base', () => {
+test('build:pages prefixes homepage landing links with the GitHub Pages base and .html leaf routes', () => {
   const { en, zh } = readBuiltLandingPages()
 
   for (const href of [
     '/cpp-high-performance-guide/en/reference/',
-    '/cpp-high-performance-guide/en/getting-started/quickstart',
-    '/cpp-high-performance-guide/en/guides/learning-path',
-    '/cpp-high-performance-guide/en/exercises/module-02-memory',
-    '/cpp-high-performance-guide/en/exercises/module-04-simd',
-    '/cpp-high-performance-guide/en/exercises/module-05-concurrency',
-    '/cpp-high-performance-guide/en/getting-started/prerequisites',
-    '/cpp-high-performance-guide/en/guides/profiling-guide',
-    '/cpp-high-performance-guide/en/guides/optimization-decision-tree',
-    '/cpp-high-performance-guide/en/guides/validation',
-    '/cpp-high-performance-guide/en/guides/best-practices',
+    '/cpp-high-performance-guide/en/getting-started/quickstart.html',
+    '/cpp-high-performance-guide/en/guides/learning-path.html',
+    '/cpp-high-performance-guide/en/guides/validation.html',
+    '/cpp-high-performance-guide/en/contributing/ai-workflow.html',
     '/cpp-high-performance-guide/zh/',
   ]) {
     assert.match(en, new RegExp(`href="${href.replaceAll('/', '\\/')}"`))
@@ -65,16 +72,10 @@ test('build:pages prefixes homepage landing links with the GitHub Pages base', (
 
   for (const href of [
     '/cpp-high-performance-guide/zh/reference/',
-    '/cpp-high-performance-guide/zh/getting-started/quickstart',
-    '/cpp-high-performance-guide/zh/guides/learning-path',
-    '/cpp-high-performance-guide/en/exercises/module-02-memory',
-    '/cpp-high-performance-guide/en/exercises/module-04-simd',
-    '/cpp-high-performance-guide/en/exercises/module-05-concurrency',
-    '/cpp-high-performance-guide/zh/getting-started/prerequisites',
-    '/cpp-high-performance-guide/zh/guides/profiling-guide',
-    '/cpp-high-performance-guide/zh/guides/optimization-decision-tree',
-    '/cpp-high-performance-guide/zh/guides/validation',
-    '/cpp-high-performance-guide/zh/guides/best-practices',
+    '/cpp-high-performance-guide/zh/getting-started/quickstart.html',
+    '/cpp-high-performance-guide/zh/guides/learning-path.html',
+    '/cpp-high-performance-guide/zh/guides/validation.html',
+    '/cpp-high-performance-guide/zh/contributing/ai-workflow.html',
     '/cpp-high-performance-guide/en/',
   ]) {
     assert.match(zh, new RegExp(`href="${href.replaceAll('/', '\\/')}"`))
@@ -84,14 +85,8 @@ test('build:pages prefixes homepage landing links with the GitHub Pages base', (
     'href="/en/reference/"',
     'href="/en/getting-started/quickstart"',
     'href="/en/guides/learning-path"',
-    'href="/en/exercises/module-02-memory"',
-    'href="/en/exercises/module-04-simd"',
-    'href="/en/exercises/module-05-concurrency"',
-    'href="/en/getting-started/prerequisites"',
-    'href="/en/guides/profiling-guide"',
-    'href="/en/guides/optimization-decision-tree"',
     'href="/en/guides/validation"',
-    'href="/en/guides/best-practices"',
+    'href="/en/contributing/ai-workflow"',
     'href="/zh/"',
   ]) {
     assert.doesNotMatch(en, new RegExp(rawHref.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
@@ -101,18 +96,24 @@ test('build:pages prefixes homepage landing links with the GitHub Pages base', (
     'href="/zh/reference/"',
     'href="/zh/getting-started/quickstart"',
     'href="/zh/guides/learning-path"',
-    'href="/zh/getting-started/prerequisites"',
-    'href="/zh/guides/profiling-guide"',
-    'href="/zh/guides/optimization-decision-tree"',
     'href="/zh/guides/validation"',
-    'href="/zh/guides/best-practices"',
+    'href="/zh/contributing/ai-workflow"',
     'href="/en/"',
-    'href="/en/exercises/module-02-memory"',
-    'href="/en/exercises/module-04-simd"',
-    'href="/en/exercises/module-05-concurrency"',
   ]) {
     assert.doesNotMatch(zh, new RegExp(rawHref.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
+})
+
+test('build:pages preserves an externally supplied base path', () => {
+  const { en, zh } = readBuiltLandingPages('/custom-base/')
+
+  assert.match(en, /href="\/custom-base\/en\/getting-started\/quickstart\.html"/)
+  assert.match(en, /href="\/custom-base\/zh\/"/)
+  assert.doesNotMatch(en, /href="\/cpp-high-performance-guide\/en\/getting-started\/quickstart\.html"/)
+
+  assert.match(zh, /href="\/custom-base\/zh\/getting-started\/quickstart\.html"/)
+  assert.match(zh, /href="\/custom-base\/en\/"/)
+  assert.doesNotMatch(zh, /href="\/cpp-high-performance-guide\/zh\/getting-started\/quickstart\.html"/)
 })
 
 test('build:pages emits the exercises overview as a clean index route', () => {

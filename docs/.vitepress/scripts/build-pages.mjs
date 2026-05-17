@@ -5,13 +5,14 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const docsRoot = path.resolve(__dirname, '..', '..')
 const vitepressCli = path.resolve(docsRoot, 'node_modules', 'vitepress', 'dist', 'node', 'cli.js')
+const pagesBase = process.env.VITEPRESS_BASE || '/cpp-high-performance-guide/'
 
 const result = spawnSync(process.execPath, [vitepressCli, 'build'], {
   cwd: docsRoot,
   stdio: 'inherit',
   env: {
     ...process.env,
-    VITEPRESS_BASE: '/cpp-high-performance-guide/',
+    VITEPRESS_BASE: pagesBase,
   },
 })
 
