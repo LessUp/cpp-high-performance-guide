@@ -130,7 +130,7 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   }
 
   assert.match(enIndex, /title="C\+\+ High Performance Guide"/)
-  assert.match(enIndex, /A practical C\+\+20 guide to builds, memory layout, SIMD, concurrency, benchmarking, and profiling\./)
+  assert.match(enIndex, /This repository treats performance advice as something to compile, test, benchmark, and falsify\./)
   assert.match(enIndex, /title="Quick Start"/)
   assert.match(zhIndex, /title="C\+\+ 高性能指南"/)
   assert.match(zhIndex, /一份实用的 C\+\+20 指南，涵盖构建系统、内存布局、SIMD、并发、基准测试和性能分析。/)
