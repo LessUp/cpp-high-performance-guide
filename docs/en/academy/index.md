@@ -15,7 +15,7 @@ The academy is the onboarding layer for the whitepaper. It explains how to read 
 | understand the teaching surface | [Module Atlas](./module-atlas) |
 | align on evidence standards | [Validation Doctrine](./validation-doctrine) |
 | run code quickly | [Quick Start](/en/getting-started/quickstart) |
-| practice directly | [Exercises](/en/exercises/README) *(secondary)* |
+| practice directly | [Exercises](/en/exercises/) *(secondary)* |
 
 ## Status
 

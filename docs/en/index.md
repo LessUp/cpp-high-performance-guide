@@ -123,4 +123,4 @@ layout: home
 ## Secondary routes
 
 - [Contributing workflow](/en/contributing/ai-workflow) remains available but sits outside the main reading sequence.
-- [Exercises](/en/exercises/README) stay reachable as a secondary, English-first practice surface.
+- [Exercises](/en/exercises/) stay reachable as a secondary, English-first practice surface.

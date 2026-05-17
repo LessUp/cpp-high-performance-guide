@@ -123,4 +123,4 @@ layout: home
 ## 次要入口
 
 - [贡献流程](/zh/contributing/ai-workflow) 继续保留，但不再主导顶层叙事。
-- [练习](/en/exercises/README) 仍可访问，但作为英文优先的次级实践表面存在。
+- [练习](/en/exercises/) 仍可访问，但作为英文优先的次级实践表面存在。

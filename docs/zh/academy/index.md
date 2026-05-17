@@ -15,7 +15,7 @@
 | 理解教学结构 | [模块总览](./module-atlas) |
 | 对齐证据标准 | [验证原则](./validation-doctrine) |
 | 快速跑通仓库 | [快速开始](/zh/getting-started/quickstart) |
-| 直接练习 | [练习](/en/exercises/README) *(次要，英文优先)* |
+| 直接练习 | [练习](/en/exercises/) *(次要，英文优先)* |
 
 ## 状态
 

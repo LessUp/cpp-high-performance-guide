@@ -16,5 +16,5 @@
 
 1. 先从[实践手册](/zh/playbook/)进入，跑通基本环境。
 2. 使用[学习路径](/zh/guides/learning-path)安排主题顺序。
-3. 需要刻意练习时进入[练习](/en/exercises/README)。
+3. 需要刻意练习时进入[练习](/en/exercises/)。
 4. 需要仓库级背景时回到[架构](/zh/architecture/)。

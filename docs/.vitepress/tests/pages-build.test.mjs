@@ -25,6 +25,8 @@ function readBuiltLandingPages() {
     cachedLandingPages = {
       en: fs.readFileSync(path.join(distRoot, 'en', 'index.html'), 'utf8'),
       zh: fs.readFileSync(path.join(distRoot, 'zh', 'index.html'), 'utf8'),
+      exercisesIndexExists: fs.existsSync(path.join(distRoot, 'en', 'exercises', 'index.html')),
+      exercisesReadmeExists: fs.existsSync(path.join(distRoot, 'en', 'exercises', 'README.html')),
     }
   }
 
@@ -111,4 +113,11 @@ test('build:pages prefixes homepage landing links with the GitHub Pages base', (
   ]) {
     assert.doesNotMatch(zh, new RegExp(rawHref.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
+})
+
+test('build:pages emits the exercises overview as a clean index route', () => {
+  const { exercisesIndexExists, exercisesReadmeExists } = readBuiltLandingPages()
+
+  assert.equal(exercisesIndexExists, true)
+  assert.equal(exercisesReadmeExists, false)
 })
