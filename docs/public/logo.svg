@@ -1,17 +1,42 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logo-title logo-desc">
   <title id="logo-title">C++ High Performance Guide logo</title>
   <desc id="logo-desc">A cobalt engineering badge with layered cache lines and a C++ monogram.</desc>
-  <rect width="512" height="512" rx="120" fill="#0B1020"/>
-  <rect x="56" y="56" width="400" height="400" rx="96" fill="url(#panel)"/>
-  <path d="M152 160H296C337.974 160 372 194.026 372 236C372 277.974 337.974 312 296 312H152V160Z" fill="#EAF2FF" fill-opacity="0.08" stroke="#8EB8FF" stroke-width="20"/>
-  <path d="M192 208H300" stroke="#EAF2FF" stroke-width="24" stroke-linecap="round"/>
-  <path d="M192 264H272" stroke="#EAF2FF" stroke-width="24" stroke-linecap="round"/>
-  <path d="M348 206V266" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
-  <path d="M318 236H378" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
-  <path d="M404 206V266" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
-  <path d="M374 236H434" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
-  <rect x="112" y="352" width="288" height="16" rx="8" fill="#8EB8FF" fill-opacity="0.32"/>
-  <rect x="112" y="384" width="208" height="16" rx="8" fill="#8EB8FF" fill-opacity="0.2"/>
+  <style>
+    /* Theme-aware colors via CSS variables */
+    .logo-bg { fill: var(--wp-logo-bg, #0B1020); }
+    .logo-panel { fill: var(--wp-logo-panel, url(#panel)); }
+    .logo-primary { fill: var(--wp-logo-primary, #EAF2FF); }
+    .logo-accent { fill: var(--wp-logo-accent, #8EB8FF); }
+    .logo-stroke { stroke: var(--wp-logo-stroke, #8EB8FF); }
+    .logo-accent-stroke { stroke: var(--wp-logo-accent-stroke, #8EB8FF); }
+    .logo-muted { fill: var(--wp-logo-muted, #8EB8FF); }
+
+    @media (prefers-color-scheme: dark) {
+      .logo-bg { fill: var(--wp-logo-bg-dark, #0B1020); }
+      .logo-primary { fill: var(--wp-logo-primary-dark, #EAF2FF); }
+      .logo-accent { fill: var(--wp-logo-accent-dark, #6BA3FF); }
+      .logo-stroke { stroke: var(--wp-logo-stroke-dark, #6BA3FF); }
+      .logo-accent-stroke { stroke: var(--wp-logo-accent-stroke-dark, #6BA3FF); }
+      .logo-muted { fill: var(--wp-logo-muted-dark, #6BA3FF); }
+    }
+  </style>
+  <!-- Background -->
+  <rect class="logo-bg" width="512" height="512" rx="120"/>
+  <!-- Inner panel with gradient -->
+  <rect class="logo-panel" x="56" y="56" width="400" height="400" rx="96" fill="url(#panel)"/>
+  <!-- C block shape -->
+  <path class="logo-primary" d="M152 160H296C337.974 160 372 194.026 372 236C372 277.974 337.974 312 296 312H152V160Z" fill="#EAF2FF" fill-opacity="0.08" stroke="#8EB8FF" stroke-width="20"/>
+  <!-- Text lines inside C -->
+  <path class="logo-stroke" d="M192 208H300" stroke="#EAF2FF" stroke-width="24" stroke-linecap="round"/>
+  <path class="logo-stroke" d="M192 264H272" stroke="#EAF2FF" stroke-width="24" stroke-linecap="round"/>
+  <!-- ++ symbols -->
+  <path class="logo-accent-stroke" d="M348 206V266" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
+  <path class="logo-accent-stroke" d="M318 236H378" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
+  <path class="logo-accent-stroke" d="M404 206V266" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
+  <path class="logo-accent-stroke" d="M374 236H434" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
+  <!-- Cache line representations -->
+  <rect class="logo-muted" x="112" y="352" width="288" height="16" rx="8" fill="#8EB8FF" fill-opacity="0.32"/>
+  <rect class="logo-muted" x="112" y="384" width="208" height="16" rx="8" fill="#8EB8FF" fill-opacity="0.2"/>
   <defs>
     <linearGradient id="panel" x1="92" y1="92" x2="420" y2="420" gradientUnits="userSpaceOnUse">
       <stop stop-color="#16213F"/>
