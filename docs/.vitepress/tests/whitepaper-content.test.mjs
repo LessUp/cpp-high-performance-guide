@@ -54,9 +54,25 @@ test('architecture pages describe preset-driven validation and profiling methodo
   assert.match(methodology, /Google Benchmark/)
 })
 
+test('benchmark command references use real build output paths', () => {
+  const methodology = read('en/architecture/performance-methodology.md')
+  const doctrine = read('en/academy/validation-doctrine.md')
+
+  for (const content of [methodology, doctrine]) {
+    assert.doesNotMatch(content, /\/bench\//)
+  }
+
+  assert.match(methodology, /\.\/build\/release\/examples\/02-memory-cache\/aos_vs_soa_bench/)
+  assert.match(methodology, /\.\/build\/release\/examples\/04-simd-vectorization\/simd_bench/)
+  assert.match(methodology, /\.\/build\/relwithdebinfo\/examples\/04-simd-vectorization\/simd_bench/)
+  assert.match(methodology, /\.\/tools\/performance\/generate_flamegraph\.sh \.\/build\/relwithdebinfo\/examples\/02-memory-cache\/aos_vs_soa_bench/)
+  assert.match(doctrine, /\.\/build\/release\/examples\/02-memory-cache\/aos_vs_soa_bench/)
+})
+
 test('research pages cite concrete external repositories and references', () => {
   const relatedWork = read('en/research/related-work.md')
   const references = read('en/research/references.md')
+  const evolution = read('en/research/evolution.md')
 
   for (const needle of [
     'https://github.com/google/benchmark',
@@ -67,7 +83,41 @@ test('research pages cite concrete external repositories and references', () => 
     'https://github.com/abseil/abseil-cpp',
     'https://www.agner.org/optimize/',
     'https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html',
+    'https://vitepress.dev/',
   ]) {
-    assert.ok(relatedWork.includes(needle) || references.includes(needle), needle)
+    assert.ok(
+      relatedWork.includes(needle) || references.includes(needle) || evolution.includes(needle),
+      needle,
+    )
+  }
+})
+
+test('module atlas uses explicit repository paths for supporting headers', () => {
+  const moduleAtlas = read('en/academy/module-atlas.md')
+
+  for (const needle of [
+    'examples/03-modern-cpp/include/buffer.hpp',
+    'examples/03-modern-cpp/include/compile_time.hpp',
+    'examples/03-modern-cpp/include/ranges_utils.hpp',
+    'examples/03-modern-cpp/include/vector_reserve.hpp',
+    'examples/04-simd-vectorization/include/simd_utils.hpp',
+    'examples/04-simd-vectorization/include/simd_wrapper.hpp',
+    'examples/05-concurrency/include/concurrency_utils.hpp',
+    'examples/05-concurrency/include/lock_free_queue.hpp',
+  ]) {
+    assert.match(moduleAtlas, new RegExp(needle.replaceAll('/', '\\/')))
+  }
+
+  for (const bareName of [
+    '`buffer.hpp`',
+    '`compile_time.hpp`',
+    '`ranges_utils.hpp`',
+    '`vector_reserve.hpp`',
+    '`simd_utils.hpp`',
+    '`simd_wrapper.hpp`',
+    '`concurrency_utils.hpp`',
+    '`lock_free_queue.hpp`',
+  ]) {
+    assert.ok(!moduleAtlas.includes(bareName), bareName)
   }
 })

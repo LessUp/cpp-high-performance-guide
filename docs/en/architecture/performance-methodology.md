@@ -28,7 +28,7 @@ The repository uses a conservative methodology for performance work: establish a
 
 When the repository uses Google Benchmark-based executables, the protocol is straightforward:
 
-1. build an optimized binary, usually under `build/release/`
+1. build an optimized binary, usually under `build/release/examples/<module>/`
 2. run the exact benchmark executable for the module you changed
 3. keep the dataset and compiler flags stable while you compare variants
 4. prefer multiple short, comparable runs over one anecdotal outlier
@@ -36,8 +36,8 @@ When the repository uses Google Benchmark-based executables, the protocol is str
 Representative examples include:
 
 ```bash
-./build/release/examples/02-memory-cache/bench/aos_soa_bench
-./build/release/examples/04-simd-vectorization/bench/simd_bench
+./build/release/examples/02-memory-cache/aos_vs_soa_bench
+./build/release/examples/04-simd-vectorization/simd_bench
 ```
 
 A benchmark number is strong evidence only when the changed variable is clear. If code layout, compiler, dataset, and synchronization strategy all changed together, the result is descriptive but not diagnostic.
@@ -49,7 +49,7 @@ Use profiling when you need to explain a result, not merely display it.
 ### Counter-oriented checks
 
 ```bash
-perf stat -d ./build/release/examples/02-memory-cache/bench/aos_soa_bench
+perf stat -d ./build/release/examples/02-memory-cache/aos_vs_soa_bench
 ```
 
 Use this for quick checks on cache misses, branch behavior, or broad CPU-bound versus memory-bound suspicion.
@@ -57,7 +57,7 @@ Use this for quick checks on cache misses, branch behavior, or broad CPU-bound v
 ### Call-path inspection
 
 ```bash
-perf record -g --call-graph dwarf ./build/relwithdebinfo/examples/04-simd-vectorization/bench/simd_bench
+perf record -g --call-graph dwarf ./build/relwithdebinfo/examples/04-simd-vectorization/simd_bench
 perf report
 ```
 
@@ -66,7 +66,7 @@ Use this when a benchmark changes but the cause is not obvious from source inspe
 ### FlameGraph workflow
 
 ```bash
-./tools/performance/generate_flamegraph.sh ./build/relwithdebinfo/examples/02-memory-cache/bench/aos_soa_bench
+./tools/performance/generate_flamegraph.sh ./build/relwithdebinfo/examples/02-memory-cache/aos_vs_soa_bench
 ```
 
 Use this when the explanation benefits from a durable visual artifact or when a wide call tree needs to be collapsed into a reviewable picture.
