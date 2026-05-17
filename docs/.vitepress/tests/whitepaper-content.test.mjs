@@ -34,6 +34,30 @@ test('rewritten English whitepaper pages no longer contain stub markers', () => 
   }
 })
 
+test('rewritten Chinese whitepaper pages no longer contain placeholder markers', () => {
+  for (const relativePath of [
+    'zh/index.md',
+    'zh/academy/index.md',
+    'zh/academy/module-atlas.md',
+    'zh/academy/validation-doctrine.md',
+    'zh/architecture/index.md',
+    'zh/architecture/repository-topology.md',
+    'zh/architecture/performance-methodology.md',
+    'zh/playbook/index.md',
+    'zh/reference/index.md',
+    'zh/research/index.md',
+    'zh/research/related-work.md',
+    'zh/research/references.md',
+    'zh/research/evolution.md',
+  ]) {
+    const content = read(relativePath)
+    assert.doesNotMatch(content, /占位/)
+    assert.doesNotMatch(content, /Task 3/i)
+    assert.doesNotMatch(content, /后续任务/)
+    assert.doesNotMatch(content, /第一版参考资料书架/)
+  }
+})
+
 test('landing page states the stronger thesis and validation ladder', () => {
   const content = read('en/index.md')
 
@@ -89,6 +113,23 @@ test('research pages cite concrete external repositories and references', () => 
       relatedWork.includes(needle) || references.includes(needle) || evolution.includes(needle),
       needle,
     )
+  }
+})
+
+test('translation scope names bilingual whitepaper routes and English-only detail areas', () => {
+  const content = read('TRANSLATION_SCOPE.md')
+
+  for (const needle of [
+    'academy/',
+    'architecture/',
+    'playbook/',
+    'reference/` top-level pages',
+    'research/',
+    'contributing/',
+    'exercises/',
+    'reference/api/',
+  ]) {
+    assert.match(content, new RegExp(needle.replaceAll('/', '\\/')))
   }
 })
 
