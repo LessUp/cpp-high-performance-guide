@@ -16,5 +16,5 @@ This atlas maps the current learning surfaces to the repository areas they expla
 
 1. Enter through the [Playbook](/en/playbook/) for runnable setup.
 2. Use the [Learning Path](/en/guides/learning-path) to sequence topics.
-3. Drop into [Exercises](/en/exercises/README) when you want deliberate practice.
+3. Drop into [Exercises](/en/exercises/) when you want deliberate practice.
 4. Return to [Architecture](/en/architecture/) when you need repository-level context.

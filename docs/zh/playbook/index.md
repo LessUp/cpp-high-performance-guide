@@ -17,5 +17,5 @@
 
 ## 次级支持
 
-- [练习](/en/exercises/README) 继续保留用于刻意练习。
+- [练习](/en/exercises/) 继续保留用于刻意练习。
 - [AI 开发流程](/zh/contributing/ai-workflow) 继续保留给贡献者使用。

@@ -17,5 +17,5 @@ The playbook regroups the existing getting-started and guide pages into one oper
 
 ## Secondary support
 
-- [Exercises](/en/exercises/README) remain available for deliberate practice.
+- [Exercises](/en/exercises/) remain available for deliberate practice.
 - [AI Workflow](/en/contributing/ai-workflow) remains available for contributors.
