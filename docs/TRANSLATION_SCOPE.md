@@ -12,12 +12,16 @@ structurally aligned between `docs/en/` and `docs/zh/` in the same commit:
 - `academy/`
 - `architecture/`
 - `playbook/`
+- playbook-routed learning pages: `getting-started/`, `guides/`
 - `reference/` top-level pages: `index.md`, `faq.md`, `troubleshooting.md`, `api-reference.md`
 - `research/`
 - `contributing/`
 
 These surfaces carry the main reader journey and therefore require bilingual
 parity in information architecture, navigational links, and argument depth.
+`getting-started/` and `guides/` remain part of that bilingual scope even
+though they are surfaced through the playbook narrative rather than living
+under `playbook/` on disk.
 
 ## English-only technical-detail surfaces
 
