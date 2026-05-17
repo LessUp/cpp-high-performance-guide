@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 import llmstxt from 'vitepress-plugin-llms'
+import { englishReferenceHub } from './config-helpers.js'
 
 const rawBase = process.env.VITEPRESS_BASE
 const base = rawBase
@@ -9,116 +10,204 @@ const base = rawBase
     : `/${rawBase}/`
   : '/'
 
+const siteTitle = 'C++ High Performance Guide'
+const siteDescription =
+  'Runnable C++ performance engineering docs covering academy, architecture, playbooks, references, and research.'
+const zhSiteTitle = 'C++ 高性能指南'
+const zhSiteDescription = '可运行的 C++ 性能工程文档，覆盖学院、架构、实践手册、参考资料与研究内容。'
+const siteUrl = 'https://lessup.github.io'
+const canonicalBase = '/cpp-high-performance-guide/'
+const currentYear = new Date().getFullYear()
+
+function assetPath(path: string): string {
+  const normalizedPath = path.replace(/^\/+/, '')
+  return `${base}${normalizedPath}`
+}
+
+function canonicalAssetUrl(path: string): string {
+  const normalizedPath = path.replace(/^\/+/, '')
+  return new URL(`${canonicalBase.replace(/^\/+/, '')}${normalizedPath}`, `${siteUrl}/`).toString()
+}
+
+const enAcademyItems = [
+  { text: 'Academy Overview', link: '/en/academy/' },
+  { text: 'Module Atlas', link: '/en/academy/module-atlas' },
+  { text: 'Validation Doctrine', link: '/en/academy/validation-doctrine' },
+]
+
+const enArchitectureItems = [
+  { text: 'Architecture Overview', link: '/en/architecture/' },
+  { text: 'Repository Topology', link: '/en/architecture/repository-topology' },
+  { text: 'Performance Methodology', link: '/en/architecture/performance-methodology' },
+]
+
+const enPlaybookItems = [
+  { text: 'Playbook Overview', link: '/en/playbook/' },
+  { text: 'Quick Start', link: '/en/getting-started/quickstart' },
+  { text: 'Installation', link: '/en/getting-started/installation' },
+  { text: 'Prerequisites', link: '/en/getting-started/prerequisites' },
+  { text: 'Learning Path', link: '/en/guides/learning-path' },
+  { text: 'Profiling Guide', link: '/en/guides/profiling-guide' },
+  { text: 'Validation & Sanitizers', link: '/en/guides/validation' },
+  { text: 'Optimization Decision Tree', link: '/en/guides/optimization-decision-tree' },
+  { text: 'Best Practices', link: '/en/guides/best-practices' },
+]
+
+const enReferenceItems = [
+  { text: 'Reference Overview', link: '/en/reference/' },
+  { text: 'API Reference', link: '/en/reference/api-reference' },
+  { text: 'FAQ', link: '/en/reference/faq' },
+  { text: 'Troubleshooting', link: '/en/reference/troubleshooting' },
+  { text: 'Memory Utilities', link: '/en/reference/api/memory-utils' },
+  { text: 'SIMD Wrapper', link: '/en/reference/api/simd-wrapper' },
+  { text: 'Benchmark Utils', link: '/en/reference/api/benchmark-utils' },
+]
+
+const enResearchItems = [
+  { text: 'Research Overview', link: '/en/research/' },
+  { text: 'Related Work', link: '/en/research/related-work' },
+  { text: 'References', link: '/en/research/references' },
+  { text: 'Evolution', link: '/en/research/evolution' },
+]
+
+const enContributingItems = [
+  { text: 'AI Workflow', link: '/en/contributing/ai-workflow' },
+]
+
+const enExerciseItems = [
+  { text: 'Overview', link: '/en/exercises/' },
+  { text: 'Memory', link: '/en/exercises/module-02-memory' },
+  { text: 'SIMD', link: '/en/exercises/module-04-simd' },
+  { text: 'Concurrency', link: '/en/exercises/module-05-concurrency' },
+  { text: 'Solutions', link: '/en/exercises/solutions' },
+]
+
+const zhAcademyItems = [
+  { text: '学院概览', link: '/zh/academy/' },
+  { text: '模块总览', link: '/zh/academy/module-atlas' },
+  { text: '验证原则', link: '/zh/academy/validation-doctrine' },
+]
+
+const zhArchitectureItems = [
+  { text: '架构概览', link: '/zh/architecture/' },
+  { text: '仓库拓扑', link: '/zh/architecture/repository-topology' },
+  { text: '性能方法论', link: '/zh/architecture/performance-methodology' },
+]
+
+const zhPlaybookItems = [
+  { text: '实践手册概览', link: '/zh/playbook/' },
+  { text: '快速开始', link: '/zh/getting-started/quickstart' },
+  { text: '安装指南', link: '/zh/getting-started/installation' },
+  { text: '先决条件', link: '/zh/getting-started/prerequisites' },
+  { text: '学习路径', link: '/zh/guides/learning-path' },
+  { text: '性能分析指南', link: '/zh/guides/profiling-guide' },
+  { text: '验证与 Sanitizer', link: '/zh/guides/validation' },
+  { text: '优化决策树', link: '/zh/guides/optimization-decision-tree' },
+  { text: '最佳实践', link: '/zh/guides/best-practices' },
+]
+
+const zhReferenceItems = [
+  { text: '参考概览', link: '/zh/reference/' },
+  { text: 'API 入口', link: '/zh/reference/api-reference' },
+  { text: '常见问题', link: '/zh/reference/faq' },
+  { text: '故障排查', link: '/zh/reference/troubleshooting' },
+  { text: '参考概览（英文）', link: englishReferenceHub },
+]
+
+const zhResearchItems = [
+  { text: '研究概览', link: '/zh/research/' },
+  { text: '相关工作', link: '/zh/research/related-work' },
+  { text: '参考资料', link: '/zh/research/references' },
+  { text: '演进记录', link: '/zh/research/evolution' },
+]
+
+const zhContributingItems = [
+  { text: 'AI 开发流程', link: '/zh/contributing/ai-workflow' },
+]
+
+const zhExerciseItems = [
+  { text: '练习总览（英文）', link: '/en/exercises/' },
+  { text: '内存练习（英文）', link: '/en/exercises/module-02-memory' },
+  { text: 'SIMD 练习（英文）', link: '/en/exercises/module-04-simd' },
+  { text: '并发练习（英文）', link: '/en/exercises/module-05-concurrency' },
+  { text: '解答（英文）', link: '/en/exercises/solutions' },
+]
+
 export default withMermaid(defineConfig({
-  title: 'C++ High Performance Guide',
-  description:
-    'Runnable C++20 performance engineering examples covering CMake, memory layout, SIMD, concurrency, and profiling.',
-  base: base || '/cpp-high-performance-guide/',
-  cleanUrls: true,
+  title: siteTitle,
+  description: siteDescription,
+  base,
+  cleanUrls: false,
   lastUpdated: true,
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: assetPath('/logo.svg') }],
     ['meta', { name: 'theme-color', content: '#3476f6' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:site_name', content: 'C++ High Performance Guide' }],
-    ['meta', { property: 'og:title', content: 'C++ High Performance Guide' }],
-    ['meta', { property: 'og:description', content: 'Runnable C++20 performance engineering examples and learning docs.' }],
-    ['meta', { property: 'og:image', content: 'https://lessup.github.io/cpp-high-performance-guide/logo.svg' }],
+    ['meta', { property: 'og:site_name', content: siteTitle }],
+    ['meta', { property: 'og:title', content: siteTitle }],
+    ['meta', { property: 'og:description', content: siteDescription }],
+    ['meta', { property: 'og:image', content: canonicalAssetUrl('/og-card.png') }],
+    ['meta', { property: 'og:image:alt', content: 'C++ High Performance Guide documentation social card' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-    ['meta', { name: 'keywords', content: 'C++, C++20, performance, SIMD, cache optimization, concurrency, CMake, benchmark' }],
+    ['meta', { name: 'twitter:image', content: canonicalAssetUrl('/og-card.png') }],
+    ['meta', { name: 'twitter:title', content: siteTitle }],
+    ['meta', { name: 'twitter:description', content: siteDescription }],
+    ['meta', { name: 'keywords', content: 'C++, performance, academy, architecture, playbook, reference, research, SIMD, concurrency, CMake, benchmark' }],
   ],
   locales: {
-    root: {
+    en: {
       label: 'English',
-      lang: 'en',
+      lang: 'en-US',
       link: '/en/',
+      title: siteTitle,
+      description: siteDescription,
+      head: [
+        ['meta', { property: 'og:locale', content: 'en_US' }],
+      ],
       themeConfig: {
         nav: [
-          {
-            text: 'Start',
-            activeMatch: '/en/getting-started/',
-            items: [
-              { text: 'Docs landing', link: '/en/' },
-              { text: 'Quick Start', link: '/en/getting-started/quickstart' },
-              { text: 'Installation', link: '/en/getting-started/installation' },
-            ],
-          },
-          {
-            text: 'Learn',
-            activeMatch: '/en/guides/',
-            items: [
-              { text: 'Learning Path', link: '/en/guides/learning-path' },
-              { text: 'Optimization Decision Tree', link: '/en/guides/optimization-decision-tree' },
-              { text: 'Profiling Guide', link: '/en/guides/profiling-guide' },
-              { text: 'Validation & Sanitizers', link: '/en/guides/validation' },
-              { text: 'Best Practices', link: '/en/guides/best-practices' },
-            ],
-          },
-          {
-            text: 'Reference',
-            activeMatch: '/en/reference/',
-            items: [
-              { text: 'FAQ', link: '/en/reference/faq' },
-              { text: 'Troubleshooting', link: '/en/reference/troubleshooting' },
-              { text: 'API Reference', link: '/en/reference/api-reference' },
-            ],
-          },
-          {
-            text: 'Contributing',
-            activeMatch: '/en/contributing/',
-            items: [
-              { text: 'AI Workflow', link: '/en/contributing/ai-workflow' },
-              { text: 'Repository', link: 'https://github.com/LessUp/cpp-high-performance-guide' },
-            ],
-          },
+          { text: 'Academy', link: '/en/academy/', activeMatch: '/en/academy/' },
+          { text: 'Architecture', link: '/en/architecture/', activeMatch: '/en/architecture/' },
+          { text: 'Playbook', link: '/en/playbook/', activeMatch: '/en/playbook/|/en/getting-started/|/en/guides/' },
+          { text: 'Reference', link: '/en/reference/', activeMatch: '/en/reference/' },
+          { text: 'Research', link: '/en/research/', activeMatch: '/en/research/' },
+          { text: 'Contributing', link: '/en/contributing/ai-workflow', activeMatch: '/en/contributing/' },
         ],
         sidebar: {
           '/en/': [
             {
-              text: 'Getting Started',
+              text: 'Overview',
               items: [
                 { text: 'Docs landing', link: '/en/' },
-                { text: 'Quick Start', link: '/en/getting-started/quickstart' },
-                { text: 'Installation', link: '/en/getting-started/installation' },
-                { text: 'Prerequisites', link: '/en/getting-started/prerequisites' },
               ],
             },
             {
-              text: 'Guides',
-              items: [
-                { text: 'Learning Path', link: '/en/guides/learning-path' },
-                { text: 'Optimization Decision Tree', link: '/en/guides/optimization-decision-tree' },
-                { text: 'Profiling Guide', link: '/en/guides/profiling-guide' },
-                { text: 'Validation & Sanitizers', link: '/en/guides/validation' },
-                { text: 'Best Practices', link: '/en/guides/best-practices' },
-              ],
+              text: 'Academy',
+              items: enAcademyItems,
             },
             {
-              text: 'Exercises',
-              items: [
-                { text: 'Overview', link: '/en/exercises/' },
-                { text: 'Memory', link: '/en/exercises/module-02-memory' },
-                { text: 'SIMD', link: '/en/exercises/module-04-simd' },
-                { text: 'Concurrency', link: '/en/exercises/module-05-concurrency' },
-                { text: 'Solutions', link: '/en/exercises/solutions' },
-              ],
+              text: 'Architecture',
+              items: enArchitectureItems,
+            },
+            {
+              text: 'Playbook',
+              items: enPlaybookItems,
             },
             {
               text: 'Reference',
-              items: [
-                { text: 'FAQ', link: '/en/reference/faq' },
-                { text: 'Troubleshooting', link: '/en/reference/troubleshooting' },
-                { text: 'API Reference', link: '/en/reference/api-reference' },
-                { text: 'Memory Utilities', link: '/en/reference/api/memory-utils' },
-                { text: 'SIMD Wrapper', link: '/en/reference/api/simd-wrapper' },
-                { text: 'Benchmark Utils', link: '/en/reference/api/benchmark-utils' },
-              ],
+              items: enReferenceItems,
+            },
+            {
+              text: 'Research',
+              items: enResearchItems,
             },
             {
               text: 'Contributing',
-              items: [
-                { text: 'AI Workflow', link: '/en/contributing/ai-workflow' },
-              ],
+              items: enContributingItems,
+            },
+            {
+              text: 'Exercises (secondary)',
+              items: enExerciseItems,
             },
           ],
         },
@@ -128,9 +217,15 @@ export default withMermaid(defineConfig({
       label: '简体中文',
       lang: 'zh-CN',
       link: '/zh/',
-      description: '可运行的 C++20 性能工程示例与学习文档。',
+      title: zhSiteTitle,
+      description: zhSiteDescription,
       head: [
         ['meta', { property: 'og:locale', content: 'zh_CN' }],
+        ['meta', { property: 'og:title', content: zhSiteTitle }],
+        ['meta', { property: 'og:description', content: zhSiteDescription }],
+        ['meta', { property: 'og:image:alt', content: 'C++ 高性能指南文档社交卡片' }],
+        ['meta', { name: 'twitter:title', content: zhSiteTitle }],
+        ['meta', { name: 'twitter:description', content: zhSiteDescription }],
       ],
       themeConfig: {
         editLink: {
@@ -139,88 +234,51 @@ export default withMermaid(defineConfig({
         },
         footer: {
           message: '基于 MIT 许可证发布。',
-          copyright: `版权所有 © ${new Date().getFullYear()} C++ HPC Guide 贡献者`,
+          copyright: `版权所有 © ${currentYear} C++ HPC Guide 贡献者`,
         },
         nav: [
-          {
-            text: '开始',
-            activeMatch: '/zh/getting-started/',
-            items: [
-              { text: '文档入口', link: '/zh/' },
-              { text: '快速开始', link: '/zh/getting-started/quickstart' },
-              { text: '安装指南', link: '/zh/getting-started/installation' },
-            ],
-          },
-          {
-            text: '学习',
-            activeMatch: '/zh/guides/',
-            items: [
-              { text: '学习路径', link: '/zh/guides/learning-path' },
-              { text: '优化决策树', link: '/zh/guides/optimization-decision-tree' },
-              { text: '性能分析指南', link: '/zh/guides/profiling-guide' },
-              { text: '验证与 Sanitizer', link: '/zh/guides/validation' },
-              { text: '最佳实践', link: '/zh/guides/best-practices' },
-            ],
-          },
-          {
-            text: '参考',
-            activeMatch: '/zh/reference/',
-            items: [
-              { text: '常见问题', link: '/zh/reference/faq' },
-              { text: '故障排查', link: '/zh/reference/troubleshooting' },
-              { text: 'API 入口', link: '/zh/reference/api-reference' },
-            ],
-          },
-          {
-            text: '贡献',
-            activeMatch: '/zh/contributing/',
-            items: [
-              { text: 'AI 开发流程', link: '/zh/contributing/ai-workflow' },
-              { text: '仓库主页', link: 'https://github.com/LessUp/cpp-high-performance-guide' },
-            ],
-          },
+          { text: '学院', link: '/zh/academy/', activeMatch: '/zh/academy/' },
+          { text: '架构', link: '/zh/architecture/', activeMatch: '/zh/architecture/' },
+          { text: '实践手册', link: '/zh/playbook/', activeMatch: '/zh/playbook/|/zh/getting-started/|/zh/guides/' },
+          { text: '参考', link: '/zh/reference/', activeMatch: '/zh/reference/' },
+          { text: '研究', link: '/zh/research/', activeMatch: '/zh/research/' },
+          { text: '贡献', link: '/zh/contributing/ai-workflow', activeMatch: '/zh/contributing/' },
         ],
         sidebar: {
           '/zh/': [
             {
-              text: '入门',
+              text: '概览',
               items: [
                 { text: '文档入口', link: '/zh/' },
-                { text: '快速开始', link: '/zh/getting-started/quickstart' },
-                { text: '安装指南', link: '/zh/getting-started/installation' },
-                { text: '先决条件', link: '/zh/getting-started/prerequisites' },
               ],
             },
             {
-              text: '指南',
-              items: [
-                { text: '学习路径', link: '/zh/guides/learning-path' },
-                { text: '优化决策树', link: '/zh/guides/optimization-decision-tree' },
-                { text: '性能分析指南', link: '/zh/guides/profiling-guide' },
-                { text: '验证与 Sanitizer', link: '/zh/guides/validation' },
-                { text: '最佳实践', link: '/zh/guides/best-practices' },
-              ],
+              text: '学院',
+              items: zhAcademyItems,
             },
             {
-              text: '练习',
-              items: [
-                { text: '练习（英文）', link: '/en/exercises/' },
-              ],
+              text: '架构',
+              items: zhArchitectureItems,
+            },
+            {
+              text: '实践手册',
+              items: zhPlaybookItems,
             },
             {
               text: '参考',
-              items: [
-                { text: '常见问题', link: '/zh/reference/faq' },
-                { text: '故障排查', link: '/zh/reference/troubleshooting' },
-                { text: 'API 入口', link: '/zh/reference/api-reference' },
-                { text: 'API 参考（英文）', link: '/en/reference/api/memory-utils' },
-              ],
+              items: zhReferenceItems,
+            },
+            {
+              text: '研究',
+              items: zhResearchItems,
             },
             {
               text: '贡献',
-              items: [
-                { text: 'AI 开发流程', link: '/zh/contributing/ai-workflow' },
-              ],
+              items: zhContributingItems,
+            },
+            {
+              text: '练习（次要，英文优先）',
+              items: zhExerciseItems,
             },
           ],
         },
@@ -244,6 +302,18 @@ export default withMermaid(defineConfig({
   themeConfig: {
     outline: [2, 3],
     search: { provider: 'local' },
+    logo: {
+      light: '/logo.svg',
+      dark: '/logo.svg',
+    },
+    editLink: {
+      pattern: 'https://github.com/LessUp/cpp-high-performance-guide/edit/master/docs/:path',
+      text: 'Edit this page on GitHub',
+    },
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: `Copyright © ${currentYear} C++ HPC Guide contributors`,
+    },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/LessUp/cpp-high-performance-guide' },
     ],

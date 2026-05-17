@@ -1,0 +1,21 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logo-title logo-desc">
+  <title id="logo-title">C++ High Performance Guide logo</title>
+  <desc id="logo-desc">A cobalt engineering badge with layered cache lines and a C++ monogram.</desc>
+  <rect width="512" height="512" rx="120" fill="#0B1020"/>
+  <rect x="56" y="56" width="400" height="400" rx="96" fill="url(#panel)"/>
+  <path d="M152 160H296C337.974 160 372 194.026 372 236C372 277.974 337.974 312 296 312H152V160Z" fill="#EAF2FF" fill-opacity="0.08" stroke="#8EB8FF" stroke-width="20"/>
+  <path d="M192 208H300" stroke="#EAF2FF" stroke-width="24" stroke-linecap="round"/>
+  <path d="M192 264H272" stroke="#EAF2FF" stroke-width="24" stroke-linecap="round"/>
+  <path d="M348 206V266" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
+  <path d="M318 236H378" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
+  <path d="M404 206V266" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
+  <path d="M374 236H434" stroke="#8EB8FF" stroke-width="18" stroke-linecap="round"/>
+  <rect x="112" y="352" width="288" height="16" rx="8" fill="#8EB8FF" fill-opacity="0.32"/>
+  <rect x="112" y="384" width="208" height="16" rx="8" fill="#8EB8FF" fill-opacity="0.2"/>
+  <defs>
+    <linearGradient id="panel" x1="92" y1="92" x2="420" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#16213F"/>
+      <stop offset="1" stop-color="#122B62"/>
+    </linearGradient>
+  </defs>
+</svg>
