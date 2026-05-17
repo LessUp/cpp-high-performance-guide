@@ -41,7 +41,7 @@ The repository uses presets as the public vocabulary for validation. That keeps 
 
 Benchmarks are part of the evidence ladder, not a substitute for it. In this repository, a benchmark result is persuasive only when the surrounding conditions are explicit:
 
-1. **The executable is identified.** Prefer the exact benchmark path, such as `build/release/examples/02-memory-cache/bench/aos_soa_bench`.
+1. **The executable is identified.** Prefer the exact benchmark path, such as `./build/release/examples/02-memory-cache/aos_vs_soa_bench`.
 2. **The build preset is named.** `release` and `relwithdebinfo` mean different things for diagnosis.
 3. **The comparison isolates one variable.** Algorithm, data layout, or synchronization strategy should change one at a time.
 4. **The hardware context is understood.** Cache, ISA, and core count determine whether a result generalizes.

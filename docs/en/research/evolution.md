@@ -34,6 +34,15 @@ Three pressures shape the current maintenance model:
 - documentation copy that sounds broader or more certain than the code can support
 - duplicate surfaces that compete to be the source of truth
 
+## External anchors for the current posture
+
+The stricter posture is also grounded in public tooling and documentation that reward explicit, low-indirection workflows:
+
+- [CMake Presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html) reinforce the repository's preset-first validation contract.
+- [Google Benchmark](https://github.com/google/benchmark) is the benchmark harness behind the repository's repeatable microbenchmark runs.
+- [perf wiki](https://perf.wiki.kernel.org/) and [Brendan Gregg's FlameGraph project](https://github.com/brendangregg/FlameGraph) match the repository's Linux-first profiling workflow.
+- [VitePress](https://vitepress.dev/) supports the docs-site consolidation that replaced older, higher-drift publishing surfaces.
+
 ## Reading the current repository correctly
 
 The most important interpretive shift is this: the repository is no longer trying to be a constantly expanding encyclopedia of performance tricks. It is trying to remain a compact, trustworthy set of examples and notes that a strict reviewer can still audit years later.
