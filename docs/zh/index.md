@@ -13,7 +13,6 @@ layout: home
      { href: "/zh/architecture/", label: "架构" },
      { href: "/zh/playbook/", label: "实践手册" },
      { href: "/zh/research/", label: "研究" },
-     { href: "/zh/reference/", label: "参考" },
      { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
      { href: "/en/", label: "English" },
   ]'

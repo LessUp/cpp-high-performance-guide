@@ -15,6 +15,21 @@ function read(relativePath) {
   return fs.readFileSync(path.join(themeDir, relativePath), 'utf8')
 }
 
+function extractHeroLinks(content) {
+  const linksMatch = content.match(/:links='\[(.*?)\]'/s)
+  assert.ok(linksMatch, 'expected SectionHero links array')
+
+  return [...linksMatch[1].matchAll(/href:\s*"([^"]+)"/g)].map(([, href]) => href)
+}
+
+function normalizeHeroLink(href) {
+  if (href.startsWith('http')) {
+    return href
+  }
+
+  return href.replace(/^\/(?:en|zh)(?=\/|$)/, '') || '/'
+}
+
 async function renderComponent(relativePath, props) {
   const source = read(relativePath)
   const { descriptor } = parse(source, { filename: relativePath })
@@ -203,4 +218,15 @@ test('shared landing components render localized aria labels', async () => {
   assert.match(metricHtml, /<section\b/)
   assert.match(metricHtml, /aria-label="项目指标"/)
   assert.doesNotMatch(metricHtml, /aria-label="Project metrics"/)
+})
+
+test('bilingual landing pages promote equivalent hero links', () => {
+  const docsRoot = path.resolve(themeDir, '..', '..')
+  const enIndex = fs.readFileSync(path.join(docsRoot, 'en', 'index.md'), 'utf8')
+  const zhIndex = fs.readFileSync(path.join(docsRoot, 'zh', 'index.md'), 'utf8')
+
+  const enHeroLinks = extractHeroLinks(enIndex).map(normalizeHeroLink)
+  const zhHeroLinks = extractHeroLinks(zhIndex).map(normalizeHeroLink)
+
+  assert.deepEqual(zhHeroLinks, enHeroLinks)
 })
