@@ -139,6 +139,12 @@ export default withMermaid(defineConfig({
   base,
   cleanUrls: false,
   lastUpdated: true,
+  mermaid: {
+    startOnLoad: false,
+    securityLevel: 'strict',
+    flowchart: { useMaxWidth: true },
+    sequence: { useMaxWidth: true },
+  },
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: assetPath('/logo.svg') }],
     ['meta', { name: 'theme-color', content: '#3476f6' }],
@@ -320,5 +326,15 @@ export default withMermaid(defineConfig({
   },
   vite: {
     plugins: [llmstxt()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('mermaid')) return 'mermaid-lazy'
+            if (id.includes('katex')) return 'katex-lazy'
+          },
+        },
+      },
+    },
   },
 }))
