@@ -70,6 +70,13 @@ const enResearchItems = [
   { text: 'Evolution', link: '/en/research/evolution' },
 ]
 
+const enDeepDivesItems = [
+  { text: 'Deep Dives Overview', link: '/en/deep-dives/' },
+  { text: 'Memory Layout', link: '/en/deep-dives/memory-layout' },
+  { text: 'Lock-Free Queues', link: '/en/deep-dives/lock-free-queue' },
+  { text: 'SIMD Internals', link: '/en/deep-dives/simd-internals' },
+]
+
 const enContributingItems = [
   { text: 'AI Workflow', link: '/en/contributing/ai-workflow' },
 ]
@@ -125,6 +132,13 @@ const zhContributingItems = [
   { text: 'AI 开发流程', link: '/zh/contributing/ai-workflow' },
 ]
 
+const zhDeepDivesItems = [
+  { text: '深度专题概览', link: '/zh/deep-dives/' },
+  { text: '内存布局（英文）', link: '/en/deep-dives/memory-layout' },
+  { text: '无锁队列（英文）', link: '/en/deep-dives/lock-free-queue' },
+  { text: 'SIMD 内部机制（英文）', link: '/en/deep-dives/simd-internals' },
+]
+
 const zhExerciseItems = [
   { text: '练习总览（英文）', link: '/en/exercises/' },
   { text: '内存练习（英文）', link: '/en/exercises/module-02-memory' },
@@ -144,6 +158,38 @@ export default withMermaid(defineConfig({
     securityLevel: 'strict',
     flowchart: { useMaxWidth: true },
     sequence: { useMaxWidth: true },
+    // Modern Geek Theme - Light Mode (Cobalt Engineering)
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#E8EDF5',
+      primaryTextColor: '#1A2A4A',
+      primaryBorderColor: '#3B6BDC',
+      secondaryColor: '#F0F4FA',
+      tertiaryColor: '#E8EDF5',
+      lineColor: '#5A6A8A',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      fontSize: '14px',
+      nodeBorder: '#3B6BDC',
+      mainBkg: '#E8EDF5',
+      clusterBkg: '#F0F4FA',
+      clusterBorder: '#3B6BDC',
+      titleColor: '#1A2A4A',
+      edgeLabelBackground: '#F0F4FA',
+      actorBkg: '#E8EDF5',
+      actorBorder: '#3B6BDC',
+      actorTextColor: '#1A2A4A',
+      actorLineColor: '#5A6A8A',
+      signalColor: '#1A2A4A',
+      signalTextColor: '#1A2A4A',
+      labelBoxBkg: '#E8EDF5',
+      labelBoxBorderColor: '#3B6BDC',
+      labelTextColor: '#1A2A4A',
+      loopTextColor: '#1A2A4A',
+      noteBorderColor: '#5A6A8A',
+      noteBkgColor: '#F0F4FA',
+      activationBorderColor: '#3B6BDC',
+      activationBkgColor: '#E8EDF5',
+    },
   },
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: assetPath('/logo.svg') }],
@@ -175,6 +221,7 @@ export default withMermaid(defineConfig({
           { text: 'Academy', link: '/en/academy/', activeMatch: '/en/academy/' },
           { text: 'Architecture', link: '/en/architecture/', activeMatch: '/en/architecture/' },
           { text: 'Playbook', link: '/en/playbook/', activeMatch: '/en/playbook/|/en/getting-started/|/en/guides/' },
+          { text: 'Deep Dives', link: '/en/deep-dives/', activeMatch: '/en/deep-dives/' },
           { text: 'Reference', link: '/en/reference/', activeMatch: '/en/reference/' },
           { text: 'Research', link: '/en/research/', activeMatch: '/en/research/' },
           { text: 'Contributing', link: '/en/contributing/ai-workflow', activeMatch: '/en/contributing/' },
@@ -198,6 +245,10 @@ export default withMermaid(defineConfig({
             {
               text: 'Playbook',
               items: enPlaybookItems,
+            },
+            {
+              text: 'Deep Dives',
+              items: enDeepDivesItems,
             },
             {
               text: 'Reference',
@@ -246,6 +297,7 @@ export default withMermaid(defineConfig({
           { text: '学院', link: '/zh/academy/', activeMatch: '/zh/academy/' },
           { text: '架构', link: '/zh/architecture/', activeMatch: '/zh/architecture/' },
           { text: '实践手册', link: '/zh/playbook/', activeMatch: '/zh/playbook/|/zh/getting-started/|/zh/guides/' },
+          { text: '深度专题', link: '/zh/deep-dives/', activeMatch: '/zh/deep-dives/' },
           { text: '参考', link: '/zh/reference/', activeMatch: '/zh/reference/' },
           { text: '研究', link: '/zh/research/', activeMatch: '/zh/research/' },
           { text: '贡献', link: '/zh/contributing/ai-workflow', activeMatch: '/zh/contributing/' },
@@ -269,6 +321,10 @@ export default withMermaid(defineConfig({
             {
               text: '实践手册',
               items: zhPlaybookItems,
+            },
+            {
+              text: '深度专题',
+              items: zhDeepDivesItems,
             },
             {
               text: '参考',
