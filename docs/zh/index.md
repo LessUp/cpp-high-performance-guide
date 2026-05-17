@@ -11,6 +11,7 @@ layout: home
   :links='[
      { href: "/zh/academy/", label: "学院" },
      { href: "/zh/architecture/", label: "架构" },
+     { href: "/zh/algorithms/", label: "算法" },
      { href: "/zh/playbook/", label: "实践手册" },
      { href: "/zh/research/", label: "研究" },
      { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
@@ -22,8 +23,8 @@ layout: home
       aria-label="项目指标"
       :items='[
         { value: "5", label: "个教学模块" },
+        { value: "6", label: "个白皮书章节" },
         { value: "debug→ubsan", label: "验证阶梯" },
-        { value: "academy→research", label: "阅读弧线" },
       ]'
     />
   </template>
@@ -69,6 +70,15 @@ layout: home
         { href: "/zh/architecture/", label: "架构概览" },
         { href: "/zh/architecture/repository-topology", label: "仓库拓扑" },
         { href: "/zh/architecture/performance-methodology", label: "性能方法论" },
+      ],
+    },
+    {
+      title: "算法",
+      description: "高性能算法实现，附带复杂度分析、缓存感知权衡与可复现基准测试。",
+      links: [
+        { href: "/zh/algorithms/", label: "算法概览" },
+        { href: "/zh/algorithms/sorting", label: "排序算法" },
+        { href: "/zh/algorithms/hashing", label: "哈希算法" },
       ],
     },
     {
@@ -161,6 +171,19 @@ layout: home
     },
   ]'
 />
+
+## 技术规格
+
+| 层面 | 详情 |
+| --- | --- |
+| C++ 标准 | C++17 最低，C++20 在有益处时使用 |
+| 构建系统 | CMake 3.20+，基于 preset |
+| 平台 | 以 Linux 为主；macOS 和 Windows 通过跨平台头文件支持 |
+| 编译器 | GCC 11+、Clang 14+、MSVC 2022+ |
+| 测试 | GoogleTest + RapidCheck（基于性质的测试） |
+| 基准测试 | Google Benchmark，`perf` 集成 |
+| Sanitizer | ASan、TSan、UBSan，通过 CMake preset 启用 |
+| 文档 | VitePress，双语（中/英），GitHub Pages 发布 |
 
 ## 次要入口
 

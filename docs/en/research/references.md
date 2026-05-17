@@ -31,6 +31,18 @@ This page collects the external sources most useful for understanding the reposi
 | [What Every Programmer Should Know About Memory](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf) | long-form article | foundational reading for the memory and cache module |
 | [Gallery of Processor Cache Effects](http://igoro.com/archive/gallery-of-processor-cache-effects/) | article | approachable illustrations of cache behavior that complement the repository's examples |
 
+## Algorithms and data structures
+
+| Source | Kind | Why it matters here |
+| --- | --- | --- |
+| [Sedgewick & Wayne, *Algorithms* (4th ed.)](https://algs4.cs.princeton.edu/home/) | textbook | canonical reference for the sorting, searching, and graph algorithms discussed in the repository |
+| [Knuth, *The Art of Computer Programming* Vol. 3](https://www-cs-faculty.stanford.edu/~knuth/taocp.html) | textbook | definitive analysis of sorting and searching algorithms; the benchmark against which all teaching references are measured |
+| [Celis (1985), *Robin Hood Hashing*](https://cs.uwaterloo.ca/research/tr/1985/CS-85-14.pdf) | PhD thesis | foundational paper for the Robin Hood hashing discussion in the algorithms module |
+| [Facebook F14 Design Notes](https://engineering.fb.com/2019/04/25/developer-tools/f14/) | engineering blog | explains the group-probing, SIMD-accelerated hash table design referenced in the hashing guide |
+| [Abseil Swiss Tables](https://abseil.io/about/design/swisstables) | public documentation | the design rationale behind `absl::flat_hash_map`, a direct comparison point for the repository's hash-table teaching implementation |
+| [Lemire & Boytsov (2019), *Decoding billions of integers per second through vectorization*](https://arxiv.org/abs/1209.1717) | research paper | demonstrates SIMD-friendly algorithm design applicable to sorting, compression, and bitmap indexing |
+| [McIlroy (1999), *A Killer Adversary for Quicksort*](https://doi.org/10.1002/(SICI)1097-024X(19990325)29:4<341::AID-SPE258>3.0.CO;2-9) | research paper | shows why robust pivot selection matters in real-world quicksort implementations |
+
 ## Public repositories and libraries used as comparison points
 
 | Source | Kind | Why it matters here |
@@ -39,6 +51,8 @@ This page collects the external sources most useful for understanding the reposi
 | [oneTBB](https://github.com/oneapi-src/oneTBB) | public repository | reference for production-grade parallelism and scheduling |
 | [folly](https://github.com/facebook/folly) | public repository | shows what a much broader systems utility library looks like |
 | [Abseil C++](https://github.com/abseil/abseil-cpp) | public repository | useful comparison for API surface and low-level utility design |
+| [ska::flat_hash_map](https://github.com/skarupke/flat_hash_map) | public repository | teaching-sized Robin Hood hash map; close in scope to the repository's hash-table examples |
+| [tsl::robin_map](https://github.com/Tessil/robin-map) | public repository | another Robin Hood implementation with emphasis on API compatibility and performance |
 
 ## Repository cross-links
 
@@ -46,5 +60,6 @@ This page collects the external sources most useful for understanding the reposi
 - [Validation Doctrine](/en/academy/validation-doctrine)
 - [Profiling Guide](/en/guides/profiling-guide)
 - [Related Work](/en/research/related-work)
+- [Algorithms Overview](/en/algorithms/)
 
 This reference shelf is intentionally selective. It favors sources that help readers inspect or challenge a concrete claim in the repository.

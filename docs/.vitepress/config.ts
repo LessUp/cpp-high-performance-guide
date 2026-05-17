@@ -70,6 +70,12 @@ const enResearchItems = [
   { text: 'Evolution', link: '/en/research/evolution' },
 ]
 
+const enAlgorithmsItems = [
+  { text: 'Algorithms Overview', link: '/en/algorithms/' },
+  { text: 'Sorting', link: '/en/algorithms/sorting' },
+  { text: 'Hashing', link: '/en/algorithms/hashing' },
+]
+
 const enDeepDivesItems = [
   { text: 'Deep Dives Overview', link: '/en/deep-dives/' },
   { text: 'Memory Layout', link: '/en/deep-dives/memory-layout' },
@@ -132,6 +138,12 @@ const zhContributingItems = [
   { text: 'AI 开发流程', link: '/zh/contributing/ai-workflow' },
 ]
 
+const zhAlgorithmsItems = [
+  { text: '算法概览', link: '/zh/algorithms/' },
+  { text: '排序算法', link: '/zh/algorithms/sorting' },
+  { text: '哈希算法', link: '/zh/algorithms/hashing' },
+]
+
 const zhDeepDivesItems = [
   { text: '深度专题概览', link: '/zh/deep-dives/' },
   { text: '内存布局（英文）', link: '/en/deep-dives/memory-layout' },
@@ -156,39 +168,15 @@ export default withMermaid(defineConfig({
   mermaid: {
     startOnLoad: false,
     securityLevel: 'strict',
-    flowchart: { useMaxWidth: true },
+    flowchart: { useMaxWidth: true, htmlLabels: true },
     sequence: { useMaxWidth: true },
-    // Modern Geek Theme - Light Mode (Cobalt Engineering)
+    gantt: { useMaxWidth: true },
+    // Theme is fully controlled by CSS variables in style.css
+    // for seamless light/dark mode switching.
     theme: 'base',
     themeVariables: {
-      primaryColor: '#E8EDF5',
-      primaryTextColor: '#1A2A4A',
-      primaryBorderColor: '#3B6BDC',
-      secondaryColor: '#F0F4FA',
-      tertiaryColor: '#E8EDF5',
-      lineColor: '#5A6A8A',
       fontFamily: 'Inter, system-ui, sans-serif',
       fontSize: '14px',
-      nodeBorder: '#3B6BDC',
-      mainBkg: '#E8EDF5',
-      clusterBkg: '#F0F4FA',
-      clusterBorder: '#3B6BDC',
-      titleColor: '#1A2A4A',
-      edgeLabelBackground: '#F0F4FA',
-      actorBkg: '#E8EDF5',
-      actorBorder: '#3B6BDC',
-      actorTextColor: '#1A2A4A',
-      actorLineColor: '#5A6A8A',
-      signalColor: '#1A2A4A',
-      signalTextColor: '#1A2A4A',
-      labelBoxBkg: '#E8EDF5',
-      labelBoxBorderColor: '#3B6BDC',
-      labelTextColor: '#1A2A4A',
-      loopTextColor: '#1A2A4A',
-      noteBorderColor: '#5A6A8A',
-      noteBkgColor: '#F0F4FA',
-      activationBorderColor: '#3B6BDC',
-      activationBkgColor: '#E8EDF5',
     },
   },
   head: [
@@ -220,6 +208,7 @@ export default withMermaid(defineConfig({
         nav: [
           { text: 'Academy', link: '/en/academy/', activeMatch: '/en/academy/' },
           { text: 'Architecture', link: '/en/architecture/', activeMatch: '/en/architecture/' },
+          { text: 'Algorithms', link: '/en/algorithms/', activeMatch: '/en/algorithms/' },
           { text: 'Playbook', link: '/en/playbook/', activeMatch: '/en/playbook/|/en/getting-started/|/en/guides/' },
           { text: 'Deep Dives', link: '/en/deep-dives/', activeMatch: '/en/deep-dives/' },
           { text: 'Reference', link: '/en/reference/', activeMatch: '/en/reference/' },
@@ -241,6 +230,10 @@ export default withMermaid(defineConfig({
             {
               text: 'Architecture',
               items: enArchitectureItems,
+            },
+            {
+              text: 'Algorithms',
+              items: enAlgorithmsItems,
             },
             {
               text: 'Playbook',
@@ -296,6 +289,7 @@ export default withMermaid(defineConfig({
         nav: [
           { text: '学院', link: '/zh/academy/', activeMatch: '/zh/academy/' },
           { text: '架构', link: '/zh/architecture/', activeMatch: '/zh/architecture/' },
+          { text: '算法', link: '/zh/algorithms/', activeMatch: '/zh/algorithms/' },
           { text: '实践手册', link: '/zh/playbook/', activeMatch: '/zh/playbook/|/zh/getting-started/|/zh/guides/' },
           { text: '深度专题', link: '/zh/deep-dives/', activeMatch: '/zh/deep-dives/' },
           { text: '参考', link: '/zh/reference/', activeMatch: '/zh/reference/' },
@@ -317,6 +311,10 @@ export default withMermaid(defineConfig({
             {
               text: '架构',
               items: zhArchitectureItems,
+            },
+            {
+              text: '算法',
+              items: zhAlgorithmsItems,
             },
             {
               text: '实践手册',
@@ -366,7 +364,7 @@ export default withMermaid(defineConfig({
     search: { provider: 'local' },
     logo: {
       light: '/logo.svg',
-      dark: '/logo.svg',
+      dark: '/logo-dark.svg',
     },
     editLink: {
       pattern: 'https://github.com/LessUp/cpp-high-performance-guide/edit/master/docs/:path',

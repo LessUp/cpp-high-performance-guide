@@ -29,6 +29,16 @@ This repository sits between a teaching guide, an executable notebook, and an ar
 | [Abseil C++](https://github.com/abseil/abseil-cpp) | public repository | useful as a contrast in API design, portability, and low-level utility engineering | the repository is a guide with examples, not a broad dependency library |
 | [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) | living guideline set | supplies durable language and design guidance that complements performance work | the repository focuses on measurable performance topics, not the full range of C++ design guidance |
 
+## Algorithms and hash table implementations
+
+| Work | Type | Why it matters here | How this repository differs |
+| --- | --- | --- | --- |
+| [ska::flat_hash_map](https://github.com/skarupke/flat_hash_map) | public repository | a teaching-sized Robin Hood hash map with clear source code; directly comparable to the repository's hash-table examples | the repository adds benchmark methodology, cache-miss analysis, and explicit trade-off documentation |
+| [tsl::robin_map](https://github.com/Tessil/robin-map) | public repository | another Robin Hood implementation with emphasis on API compatibility and hash customization | the repository focuses on the underlying algorithmic and cache-behavior decisions rather than API completeness |
+| [Abseil `flat_hash_map`](https://github.com/abseil/abseil-cpp) | public repository | the industry standard for Swiss Table / F14 group-probing hash tables | the repository uses Swiss Tables as a performance target and explains *why* group probing wins on modern CPUs |
+| [Sedgewick & Wayne, *Algorithms*](https://algs4.cs.princeton.edu/home/) | textbook | the canonical modern reference for sorting, searching, and graph algorithms | the repository narrows to performance-relevant details (cache behavior, SIMD opportunities, branch prediction) and keeps everything executable |
+| [Knuth, *TAOCP* Vol. 3](https://www-cs-faculty.stanford.edu/~knuth/taocp.html) | textbook | definitive analysis of sorting and searching | the repository translates Knuth's analytical insights into measured C++ implementations with `perf` output |
+
 ## What this comparison clarifies
 
 Taken together, these works show what this project is trying to be:
@@ -36,6 +46,7 @@ Taken together, these works show what this project is trying to be:
 - **not** a replacement for production utility libraries such as oneTBB, folly, or Abseil
 - **not** a standalone benchmarking or profiling tool
 - **not** a generic language tutorial divorced from executable evidence
+- **not** an exhaustive algorithms textbook, but a performance-engineering lens on algorithm selection and implementation
 - **instead**, a compact performance-engineering guide that keeps its claims close to code, validation, and public references
 
 That narrower scope is part of the repository's long-term maintainability story.

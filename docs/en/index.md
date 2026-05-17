@@ -11,6 +11,7 @@ layout: home
   :links='[
     { href: "/en/academy/", label: "Academy" },
     { href: "/en/architecture/", label: "Architecture" },
+    { href: "/en/algorithms/", label: "Algorithms" },
     { href: "/en/playbook/", label: "Playbook" },
     { href: "/en/research/", label: "Research" },
     { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
@@ -22,8 +23,8 @@ layout: home
       aria-label="Project metrics"
       :items='[
         { value: "5", label: "teaching modules" },
+        { value: "6", label: "whitepaper sections" },
         { value: "debug→ubsan", label: "validation ladder" },
-        { value: "academy→research", label: "reading arc" },
       ]'
     />
   </template>
@@ -69,6 +70,15 @@ An expert reader should be able to move from a claim on this page to the corresp
         { href: "/en/architecture/", label: "Architecture overview" },
         { href: "/en/architecture/repository-topology", label: "Repository Topology" },
         { href: "/en/architecture/performance-methodology", label: "Performance Methodology" },
+      ],
+    },
+    {
+      title: "Algorithms",
+      description: "High-performance algorithm implementations with complexity analysis, cache-aware trade-offs, and reproducible benchmarks.",
+      links: [
+        { href: "/en/algorithms/", label: "Algorithms overview" },
+        { href: "/en/algorithms/sorting", label: "Sorting" },
+        { href: "/en/algorithms/hashing", label: "Hashing" },
       ],
     },
     {
@@ -161,6 +171,19 @@ An expert reader should be able to move from a claim on this page to the corresp
     },
   ]'
 />
+
+## Technical specifications
+
+| Surface | Detail |
+| --- | --- |
+| C++ standard | C++17 minimum, C++20 where beneficial |
+| Build system | CMake 3.20+ with presets |
+| Platforms | Linux primary; macOS and Windows via cross-platform headers |
+| Compilers | GCC 11+, Clang 14+, MSVC 2022+ |
+| Testing | GoogleTest + RapidCheck (property-based) |
+| Benchmarks | Google Benchmark, `perf` integration |
+| Sanitizers | ASan, TSan, UBSan via CMake presets |
+| Documentation | VitePress, bilingual (en/zh), GitHub Pages |
 
 ## Secondary routes
 
