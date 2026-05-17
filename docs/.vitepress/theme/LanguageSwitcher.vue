@@ -1,105 +1,96 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter, useRoute, useData } from 'vitepress'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useData, useRoute } from 'vitepress'
+import { createLanguageSwitcherLinks } from './language-routing.js'
 
 const STORAGE_KEY = 'cpp-hpc-guide-lang-preference'
 
-const SUPPORTED_LANGS = [
-  { code: 'en', label: 'English', path: '/en/' },
-  { code: 'zh', label: '中文', path: '/zh/' },
-]
-
 const { site, theme } = useData()
-const router = useRouter()
 const route = useRoute()
 const isOpen = ref(false)
+const rootRef = ref<HTMLDetailsElement | null>(null)
 
-const currentLang = computed(() => {
-  const path = route.path
-  const lang = SUPPORTED_LANGS.find(l => path.startsWith(l.path))
-  return lang || SUPPORTED_LANGS[0]
+const languageLinks = computed(() => createLanguageSwitcherLinks({
+  routePath: route.path,
+  siteBase: site.value.base || '/',
+}))
+
+const currentLang = computed(() => languageLinks.value.find(lang => lang.isCurrent) ?? languageLinks.value[0])
+
+function closeMenu() {
+  rootRef.value?.removeAttribute('open')
+  isOpen.value = false
+}
+
+function rememberLangPreference(langCode: string) {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(STORAGE_KEY, langCode)
+  }
+}
+
+function syncOpenState() {
+  isOpen.value = rootRef.value?.open ?? false
+}
+
+function onDocumentClick(event: MouseEvent) {
+  if (!rootRef.value?.contains(event.target as Node)) {
+    closeMenu()
+  }
+}
+
+function onDocumentKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    closeMenu()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick)
+  document.addEventListener('keydown', onDocumentKeydown)
 })
 
-function switchLang(lang: typeof SUPPORTED_LANGS[0]) {
-  if (lang.code === currentLang.value.code) {
-    isOpen.value = false
-    return
-  }
-
-  // Save preference
-  if (typeof localStorage !== 'undefined') {
-    localStorage.setItem(STORAGE_KEY, lang.code)
-  }
-
-  // Calculate target path
-  const base = site.value.base || '/'
-  const currentPath = route.path
-
-  // Remove current language prefix
-  let pathWithoutLang = currentPath
-  for (const l of SUPPORTED_LANGS) {
-    const langPath = base + l.path.substring(1)
-    if (currentPath.startsWith(langPath)) {
-      pathWithoutLang = currentPath.substring(langPath.length)
-      break
-    }
-  }
-
-  // Build target path
-  const targetPath = base + lang.path.substring(1) + pathWithoutLang
-
-  isOpen.value = false
-  router.go(targetPath)
-}
-
-function toggle() {
-  isOpen.value = !isOpen.value
-}
-
-function handleClickOutside(event: MouseEvent) {
-  const target = event.target as HTMLElement
-  if (!target.closest('.language-switcher')) {
-    isOpen.value = false
-  }
-}
-
-// Close on outside click
-if (typeof document !== 'undefined') {
-  document.addEventListener('click', handleClickOutside)
-}
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocumentClick)
+  document.removeEventListener('keydown', onDocumentKeydown)
+})
 </script>
 
 <template>
-  <div class="language-switcher">
-    <button class="language-button" @click="toggle" :title="theme.langMenuLabel || 'Switch Language'">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M2 12h20"/>
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  <details ref="rootRef" class="language-switcher" @toggle="syncOpenState">
+    <summary
+      class="language-button"
+      :title="theme.langMenuLabel || 'Switch Language'"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M2 12h20" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
       </svg>
       <span class="language-label">{{ currentLang.label }}</span>
-      <svg class="chevron" :class="{ open: isOpen }" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="6 9 12 15 18 9"/>
+      <svg class="chevron" :class="{ open: isOpen }" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+        <polyline points="6 9 12 15 18 9" />
       </svg>
-    </button>
+    </summary>
 
-    <Transition name="dropdown">
-      <div v-if="isOpen" class="language-dropdown">
-        <button
-          v-for="lang in SUPPORTED_LANGS"
+    <ul class="language-dropdown language-list">
+      <li
+          v-for="lang in languageLinks"
           :key="lang.code"
+      >
+        <a
           class="language-option"
-          :class="{ active: lang.code === currentLang.code }"
-          @click="switchLang(lang)"
+          :class="{ active: lang.isCurrent }"
+          :href="lang.targetPath"
+          @click="rememberLangPreference(lang.code)"
         >
           <span class="option-label">{{ lang.label }}</span>
-          <svg v-if="lang.code === currentLang.code" class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="20 6 9 17 4 12"/>
+          <svg v-if="lang.isCurrent" class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            <polyline points="20 6 9 17 4 12" />
           </svg>
-        </button>
-      </div>
-    </Transition>
-  </div>
+        </a>
+      </li>
+    </ul>
+  </details>
 </template>
 
 <style scoped>
@@ -110,55 +101,76 @@ if (typeof document !== 'undefined') {
 }
 
 .language-button {
+  list-style: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border: 1px solid var(--vp-c-border);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--vp-c-text-2);
-  font-size: 13px;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--wp-pill-border);
+  border-radius: 999px;
+  background: var(--wp-pill-bg);
+  color: var(--wp-pill-text);
+  font-size: 0.86rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: border-color var(--wp-motion-1), color var(--wp-motion-1), transform var(--wp-motion-1);
   white-space: nowrap;
 }
 
+.language-button::-webkit-details-marker {
+  display: none;
+}
+
 .language-button:hover {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-brand-1);
+  border-color: color-mix(in oklch, var(--wp-accent-1) 48%, var(--wp-line-2));
+  color: var(--wp-accent-1);
+  transform: translateY(-1px);
+}
+
+.language-button svg,
+.language-option svg {
+  color: var(--wp-icon-muted);
+}
+
+.language-button:hover svg,
+.language-option.active svg {
+  color: currentColor;
 }
 
 .language-label {
   display: none;
 }
 
-@media (min-width: 768px) {
-  .language-label {
-    display: inline;
-  }
-}
-
 .chevron {
-  transition: transform 0.2s ease;
+  transition: transform 0.16s ease;
 }
 
 .chevron.open {
   transform: rotate(180deg);
 }
 
+.language-switcher:not([open]) .language-dropdown {
+  display: none;
+}
+
 .language-dropdown {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 0.4rem);
   right: 0;
-  margin-top: 4px;
-  min-width: 120px;
-  background: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-border);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  min-width: 8.5rem;
+  padding: 0.35rem;
+  border: 1px solid var(--wp-line-1);
+  border-radius: 1rem;
+  background: var(--wp-surface-1);
+  box-shadow: var(--wp-shadow-1);
   z-index: 100;
+}
+
+.language-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .language-option {
@@ -166,37 +178,27 @@ if (typeof document !== 'undefined') {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 10px 14px;
-  border: none;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.75rem;
   background: transparent;
-  color: var(--vp-c-text-1);
-  font-size: 14px;
+  color: var(--wp-ink-2);
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background var(--wp-motion-1), color var(--wp-motion-1);
 }
 
-.language-option:hover {
-  background: var(--vp-c-bg-soft);
-}
-
+.language-option:hover,
+.language-option:focus-visible,
 .language-option.active {
-  color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
+  background: var(--wp-meta-bg);
+  color: var(--wp-accent-1);
 }
 
-.check-icon {
-  color: var(--vp-c-brand-1);
-}
-
-/* Dropdown transition */
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
+@media (min-width: 768px) {
+  .language-label {
+    display: inline;
+  }
 }
 </style>
