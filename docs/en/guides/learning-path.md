@@ -11,20 +11,20 @@ Understanding the memory hierarchy is fundamental to performance optimization:
 ```mermaid
 graph TB
     subgraph "CPU Memory Hierarchy"
-        REG[CPU Registers<br/>~1 cycle<br/>~512 bytes]
-        L1[L1 Cache<br/>~4 cycles<br/>32-64 KB]
-        L2[L2 Cache<br/>~12 cycles<br/>256-512 KB]
-        L3[L3 Cache<br/>~40 cycles<br/>8-32 MB]
-        RAM[Main Memory<br/>~200 cycles<br/>GBs]
+        REG[CPU Registers<br/>~1 cycle<br/>~512 bytes]:::success
+        L1[L1 Cache<br/>~4 cycles<br/>32-64 KB]:::process
+        L2[L2 Cache<br/>~12 cycles<br/>256-512 KB]:::decision
+        L3[L3 Cache<br/>~40 cycles<br/>8-32 MB]:::warning
+        RAM[Main Memory<br/>~200 cycles<br/>GBs]:::error
     end
-    
+
     REG --> L1 --> L2 --> L3 --> RAM
-    
-    style REG fill:#6bcb77
-    style L1 fill:#4d96ff
-    style L2 fill:#ffd93d
-    style L3 fill:#ff9f43
-    style RAM fill:#ff6b6b
+
+    classDef success fill:var(--wp-diagram-success),stroke:var(--wp-diagram-success-stroke),color:var(--wp-diagram-success-text)
+    classDef process fill:var(--wp-diagram-process),stroke:var(--wp-diagram-process-stroke),color:var(--wp-diagram-process-text)
+    classDef decision fill:var(--wp-diagram-decision),stroke:var(--wp-diagram-decision-stroke),color:var(--wp-diagram-decision-text)
+    classDef warning fill:var(--wp-diagram-warning),stroke:var(--wp-diagram-warning-stroke),color:var(--wp-diagram-warning-text)
+    classDef error fill:var(--wp-diagram-error),stroke:var(--wp-diagram-error-stroke),color:var(--wp-diagram-error-text)
 ```
 
 **Key Insight:** Each level is ~10x slower than the previous. Optimizations that improve cache utilization yield the biggest gains.
@@ -35,18 +35,21 @@ graph TB
 
 ```mermaid
 flowchart LR
-    A[Week 1<br/>Build System] --> B[Week 2<br/>Memory Basics]
-    B --> C[Week 3<br/>Modern C++]
-    C --> D[Week 4<br/>SIMD]
-    D --> E[Week 5<br/>Concurrency]
-    E --> F[Week 6<br/>Profiling]
-    
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#e8f5e9
-    style D fill:#fce4ec
-    style E fill:#f3e5f5
-    style F fill:#e0f7fa
+    A[Week 1<br/>Build System]:::start
+    B[Week 2<br/>Memory Basics]:::process
+    C[Week 3<br/>Modern C++]:::success
+    D[Week 4<br/>SIMD]:::action
+    E[Week 5<br/>Concurrency]:::warning
+    F[Week 6<br/>Profiling]:::complete
+
+    A --> B --> C --> D --> E --> F
+
+    classDef start fill:var(--wp-diagram-start),stroke:var(--wp-diagram-start-stroke),color:var(--wp-diagram-start-text)
+    classDef process fill:var(--wp-diagram-process),stroke:var(--wp-diagram-process-stroke),color:var(--wp-diagram-process-text)
+    classDef success fill:var(--wp-diagram-success),stroke:var(--wp-diagram-success-stroke),color:var(--wp-diagram-success-text)
+    classDef action fill:var(--wp-diagram-action),stroke:var(--wp-diagram-action-stroke),color:var(--wp-diagram-action-text)
+    classDef warning fill:var(--wp-diagram-warning),stroke:var(--wp-diagram-warning-stroke),color:var(--wp-diagram-warning-text)
+    classDef complete fill:var(--wp-diagram-complete),stroke:var(--wp-diagram-complete-stroke),color:var(--wp-diagram-complete-text)
 ```
 
 ---

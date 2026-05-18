@@ -1,133 +1,21 @@
 /* ============================================
-   Quantum Cobalt Design System v3.0
+   Quantum Cobalt Design System v4.0
    Precision Engineered for C++ High Performance Guide
    Cobalt Light + Quantum Dark Theme
    ============================================ */
+
+/* Import design tokens */
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/motion.css';
 
 /* CSS Layers for cascade management */
 @layer reset, tokens, base, components, utilities, overrides;
 
 @layer tokens {
-  /* === Design Tokens === */
+  /* === VitePress Theme Overrides === */
   :root {
-    color-scheme: light;
-
-    /* Typography System */
-    --wp-font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --wp-font-display: 'Inter', system-ui, sans-serif;
-    --wp-font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
-    --wp-font-size-fluid: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-
-    /* === Quantum Cobalt Light Theme === */
-    /* Paper surfaces - refined warm-cool white */
-    --wp-paper-0: oklch(0.998 0.002 260);
-    --wp-paper-1: oklch(0.988 0.003 260);
-    --wp-paper-2: oklch(0.972 0.005 260);
-    --wp-paper-3: oklch(0.948 0.008 260);
-    --wp-paper-4: oklch(0.918 0.010 260);
-
-    /* Ink - deep engineering navy */
-    --wp-ink-1: oklch(0.20 0.020 265);
-    --wp-ink-2: oklch(0.38 0.016 265);
-    --wp-ink-3: oklch(0.56 0.012 260);
-    --wp-ink-4: oklch(0.70 0.010 260);
-
-    /* Lines - surgical borders */
-    --wp-line-1: oklch(0.90 0.006 260);
-    --wp-line-2: oklch(0.80 0.012 260);
-    --wp-line-3: oklch(0.70 0.016 260);
-
-    /* === Quantum Accent System === */
-    --wp-accent-primary: oklch(0.52 0.24 261);
-    --wp-accent-secondary: oklch(0.62 0.20 258);
-    --wp-accent-tertiary: oklch(0.72 0.16 255);
-    --wp-accent-quaternary: oklch(0.82 0.12 255);
-    --wp-accent-1: var(--wp-accent-primary);
-    --wp-accent-2: var(--wp-accent-secondary);
-    --wp-accent-soft: color-mix(in oklch, var(--wp-accent-primary) 10%, var(--wp-paper-1));
-
-    /* === Surface System (5 layers) === */
-    --wp-surface-0: var(--wp-paper-0);
-    --wp-surface-1: color-mix(in oklch, var(--wp-paper-1) 88%, var(--wp-paper-2));
-    --wp-surface-2: color-mix(in oklch, var(--wp-paper-2) 84%, var(--wp-accent-primary) 4%);
-    --wp-surface-3: color-mix(in oklch, var(--wp-paper-3) 80%, var(--wp-accent-primary) 6%);
-    --wp-surface-4: color-mix(in oklch, var(--wp-paper-4) 76%, var(--wp-accent-primary) 8%);
-    --wp-surface-figure: var(--wp-surface-2);
-    --wp-surface-meta: var(--wp-surface-3);
-    --wp-surface-section-index: var(--wp-surface-1);
-    --wp-surface-reference: var(--wp-surface-1);
-
-    /* === Pill Component === */
-    --wp-pill-bg: color-mix(in oklch, var(--wp-paper-1) 90%, var(--wp-accent-primary) 5%);
-    --wp-pill-border: color-mix(in oklch, var(--wp-line-1) 72%, var(--wp-accent-primary) 18%);
-    --wp-pill-text: var(--wp-ink-2);
-
-    /* === Diagram System === */
-    --wp-diagram-stroke: color-mix(in oklch, var(--wp-ink-2) 60%, var(--wp-line-2));
-    --wp-diagram-node-fill: color-mix(in oklch, var(--wp-paper-1) 80%, var(--wp-accent-primary) 10%);
-    --wp-diagram-text: var(--wp-ink-1);
-
-    /* === Diagram Semantic Colors (Light) === */
-    --wp-diagram-problem: oklch(0.92 0.06 25);
-    --wp-diagram-problem-stroke: oklch(0.75 0.10 25);
-    --wp-diagram-problem-text: oklch(0.30 0.10 25);
-    --wp-diagram-decision: oklch(0.95 0.04 85);
-    --wp-diagram-decision-stroke: oklch(0.80 0.08 85);
-    --wp-diagram-decision-text: oklch(0.35 0.08 85);
-    --wp-diagram-action: oklch(0.93 0.05 240);
-    --wp-diagram-action-stroke: oklch(0.70 0.12 240);
-    --wp-diagram-action-text: oklch(0.25 0.10 240);
-    --wp-diagram-complete: oklch(0.93 0.06 145);
-    --wp-diagram-complete-stroke: oklch(0.70 0.14 145);
-    --wp-diagram-complete-text: oklch(0.25 0.10 145);
-    --wp-diagram-start: oklch(0.95 0.03 265);
-    --wp-diagram-start-stroke: oklch(0.78 0.08 265);
-    --wp-diagram-start-text: oklch(0.30 0.08 265);
-
-    /* === Icon System === */
-    --wp-icon-muted: color-mix(in oklch, var(--wp-ink-2) 80%, var(--wp-paper-2));
-    --wp-icon-strong: var(--wp-ink-1);
-
-    /* === Logo Colors === */
-    --wp-logo-primary: var(--wp-ink-1);
-    --wp-logo-secondary: var(--wp-ink-2);
-    --wp-logo-accent: var(--wp-accent-primary);
-
-    /* === Shadow System === */
-    --wp-shadow-1: 0 18px 40px oklch(0.20 0.01 265 / 0.06);
-    --wp-shadow-2: 0 10px 24px oklch(0.52 0.15 261 / 0.08);
-    --wp-shadow-glow: 0 0 40px oklch(0.52 0.20 261 / 0.12);
-    --wp-shadow-card: 0 4px 16px oklch(0.20 0.01 265 / 0.04);
-    --wp-shadow-elevated: 0 8px 32px oklch(0.20 0.01 265 / 0.08);
-
-    /* === Motion System === */
-    --wp-transition-fast: 0.15s ease-out;
-    --wp-transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --wp-transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --wp-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --wp-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-    --wp-motion-1: var(--wp-transition-normal);
-
-    /* === Spacing System === */
-    --wp-radius-1: 8px;
-    --wp-radius-2: 14px;
-    --wp-radius-3: 20px;
-    --wp-radius-full: 9999px;
-    --wp-space-1: 0.25rem;
-    --wp-space-2: 0.5rem;
-    --wp-space-3: 0.75rem;
-    --wp-space-4: 1rem;
-    --wp-space-5: 1.5rem;
-    --wp-space-6: 2rem;
-    --wp-space-7: 3rem;
-    --wp-space-8: 4rem;
-    --wp-content-width: 70ch;
-
-    /* === Glass Effect === */
-    --wp-glass-bg: color-mix(in oklch, var(--wp-paper-1) 70%, transparent);
-    --wp-glass-blur: 12px;
-
-    /* === VitePress Theme Overrides === */
     --vp-c-brand-1: var(--wp-accent-primary);
     --vp-c-brand-2: var(--wp-accent-secondary);
     --vp-c-brand-3: color-mix(in oklch, var(--wp-accent-secondary) 84%, var(--wp-paper-1));
@@ -148,94 +36,7 @@
     --vp-home-hero-image-filter: none;
   }
 
-  /* === Quantum Dark Theme === */
   .dark {
-    color-scheme: dark;
-
-    /* Paper surfaces - deep space */
-    --wp-paper-0: oklch(0.14 0.014 265);
-    --wp-paper-1: oklch(0.16 0.016 265);
-    --wp-paper-2: oklch(0.20 0.016 265);
-    --wp-paper-3: oklch(0.26 0.018 265);
-    --wp-paper-4: oklch(0.32 0.020 265);
-
-    /* Ink - bright text */
-    --wp-ink-1: oklch(0.94 0.008 260);
-    --wp-ink-2: oklch(0.80 0.010 260);
-    --wp-ink-3: oklch(0.62 0.012 260);
-    --wp-ink-4: oklch(0.48 0.014 260);
-
-    /* Lines - visible borders */
-    --wp-line-1: oklch(0.32 0.014 260);
-    --wp-line-2: oklch(0.42 0.018 260);
-    --wp-line-3: oklch(0.52 0.020 260);
-
-    /* === Quantum Accent System (Dark) === */
-    --wp-accent-primary: oklch(0.70 0.20 261);
-    --wp-accent-secondary: oklch(0.78 0.16 258);
-    --wp-accent-tertiary: oklch(0.84 0.12 255);
-    --wp-accent-quaternary: oklch(0.88 0.10 255);
-    --wp-accent-glow: oklch(0.75 0.25 261);
-    --wp-accent-highlight: oklch(0.72 0.22 145);
-    --wp-accent-1: var(--wp-accent-primary);
-    --wp-accent-2: var(--wp-accent-secondary);
-    --wp-accent-soft: color-mix(in oklch, var(--wp-accent-primary) 18%, var(--wp-paper-2));
-
-    /* === Surface System (Dark, 5 layers) === */
-    --wp-surface-0: var(--wp-paper-0);
-    --wp-surface-1: color-mix(in oklch, var(--wp-paper-2) 88%, var(--wp-paper-1));
-    --wp-surface-2: color-mix(in oklch, var(--wp-paper-3) 84%, var(--wp-accent-primary) 8%);
-    --wp-surface-3: color-mix(in oklch, var(--wp-paper-4) 80%, var(--wp-accent-primary) 10%);
-    --wp-surface-4: color-mix(in oklch, var(--wp-paper-4) 76%, var(--wp-accent-primary) 14%);
-    --wp-surface-figure: var(--wp-surface-2);
-    --wp-surface-meta: var(--wp-surface-3);
-    --wp-surface-section-index: var(--wp-surface-1);
-    --wp-surface-reference: var(--wp-surface-1);
-
-    /* === Pill Component (Dark) === */
-    --wp-pill-bg: color-mix(in oklch, var(--wp-paper-2) 86%, var(--wp-accent-primary) 10%);
-    --wp-pill-border: color-mix(in oklch, var(--wp-line-1) 68%, var(--wp-accent-primary) 30%);
-    --wp-pill-text: var(--wp-ink-2);
-
-    /* === Diagram System (Dark) === */
-    --wp-diagram-stroke: color-mix(in oklch, var(--wp-ink-2) 70%, var(--wp-line-2));
-    --wp-diagram-node-fill: color-mix(in oklch, var(--wp-paper-2) 78%, var(--wp-accent-primary) 14%);
-    --wp-diagram-text: var(--wp-ink-1);
-
-    /* === Diagram Semantic Colors (Dark) === */
-    --wp-diagram-problem: oklch(0.55 0.14 25);
-    --wp-diagram-problem-stroke: oklch(0.70 0.16 25);
-    --wp-diagram-problem-text: oklch(0.95 0.04 25);
-    --wp-diagram-decision: oklch(0.30 0.06 85);
-    --wp-diagram-decision-stroke: oklch(0.50 0.08 85);
-    --wp-diagram-decision-text: oklch(0.95 0.06 85);
-    --wp-diagram-action: oklch(0.28 0.08 240);
-    --wp-diagram-action-stroke: oklch(0.50 0.12 240);
-    --wp-diagram-action-text: oklch(0.90 0.06 240);
-    --wp-diagram-complete: oklch(0.30 0.10 145);
-    --wp-diagram-complete-stroke: oklch(0.50 0.14 145);
-    --wp-diagram-complete-text: oklch(0.95 0.06 145);
-    --wp-diagram-start: oklch(0.26 0.05 265);
-    --wp-diagram-start-stroke: oklch(0.48 0.08 265);
-    --wp-diagram-start-text: oklch(0.92 0.05 265);
-
-    /* === Icon System (Dark) === */
-    --wp-icon-muted: color-mix(in oklch, var(--wp-ink-2) 85%, var(--wp-paper-3));
-    --wp-icon-strong: var(--wp-ink-1);
-
-    /* === Logo Colors (Dark) === */
-    --wp-logo-primary: var(--wp-ink-1);
-    --wp-logo-secondary: var(--wp-ink-2);
-    --wp-logo-accent: var(--wp-accent-glow);
-
-    /* === Shadow System (Dark) === */
-    --wp-shadow-1: 0 22px 50px oklch(0.14 0.01 265 / 0.30);
-    --wp-shadow-2: 0 14px 32px oklch(0.70 0.15 261 / 0.15);
-    --wp-shadow-glow: 0 0 60px oklch(0.75 0.20 261 / 0.22);
-    --wp-shadow-card: 0 4px 20px oklch(0.14 0.01 265 / 0.18);
-    --wp-shadow-elevated: 0 8px 32px oklch(0.14 0.01 265 / 0.25);
-
-    /* === VitePress Theme Overrides (Dark) === */
     --vp-c-brand-1: var(--wp-accent-primary);
     --vp-c-brand-2: var(--wp-accent-secondary);
     --vp-c-brand-3: color-mix(in oklch, var(--wp-accent-secondary) 72%, var(--wp-paper-1));
@@ -389,7 +190,7 @@
   .vp-doc h1,
   .VPDoc h1 {
     margin: 0 0 var(--wp-space-5);
-    font-size: clamp(2.35rem, 4vw, 3.5rem);
+    font-size: var(--wp-heading-1);
     line-height: 1.02;
     font-weight: 800;
   }
@@ -400,7 +201,7 @@
     margin-bottom: var(--wp-space-4);
     padding-bottom: var(--wp-space-3);
     border-bottom: 1px solid var(--wp-line-1);
-    font-size: clamp(1.6rem, 3vw, 2.15rem);
+    font-size: var(--wp-heading-2);
     font-weight: 700;
   }
 
@@ -408,7 +209,7 @@
   .VPDoc h3 {
     margin-top: var(--wp-space-6);
     margin-bottom: var(--wp-space-3);
-    font-size: clamp(1.2rem, 2vw, 1.45rem);
+    font-size: var(--wp-heading-3);
     font-weight: 600;
   }
 
@@ -416,7 +217,7 @@
   .VPDoc h4 {
     margin-top: var(--wp-space-5);
     margin-bottom: var(--wp-space-2);
-    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    font-size: var(--wp-heading-4);
     font-weight: 600;
   }
 
@@ -1378,6 +1179,201 @@
   .mermaid .edgePath path {
     stroke: var(--wp-diagram-stroke) !important;
   }
+
+  /* === Landing Hero Component === */
+  .landing-hero {
+    position: relative;
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--wp-space-8) 0;
+    overflow: hidden;
+  }
+
+  .landing-hero__bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .landing-hero__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--wp-line-1) 1px, transparent 1px),
+      linear-gradient(90deg, var(--wp-line-1) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.4;
+  }
+
+  .landing-hero__glow {
+    position: absolute;
+    top: 10%;
+    left: 20%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in oklch, var(--wp-accent-primary) 12%, transparent) 0%,
+      transparent 70%
+    );
+    filter: blur(80px);
+  }
+
+  .landing-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 56rem;
+  }
+
+  .landing-hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp-space-2);
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--wp-radius-full);
+    background: var(--wp-accent-soft);
+    color: var(--wp-accent-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: var(--wp-space-5);
+  }
+
+  .landing-hero__title {
+    margin: 0 0 var(--wp-space-4);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .landing-hero__title-accent {
+    background: linear-gradient(
+      135deg,
+      var(--wp-accent-primary) 0%,
+      var(--wp-accent-secondary) 50%,
+      var(--wp-accent-tertiary) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .landing-hero__subtitle {
+    margin: 0 0 var(--wp-space-6);
+    color: var(--wp-ink-2);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.6;
+    max-width: 40rem;
+  }
+
+  .landing-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp-space-3);
+    margin-bottom: var(--wp-space-8);
+  }
+
+  .landing-hero__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp-space-2);
+    padding: 0.7rem 1.25rem;
+    border-radius: var(--wp-radius-2);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--wp-transition-fast);
+  }
+
+  .landing-hero__cta--primary {
+    background: linear-gradient(
+      135deg,
+      var(--wp-accent-primary) 0%,
+      var(--wp-accent-secondary) 100%
+    );
+    color: white;
+    box-shadow: var(--wp-shadow-2);
+  }
+
+  .landing-hero__cta--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--wp-shadow-elevated);
+  }
+
+  .landing-hero__cta:not(.landing-hero__cta--primary) {
+    border: 1px solid var(--wp-line-2);
+    background: var(--wp-paper-1);
+    color: var(--wp-ink-2);
+  }
+
+  .landing-hero__cta:not(.landing-hero__cta--primary):hover {
+    border-color: var(--wp-accent-primary);
+    color: var(--wp-accent-primary);
+  }
+
+  .landing-hero__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp-space-6);
+  }
+
+  .landing-hero__metric {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp-space-1);
+  }
+
+  .landing-hero__metric-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--wp-ink-1);
+  }
+
+  .landing-hero__metric-label {
+    font-size: 0.85rem;
+    color: var(--wp-ink-3);
+  }
+
+  /* Landing Hero Animations */
+  .landing-hero.is-visible .landing-hero__badge {
+    animation: slideUp var(--wp-duration-normal) var(--wp-ease-out) forwards;
+  }
+
+  .landing-hero.is-visible .landing-hero__title {
+    animation: slideUp var(--wp-duration-normal) var(--wp-ease-out) var(--wp-stagger-1) forwards;
+    opacity: 0;
+  }
+
+  .landing-hero.is-visible .landing-hero__subtitle {
+    animation: slideUp var(--wp-duration-normal) var(--wp-ease-out) var(--wp-stagger-2) forwards;
+    opacity: 0;
+  }
+
+  .landing-hero.is-visible .landing-hero__actions {
+    animation: slideUp var(--wp-duration-normal) var(--wp-ease-out) var(--wp-stagger-3) forwards;
+    opacity: 0;
+  }
+
+  .landing-hero.is-visible .landing-hero__metrics {
+    animation: slideUp var(--wp-duration-normal) var(--wp-ease-out) var(--wp-stagger-4) forwards;
+    opacity: 0;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 @layer utilities {
@@ -1434,25 +1430,43 @@
   }
 
   /* === Mermaid Diagram Semantic Color Classes === */
-  /* Problem / Error nodes */
-  .vp-doc .mermaid .node.problem rect,
-  .vp-doc .mermaid .node.problem circle,
-  .vp-doc .mermaid .node.problem ellipse,
-  .vp-doc .mermaid .node.problem polygon,
-  .VPDoc .mermaid .node.problem rect,
-  .mermaid .node.problem rect {
-    fill: var(--wp-diagram-problem) !important;
-    stroke: var(--wp-diagram-problem-stroke) !important;
+  /* Success / Complete nodes */
+  .vp-doc .mermaid .node.success rect,
+  .vp-doc .mermaid .node.success circle,
+  .vp-doc .mermaid .node.success ellipse,
+  .vp-doc .mermaid .node.success polygon,
+  .VPDoc .mermaid .node.success rect,
+  .mermaid .node.success rect {
+    fill: var(--wp-diagram-success) !important;
+    stroke: var(--wp-diagram-success-stroke) !important;
   }
 
-  .vp-doc .mermaid .node.problem .nodeLabel,
-  .vp-doc .mermaid .node.problem text,
-  .VPDoc .mermaid .node.problem .nodeLabel,
-  .mermaid .node.problem .nodeLabel {
-    fill: var(--wp-diagram-problem-text) !important;
+  .vp-doc .mermaid .node.success .nodeLabel,
+  .vp-doc .mermaid .node.success text,
+  .VPDoc .mermaid .node.success .nodeLabel,
+  .mermaid .node.success .nodeLabel {
+    fill: var(--wp-diagram-success-text) !important;
   }
 
-  /* Decision / Question nodes */
+  /* Process / Action nodes */
+  .vp-doc .mermaid .node.process rect,
+  .vp-doc .mermaid .node.process circle,
+  .vp-doc .mermaid .node.process ellipse,
+  .vp-doc .mermaid .node.process polygon,
+  .VPDoc .mermaid .node.process rect,
+  .mermaid .node.process rect {
+    fill: var(--wp-diagram-process) !important;
+    stroke: var(--wp-diagram-process-stroke) !important;
+  }
+
+  .vp-doc .mermaid .node.process .nodeLabel,
+  .vp-doc .mermaid .node.process text,
+  .VPDoc .mermaid .node.process .nodeLabel,
+  .mermaid .node.process .nodeLabel {
+    fill: var(--wp-diagram-process-text) !important;
+  }
+
+  /* Decision nodes */
   .vp-doc .mermaid .node.decision rect,
   .vp-doc .mermaid .node.decision circle,
   .vp-doc .mermaid .node.decision ellipse,
@@ -1470,40 +1484,40 @@
     fill: var(--wp-diagram-decision-text) !important;
   }
 
-  /* Action / Process nodes */
-  .vp-doc .mermaid .node.action rect,
-  .vp-doc .mermaid .node.action circle,
-  .vp-doc .mermaid .node.action ellipse,
-  .vp-doc .mermaid .node.action polygon,
-  .VPDoc .mermaid .node.action rect,
-  .mermaid .node.action rect {
-    fill: var(--wp-diagram-action) !important;
-    stroke: var(--wp-diagram-action-stroke) !important;
+  /* Warning nodes */
+  .vp-doc .mermaid .node.warning rect,
+  .vp-doc .mermaid .node.warning circle,
+  .vp-doc .mermaid .node.warning ellipse,
+  .vp-doc .mermaid .node.warning polygon,
+  .VPDoc .mermaid .node.warning rect,
+  .mermaid .node.warning rect {
+    fill: var(--wp-diagram-warning) !important;
+    stroke: var(--wp-diagram-warning-stroke) !important;
   }
 
-  .vp-doc .mermaid .node.action .nodeLabel,
-  .vp-doc .mermaid .node.action text,
-  .VPDoc .mermaid .node.action .nodeLabel,
-  .mermaid .node.action .nodeLabel {
-    fill: var(--wp-diagram-action-text) !important;
+  .vp-doc .mermaid .node.warning .nodeLabel,
+  .vp-doc .mermaid .node.warning text,
+  .VPDoc .mermaid .node.warning .nodeLabel,
+  .mermaid .node.warning .nodeLabel {
+    fill: var(--wp-diagram-warning-text) !important;
   }
 
-  /* Complete / Success nodes */
-  .vp-doc .mermaid .node.complete rect,
-  .vp-doc .mermaid .node.complete circle,
-  .vp-doc .mermaid .node.complete ellipse,
-  .vp-doc .mermaid .node.complete polygon,
-  .VPDoc .mermaid .node.complete rect,
-  .mermaid .node.complete rect {
-    fill: var(--wp-diagram-complete) !important;
-    stroke: var(--wp-diagram-complete-stroke) !important;
+  /* Error / Problem nodes */
+  .vp-doc .mermaid .node.error rect,
+  .vp-doc .mermaid .node.error circle,
+  .vp-doc .mermaid .node.error ellipse,
+  .vp-doc .mermaid .node.error polygon,
+  .VPDoc .mermaid .node.error rect,
+  .mermaid .node.error rect {
+    fill: var(--wp-diagram-error) !important;
+    stroke: var(--wp-diagram-error-stroke) !important;
   }
 
-  .vp-doc .mermaid .node.complete .nodeLabel,
-  .vp-doc .mermaid .node.complete text,
-  .VPDoc .mermaid .node.complete .nodeLabel,
-  .mermaid .node.complete .nodeLabel {
-    fill: var(--wp-diagram-complete-text) !important;
+  .vp-doc .mermaid .node.error .nodeLabel,
+  .vp-doc .mermaid .node.error text,
+  .VPDoc .mermaid .node.error .nodeLabel,
+  .mermaid .node.error .nodeLabel {
+    fill: var(--wp-diagram-error-text) !important;
   }
 
   /* Start / Entry nodes */
@@ -1522,6 +1536,60 @@
   .VPDoc .mermaid .node.start .nodeLabel,
   .mermaid .node.start .nodeLabel {
     fill: var(--wp-diagram-start-text) !important;
+  }
+
+  /* Action nodes */
+  .vp-doc .mermaid .node.action rect,
+  .vp-doc .mermaid .node.action circle,
+  .vp-doc .mermaid .node.action ellipse,
+  .vp-doc .mermaid .node.action polygon,
+  .VPDoc .mermaid .node.action rect,
+  .mermaid .node.action rect {
+    fill: var(--wp-diagram-action) !important;
+    stroke: var(--wp-diagram-action-stroke) !important;
+  }
+
+  .vp-doc .mermaid .node.action .nodeLabel,
+  .vp-doc .mermaid .node.action text,
+  .VPDoc .mermaid .node.action .nodeLabel,
+  .mermaid .node.action .nodeLabel {
+    fill: var(--wp-diagram-action-text) !important;
+  }
+
+  /* Complete nodes */
+  .vp-doc .mermaid .node.complete rect,
+  .vp-doc .mermaid .node.complete circle,
+  .vp-doc .mermaid .node.complete ellipse,
+  .vp-doc .mermaid .node.complete polygon,
+  .VPDoc .mermaid .node.complete rect,
+  .mermaid .node.complete rect {
+    fill: var(--wp-diagram-complete) !important;
+    stroke: var(--wp-diagram-complete-stroke) !important;
+  }
+
+  .vp-doc .mermaid .node.complete .nodeLabel,
+  .vp-doc .mermaid .node.complete text,
+  .VPDoc .mermaid .node.complete .nodeLabel,
+  .mermaid .node.complete .nodeLabel {
+    fill: var(--wp-diagram-complete-text) !important;
+  }
+
+  /* Problem nodes */
+  .vp-doc .mermaid .node.problem rect,
+  .vp-doc .mermaid .node.problem circle,
+  .vp-doc .mermaid .node.problem ellipse,
+  .vp-doc .mermaid .node.problem polygon,
+  .VPDoc .mermaid .node.problem rect,
+  .mermaid .node.problem rect {
+    fill: var(--wp-diagram-problem) !important;
+    stroke: var(--wp-diagram-problem-stroke) !important;
+  }
+
+  .vp-doc .mermaid .node.problem .nodeLabel,
+  .vp-doc .mermaid .node.problem text,
+  .VPDoc .mermaid .node.problem .nodeLabel,
+  .mermaid .node.problem .nodeLabel {
+    fill: var(--wp-diagram-problem-text) !important;
   }
 }
 
@@ -1554,6 +1622,11 @@
     .wp-code-compare {
       grid-template-columns: 1fr;
     }
+
+    .landing-hero {
+      min-height: auto;
+      padding: var(--wp-space-6) 0;
+    }
   }
 
   @media (max-width: 720px) {
@@ -1577,6 +1650,20 @@
 
     .wp-section-index-grid {
       grid-template-columns: 1fr;
+    }
+
+    .landing-hero__actions {
+      flex-direction: column;
+    }
+
+    .landing-hero__cta {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .landing-hero__metrics {
+      flex-direction: column;
+      gap: var(--wp-space-4);
     }
   }
 

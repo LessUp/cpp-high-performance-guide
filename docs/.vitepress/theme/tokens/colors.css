@@ -1,0 +1,255 @@
+/* ============================================
+   Quantum Cobalt Design System v4.0
+   Color Tokens — OKLCH perceptual color space
+   ============================================ */
+
+@layer tokens {
+  :root {
+    color-scheme: light;
+
+    /* === Cobalt Scale (Primary) === */
+    --wp-color-cobalt-50:  oklch(0.98 0.008 261);
+    --wp-color-cobalt-100: oklch(0.95 0.016 261);
+    --wp-color-cobalt-200: oklch(0.88 0.036 261);
+    --wp-color-cobalt-300: oklch(0.78 0.076 261);
+    --wp-color-cobalt-400: oklch(0.68 0.136 261);
+    --wp-color-cobalt-500: oklch(0.58 0.200 261);
+    --wp-color-cobalt-600: oklch(0.52 0.240 261);
+    --wp-color-cobalt-700: oklch(0.45 0.220 261);
+    --wp-color-cobalt-800: oklch(0.38 0.180 261);
+    --wp-color-cobalt-900: oklch(0.28 0.140 261);
+
+    /* === Semantic Colors === */
+    --wp-color-success:       oklch(0.70 0.160 145);
+    --wp-color-success-soft:  oklch(0.95 0.040 145);
+    --wp-color-warning:       oklch(0.75 0.180 85);
+    --wp-color-warning-soft:  oklch(0.95 0.040 85);
+    --wp-color-error:         oklch(0.65 0.200 25);
+    --wp-color-error-soft:    oklch(0.93 0.050 25);
+    --wp-color-info:          oklch(0.65 0.160 240);
+    --wp-color-info-soft:     oklch(0.93 0.040 240);
+
+    /* === Paper Surfaces === */
+    --wp-paper-0: oklch(0.998 0.002 260);
+    --wp-paper-1: oklch(0.988 0.003 260);
+    --wp-paper-2: oklch(0.972 0.005 260);
+    --wp-paper-3: oklch(0.948 0.008 260);
+    --wp-paper-4: oklch(0.918 0.010 260);
+
+    /* === Ink (Text) === */
+    --wp-ink-1: oklch(0.20 0.020 265);
+    --wp-ink-2: oklch(0.38 0.016 265);
+    --wp-ink-3: oklch(0.56 0.012 260);
+    --wp-ink-4: oklch(0.70 0.010 260);
+
+    /* === Lines (Borders) === */
+    --wp-line-1: oklch(0.90 0.006 260);
+    --wp-line-2: oklch(0.80 0.012 260);
+    --wp-line-3: oklch(0.70 0.016 260);
+
+    /* === Accent System === */
+    --wp-accent-primary:     oklch(0.52 0.240 261);
+    --wp-accent-secondary:   oklch(0.62 0.200 258);
+    --wp-accent-tertiary:    oklch(0.72 0.160 255);
+    --wp-accent-quaternary:  oklch(0.82 0.120 255);
+    --wp-accent-1: var(--wp-accent-primary);
+    --wp-accent-2: var(--wp-accent-secondary);
+    --wp-accent-soft: color-mix(in oklch, var(--wp-accent-primary) 10%, var(--wp-paper-1));
+
+    /* === Surface System (5 layers) === */
+    --wp-surface-0: var(--wp-paper-0);
+    --wp-surface-1: color-mix(in oklch, var(--wp-paper-1) 88%, var(--wp-paper-2));
+    --wp-surface-2: color-mix(in oklch, var(--wp-paper-2) 84%, var(--wp-accent-primary) 4%);
+    --wp-surface-3: color-mix(in oklch, var(--wp-paper-3) 80%, var(--wp-accent-primary) 6%);
+    --wp-surface-4: color-mix(in oklch, var(--wp-paper-4) 76%, var(--wp-accent-primary) 8%);
+    --wp-surface-figure:        var(--wp-surface-2);
+    --wp-surface-meta:          var(--wp-surface-3);
+    --wp-surface-section-index: var(--wp-surface-1);
+    --wp-surface-reference:     var(--wp-surface-1);
+
+    /* === Pill Component === */
+    --wp-pill-bg:     color-mix(in oklch, var(--wp-paper-1) 90%, var(--wp-accent-primary) 5%);
+    --wp-pill-border: color-mix(in oklch, var(--wp-line-1) 72%, var(--wp-accent-primary) 18%);
+    --wp-pill-text:   var(--wp-ink-2);
+
+    /* === Diagram System === */
+    --wp-diagram-stroke:      color-mix(in oklch, var(--wp-ink-2) 60%, var(--wp-line-2));
+    --wp-diagram-node-fill:   color-mix(in oklch, var(--wp-paper-1) 80%, var(--wp-accent-primary) 10%);
+    --wp-diagram-text:        var(--wp-ink-1);
+
+    /* Diagram Semantic Colors (Light) */
+    --wp-diagram-start:          oklch(0.95 0.030 265);
+    --wp-diagram-start-stroke:   oklch(0.78 0.080 265);
+    --wp-diagram-start-text:     oklch(0.30 0.080 265);
+    --wp-diagram-process:        var(--wp-color-cobalt-200);
+    --wp-diagram-process-stroke: var(--wp-color-cobalt-500);
+    --wp-diagram-process-text:   oklch(0.25 0.100 240);
+    --wp-diagram-decision:       oklch(0.95 0.040 85);
+    --wp-diagram-decision-stroke:oklch(0.80 0.080 85);
+    --wp-diagram-decision-text:  oklch(0.35 0.080 85);
+    --wp-diagram-action:         oklch(0.93 0.050 240);
+    --wp-diagram-action-stroke:  oklch(0.70 0.120 240);
+    --wp-diagram-action-text:    oklch(0.25 0.100 240);
+    --wp-diagram-complete:       oklch(0.93 0.060 145);
+    --wp-diagram-complete-stroke:oklch(0.70 0.140 145);
+    --wp-diagram-complete-text:  oklch(0.25 0.100 145);
+    --wp-diagram-problem:        oklch(0.92 0.060 25);
+    --wp-diagram-problem-stroke: oklch(0.75 0.100 25);
+    --wp-diagram-problem-text:   oklch(0.30 0.100 25);
+    --wp-diagram-success:        var(--wp-color-success-soft);
+    --wp-diagram-success-stroke: var(--wp-color-success);
+    --wp-diagram-success-text:   oklch(0.25 0.100 145);
+    --wp-diagram-warning:        var(--wp-color-warning-soft);
+    --wp-diagram-warning-stroke: var(--wp-color-warning);
+    --wp-diagram-warning-text:   oklch(0.35 0.080 85);
+    --wp-diagram-error:          var(--wp-color-error-soft);
+    --wp-diagram-error-stroke:   var(--wp-color-error);
+    --wp-diagram-error-text:     oklch(0.30 0.100 25);
+
+    /* === Icon System === */
+    --wp-icon-muted: color-mix(in oklch, var(--wp-ink-2) 80%, var(--wp-paper-2));
+    --wp-icon-strong: var(--wp-ink-1);
+
+    /* === Logo Colors === */
+    --wp-logo-primary:   var(--wp-ink-1);
+    --wp-logo-secondary: var(--wp-ink-2);
+    --wp-logo-accent:    var(--wp-accent-primary);
+
+    /* === Shadow System === */
+    --wp-shadow-1:        0 18px 40px oklch(0.20 0.010 265 / 0.06);
+    --wp-shadow-2:        0 10px 24px oklch(0.52 0.150 261 / 0.08);
+    --wp-shadow-glow:     0 0 40px oklch(0.52 0.200 261 / 0.12);
+    --wp-shadow-card:     0 4px 16px oklch(0.20 0.010 265 / 0.04);
+    --wp-shadow-elevated: 0 8px 32px oklch(0.20 0.010 265 / 0.08);
+
+    /* === Glass Effect === */
+    --wp-glass-bg:    color-mix(in oklch, var(--wp-paper-1) 70%, transparent);
+    --wp-glass-blur:  12px;
+  }
+
+  /* === Quantum Dark Theme === */
+  .dark {
+    color-scheme: dark;
+
+    /* === Cobalt Scale (Dark) === */
+    --wp-color-cobalt-50:  oklch(0.22 0.020 261);
+    --wp-color-cobalt-100: oklch(0.24 0.022 261);
+    --wp-color-cobalt-200: oklch(0.28 0.040 261);
+    --wp-color-cobalt-300: oklch(0.38 0.080 261);
+    --wp-color-cobalt-400: oklch(0.52 0.140 261);
+    --wp-color-cobalt-500: oklch(0.62 0.190 261);
+    --wp-color-cobalt-600: oklch(0.70 0.200 261);
+    --wp-color-cobalt-700: oklch(0.76 0.180 261);
+    --wp-color-cobalt-800: oklch(0.82 0.150 261);
+    --wp-color-cobalt-900: oklch(0.90 0.100 261);
+
+    /* === Semantic Colors (Dark) === */
+    --wp-color-success:       oklch(0.72 0.160 145);
+    --wp-color-success-soft:  oklch(0.28 0.060 145);
+    --wp-color-warning:       oklch(0.78 0.180 85);
+    --wp-color-warning-soft:  oklch(0.30 0.060 85);
+    --wp-color-error:         oklch(0.70 0.200 25);
+    --wp-color-error-soft:    oklch(0.30 0.080 25);
+    --wp-color-info:          oklch(0.70 0.160 240);
+    --wp-color-info-soft:     oklch(0.28 0.060 240);
+
+    /* === Paper Surfaces (Dark) === */
+    --wp-paper-0: oklch(0.14 0.014 265);
+    --wp-paper-1: oklch(0.16 0.016 265);
+    --wp-paper-2: oklch(0.20 0.016 265);
+    --wp-paper-3: oklch(0.26 0.018 265);
+    --wp-paper-4: oklch(0.32 0.020 265);
+
+    /* === Ink (Dark) === */
+    --wp-ink-1: oklch(0.94 0.008 260);
+    --wp-ink-2: oklch(0.80 0.010 260);
+    --wp-ink-3: oklch(0.62 0.012 260);
+    --wp-ink-4: oklch(0.48 0.014 260);
+
+    /* === Lines (Dark) === */
+    --wp-line-1: oklch(0.32 0.014 260);
+    --wp-line-2: oklch(0.42 0.018 260);
+    --wp-line-3: oklch(0.52 0.020 260);
+
+    /* === Accent System (Dark) === */
+    --wp-accent-primary:    oklch(0.70 0.200 261);
+    --wp-accent-secondary:  oklch(0.78 0.160 258);
+    --wp-accent-tertiary:   oklch(0.84 0.120 255);
+    --wp-accent-quaternary: oklch(0.88 0.100 255);
+    --wp-accent-glow:       oklch(0.75 0.250 261);
+    --wp-accent-highlight:  oklch(0.72 0.220 145);
+    --wp-accent-1: var(--wp-accent-primary);
+    --wp-accent-2: var(--wp-accent-secondary);
+    --wp-accent-soft: color-mix(in oklch, var(--wp-accent-primary) 18%, var(--wp-paper-2));
+
+    /* === Surface System (Dark) === */
+    --wp-surface-0: var(--wp-paper-0);
+    --wp-surface-1: color-mix(in oklch, var(--wp-paper-2) 88%, var(--wp-paper-1));
+    --wp-surface-2: color-mix(in oklch, var(--wp-paper-3) 84%, var(--wp-accent-primary) 8%);
+    --wp-surface-3: color-mix(in oklch, var(--wp-paper-4) 80%, var(--wp-accent-primary) 10%);
+    --wp-surface-4: color-mix(in oklch, var(--wp-paper-4) 76%, var(--wp-accent-primary) 14%);
+    --wp-surface-figure:        var(--wp-surface-2);
+    --wp-surface-meta:          var(--wp-surface-3);
+    --wp-surface-section-index: var(--wp-surface-1);
+    --wp-surface-reference:     var(--wp-surface-1);
+
+    /* === Pill Component (Dark) === */
+    --wp-pill-bg:     color-mix(in oklch, var(--wp-paper-2) 86%, var(--wp-accent-primary) 10%);
+    --wp-pill-border: color-mix(in oklch, var(--wp-line-1) 68%, var(--wp-accent-primary) 30%);
+    --wp-pill-text:   var(--wp-ink-2);
+
+    /* === Diagram System (Dark) === */
+    --wp-diagram-stroke:    color-mix(in oklch, var(--wp-ink-2) 70%, var(--wp-line-2));
+    --wp-diagram-node-fill: color-mix(in oklch, var(--wp-paper-2) 78%, var(--wp-accent-primary) 14%);
+    --wp-diagram-text:      var(--wp-ink-1);
+
+    /* Diagram Semantic Colors (Dark) */
+    --wp-diagram-start:          oklch(0.26 0.050 265);
+    --wp-diagram-start-stroke:   oklch(0.48 0.080 265);
+    --wp-diagram-start-text:     oklch(0.92 0.050 265);
+    --wp-diagram-process:        oklch(0.24 0.040 261);
+    --wp-diagram-process-stroke: oklch(0.50 0.120 261);
+    --wp-diagram-process-text:   oklch(0.90 0.060 240);
+    --wp-diagram-decision:       oklch(0.30 0.060 85);
+    --wp-diagram-decision-stroke:oklch(0.50 0.080 85);
+    --wp-diagram-decision-text:  oklch(0.95 0.060 85);
+    --wp-diagram-action:         oklch(0.28 0.080 240);
+    --wp-diagram-action-stroke:  oklch(0.50 0.120 240);
+    --wp-diagram-action-text:    oklch(0.90 0.060 240);
+    --wp-diagram-complete:       oklch(0.30 0.100 145);
+    --wp-diagram-complete-stroke:oklch(0.50 0.140 145);
+    --wp-diagram-complete-text:  oklch(0.95 0.060 145);
+    --wp-diagram-problem:        oklch(0.55 0.140 25);
+    --wp-diagram-problem-stroke: oklch(0.70 0.160 25);
+    --wp-diagram-problem-text:   oklch(0.95 0.040 25);
+    --wp-diagram-success:        oklch(0.28 0.080 145);
+    --wp-diagram-success-stroke: oklch(0.55 0.160 145);
+    --wp-diagram-success-text:   oklch(0.95 0.040 145);
+    --wp-diagram-warning:        oklch(0.30 0.060 85);
+    --wp-diagram-warning-stroke: oklch(0.55 0.120 85);
+    --wp-diagram-warning-text:   oklch(0.95 0.060 85);
+    --wp-diagram-error:          oklch(0.30 0.080 25);
+    --wp-diagram-error-stroke:   oklch(0.60 0.180 25);
+    --wp-diagram-error-text:     oklch(0.95 0.040 25);
+
+    /* === Icon System (Dark) === */
+    --wp-icon-muted: color-mix(in oklch, var(--wp-ink-2) 85%, var(--wp-paper-3));
+    --wp-icon-strong: var(--wp-ink-1);
+
+    /* === Logo Colors (Dark) === */
+    --wp-logo-primary:   var(--wp-ink-1);
+    --wp-logo-secondary: var(--wp-ink-2);
+    --wp-logo-accent:    var(--wp-accent-glow);
+
+    /* === Shadow System (Dark) === */
+    --wp-shadow-1:        0 22px 50px oklch(0.14 0.010 265 / 0.30);
+    --wp-shadow-2:        0 14px 32px oklch(0.70 0.150 261 / 0.15);
+    --wp-shadow-glow:     0 0 60px oklch(0.75 0.200 261 / 0.22);
+    --wp-shadow-card:     0 4px 20px oklch(0.14 0.010 265 / 0.18);
+    --wp-shadow-elevated: 0 8px 32px oklch(0.14 0.010 265 / 0.25);
+
+    /* === Glass Effect (Dark) === */
+    --wp-glass-bg:   color-mix(in oklch, var(--wp-paper-2) 70%, transparent);
+    --wp-glass-blur: 14px;
+  }
+}

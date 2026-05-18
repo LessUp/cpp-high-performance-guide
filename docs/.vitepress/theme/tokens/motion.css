@@ -1,0 +1,59 @@
+/* ============================================
+   Quantum Cobalt Design System v4.0
+   Motion & Animation Tokens
+   ============================================ */
+
+@layer tokens {
+  :root {
+    /* === Durations === */
+    --wp-duration-instant: 100ms;
+    --wp-duration-fast:    200ms;
+    --wp-duration-normal:  300ms;
+    --wp-duration-slow:    500ms;
+    --wp-duration-slower:  800ms;
+
+    /* === Legacy duration aliases (backward compat) === */
+    --wp-transition-fast:   var(--wp-duration-fast) ease-out;
+    --wp-transition-normal: var(--wp-duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
+    --wp-transition-slow:   var(--wp-duration-slow) cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* === Easing Functions === */
+    --wp-ease-default:  cubic-bezier(0.4, 0, 0.2, 1);
+    --wp-ease-in:       cubic-bezier(0.4, 0, 1, 1);
+    --wp-ease-out:      cubic-bezier(0, 0, 0.2, 1);
+    --wp-ease-bounce:   cubic-bezier(0.34, 1.56, 0.64, 1);
+    --wp-ease-elastic:  cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --wp-ease-smooth:   cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* === Preset Transitions === */
+    --wp-motion-1: var(--wp-duration-normal) var(--wp-ease-default);
+    --wp-motion-2: var(--wp-duration-slow) var(--wp-ease-default);
+
+    /* === Stagger Delays (for group animations) === */
+    --wp-stagger-1: 60ms;
+    --wp-stagger-2: 120ms;
+    --wp-stagger-3: 180ms;
+    --wp-stagger-4: 240ms;
+    --wp-stagger-5: 300ms;
+
+    /* === View Transition Durations === */
+    --wp-view-transition-out: 200ms ease-out;
+    --wp-view-transition-in:  300ms ease-in;
+  }
+
+  /* === Reduced Motion Preference === */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --wp-duration-instant: 0ms;
+      --wp-duration-fast:    0ms;
+      --wp-duration-normal:  0ms;
+      --wp-duration-slow:    0ms;
+      --wp-duration-slower:  0ms;
+      --wp-stagger-1: 0ms;
+      --wp-stagger-2: 0ms;
+      --wp-stagger-3: 0ms;
+      --wp-stagger-4: 0ms;
+      --wp-stagger-5: 0ms;
+    }
+  }
+}

@@ -11,20 +11,20 @@
 ```mermaid
 graph TB
     subgraph "CPU 内存层次结构"
-        REG[CPU寄存器<br/>~1周期<br/>~512字节]
-        L1[L1缓存<br/>~4周期<br/>32-64 KB]
-        L2[L2缓存<br/>~12周期<br/>256-512 KB]
-        L3[L3缓存<br/>~40周期<br/>8-32 MB]
-        RAM[主内存<br/>~200周期<br/>GB级]
+        REG[CPU寄存器<br/>~1周期<br/>~512字节]:::success
+        L1[L1缓存<br/>~4周期<br/>32-64 KB]:::process
+        L2[L2缓存<br/>~12周期<br/>256-512 KB]:::decision
+        L3[L3缓存<br/>~40周期<br/>8-32 MB]:::warning
+        RAM[主内存<br/>~200周期<br/>GB级]:::error
     end
 
     REG --> L1 --> L2 --> L3 --> RAM
 
-    style REG fill:#6bcb77
-    style L1 fill:#4d96ff
-    style L2 fill:#ffd93d
-    style L3 fill:#ff9f43
-    style RAM fill:#ff6b6b
+    classDef success fill:var(--wp-diagram-success),stroke:var(--wp-diagram-success-stroke),color:var(--wp-diagram-success-text)
+    classDef process fill:var(--wp-diagram-process),stroke:var(--wp-diagram-process-stroke),color:var(--wp-diagram-process-text)
+    classDef decision fill:var(--wp-diagram-decision),stroke:var(--wp-diagram-decision-stroke),color:var(--wp-diagram-decision-text)
+    classDef warning fill:var(--wp-diagram-warning),stroke:var(--wp-diagram-warning-stroke),color:var(--wp-diagram-warning-text)
+    classDef error fill:var(--wp-diagram-error),stroke:var(--wp-diagram-error-stroke),color:var(--wp-diagram-error-text)
 ```
 
 **关键洞察：** 每一级比前一级慢约10倍。改善缓存利用率的优化能带来最大的收益。
@@ -35,18 +35,21 @@ graph TB
 
 ```mermaid
 flowchart LR
-    A[第1周<br/>构建系统] --> B[第2周<br/>内存基础]
-    B --> C[第3周<br/>现代C++]
-    C --> D[第4周<br/>SIMD]
-    D --> E[第5周<br/>并发]
-    E --> F[第6周<br/>性能分析]
+    A[第1周<br/>构建系统]:::start
+    B[第2周<br/>内存基础]:::process
+    C[第3周<br/>现代C++]:::success
+    D[第4周<br/>SIMD]:::action
+    E[第5周<br/>并发]:::warning
+    F[第6周<br/>性能分析]:::complete
 
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#e8f5e9
-    style D fill:#fce4ec
-    style E fill:#f3e5f5
-    style F fill:#e0f7fa
+    A --> B --> C --> D --> E --> F
+
+    classDef start fill:var(--wp-diagram-start),stroke:var(--wp-diagram-start-stroke),color:var(--wp-diagram-start-text)
+    classDef process fill:var(--wp-diagram-process),stroke:var(--wp-diagram-process-stroke),color:var(--wp-diagram-process-text)
+    classDef success fill:var(--wp-diagram-success),stroke:var(--wp-diagram-success-stroke),color:var(--wp-diagram-success-text)
+    classDef action fill:var(--wp-diagram-action),stroke:var(--wp-diagram-action-stroke),color:var(--wp-diagram-action-text)
+    classDef warning fill:var(--wp-diagram-warning),stroke:var(--wp-diagram-warning-stroke),color:var(--wp-diagram-warning-text)
+    classDef complete fill:var(--wp-diagram-complete),stroke:var(--wp-diagram-complete-stroke),color:var(--wp-diagram-complete-text)
 ```
 
 ---
