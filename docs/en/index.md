@@ -2,33 +2,23 @@
 layout: home
 ---
 
-<SectionHero
-  badge="C++20 • Measured"
-  title="C++ High Performance Guide"
-  subtitle="Runnable architecture notes for serious performance work"
-  intro="This repository treats performance advice as something to compile, test, benchmark, and falsify. The docs site is a whitepaper layered over executable C++ modules, preset-driven validation, and research notes that explain what to trust and why."
-  links-aria-label="Landing page links"
+<LandingHero
+  badge="C++20 • Measured • Validated"
+  title="High Performance"
+  titleAccent="C++ Guide"
+  subtitle="Runnable architecture notes for serious performance work. This repository treats performance advice as something to compile, test, benchmark, and falsify."
   :links='[
+    { href: "/en/getting-started/quickstart", label: "Start Learning", primary: true },
     { href: "/en/academy/", label: "Academy" },
     { href: "/en/architecture/", label: "Architecture" },
-    { href: "/en/algorithms/", label: "Algorithms" },
-    { href: "/en/playbook/", label: "Playbook" },
-    { href: "/en/research/", label: "Research" },
     { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
-    { href: "/zh/", label: "中文" },
   ]'
->
-  <template #aside>
-    <MetricStrip
-      aria-label="Project metrics"
-      :items='[
-        { value: "5", label: "teaching modules" },
-        { value: "6", label: "whitepaper sections" },
-        { value: "debug→ubsan", label: "validation ladder" },
-      ]'
-    />
-  </template>
-</SectionHero>
+  :metrics='[
+    { value: "5", label: "Teaching Modules" },
+    { value: "6", label: "Whitepaper Sections" },
+    { value: "Debug→UBSan", label: "Validation Ladder" },
+  ]'
+/>
 
 ## Thesis
 

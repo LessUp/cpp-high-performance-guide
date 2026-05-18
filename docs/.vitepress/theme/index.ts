@@ -15,6 +15,8 @@ import AlgorithmCard from './AlgorithmCard.vue'
 import ComplexityBadge from './ComplexityBadge.vue'
 import DiagramCanvas from './DiagramCanvas.vue'
 import ReferenceCard from './ReferenceCard.vue'
+import LandingHero from './LandingHero.vue'
+import Bibliography from './Bibliography.vue'
 
 export default {
   extends: DefaultTheme,
@@ -33,6 +35,9 @@ export default {
     app.component('ComplexityBadge', ComplexityBadge)
     app.component('DiagramCanvas', DiagramCanvas)
     app.component('ReferenceCard', ReferenceCard)
+    // Quantum Cobalt v4.0 components
+    app.component('LandingHero', LandingHero)
+    app.component('Bibliography', Bibliography)
   },
   Layout() {
     return h(DefaultTheme.Layout, null, {

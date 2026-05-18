@@ -2,33 +2,23 @@
 layout: home
 ---
 
-<SectionHero
-  badge="C++20 • 经测量"
-  title="C++ 高性能指南"
-  subtitle="面向严肃性能工作的可运行架构札记"
-  intro="这个仓库把性能建议视为必须能够编译、测试、基准比较并被证伪的对象。文档站是一层覆盖在可执行 C++ 模块、preset 驱动验证与研究说明之上的白皮书，用来解释哪些内容值得相信，以及为什么。"
-  links-aria-label="落地页链接"
+<LandingHero
+  badge="C++20 • 经测量 • 已验证"
+  title="高性能"
+  titleAccent="C++ 指南"
+  subtitle="面向严肃性能工作的可运行架构札记。这个仓库把性能建议视为必须能够编译、测试、基准比较并被证伪的对象。"
   :links='[
-     { href: "/zh/academy/", label: "学院" },
-     { href: "/zh/architecture/", label: "架构" },
-     { href: "/zh/algorithms/", label: "算法" },
-     { href: "/zh/playbook/", label: "实践手册" },
-     { href: "/zh/research/", label: "研究" },
-     { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
-     { href: "/en/", label: "English" },
+    { href: "/zh/getting-started/quickstart", label: "开始学习", primary: true },
+    { href: "/zh/academy/", label: "学院" },
+    { href: "/zh/architecture/", label: "架构" },
+    { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
   ]'
->
-  <template #aside>
-    <MetricStrip
-      aria-label="项目指标"
-      :items='[
-        { value: "5", label: "个教学模块" },
-        { value: "6", label: "个白皮书章节" },
-        { value: "debug→ubsan", label: "验证阶梯" },
-      ]'
-    />
-  </template>
-</SectionHero>
+  :metrics='[
+    { value: "5", label: "个教学模块" },
+    { value: "6", label: "个白皮书章节" },
+    { value: "Debug→UBSan", label: "验证阶梯" },
+  ]'
+/>
 
 ## 论点
 
