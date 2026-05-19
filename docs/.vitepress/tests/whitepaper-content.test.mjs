@@ -62,7 +62,7 @@ test('landing page states the stronger thesis and validation ladder', () => {
   const content = read('en/index.md')
 
   assert.match(content, /performance advice as something to compile, test, benchmark, and falsify/i)
-  assert.match(content, /debug→ubsan/)
+  assert.match(content, /Debug→UBSan/)
   assert.match(content, /Validation claims/)
   assert.match(content, /Expert reader callouts/)
 })

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { withBase } from 'vitepress'
 
 interface HeroLink {
   href: string
@@ -22,6 +23,16 @@ const props = defineProps<{
 }>()
 
 const isVisible = ref(false)
+
+// Resolve links with base path for GitHub Pages compatibility
+const resolvedLinks = computed(() => {
+  return props.links?.map(link => ({
+    ...link,
+    resolvedHref: /^(?:[a-z]+:|\/\/|#)/i.test(link.href)
+      ? link.href
+      : withBase(link.href)
+  }))
+})
 
 onMounted(() => {
   // Trigger entrance animation after mount
@@ -59,11 +70,11 @@ onMounted(() => {
       <p class="landing-hero__subtitle">{{ subtitle }}</p>
 
       <!-- Action links -->
-      <nav v-if="links?.length" class="landing-hero__actions">
+      <nav v-if="resolvedLinks?.length" class="landing-hero__actions">
         <a
-          v-for="link in links"
+          v-for="link in resolvedLinks"
           :key="link.href"
-          :href="link.href"
+          :href="link.resolvedHref"
           class="landing-hero__cta"
           :class="{ 'landing-hero__cta--primary': link.primary }"
         >
