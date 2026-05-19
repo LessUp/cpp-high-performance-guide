@@ -3,33 +3,78 @@ layout: home
 ---
 
 <LandingHero
-  badge="C++20 • Measured • Validated"
-  title="High Performance"
-  titleAccent="C++ Guide"
-  subtitle="Runnable architecture notes for serious performance work. This repository treats performance advice as something to compile, test, benchmark, and falsify."
-  :links='[
-    { href: "/en/getting-started/quickstart", label: "Start Learning", primary: true },
-    { href: "/en/academy/", label: "Academy" },
-    { href: "/en/architecture/", label: "Architecture" },
-    { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "GitHub" },
+  badge="C++20 whitepaper route"
+  title="Learn performance"
+  titleAccent="with evidence first"
+  subtitle="A learning-first homepage for readers who want a serious C++ guide with runnable examples, validation routes, and explicit proof standards."
+  intro="Use this page as the front door to the whitepaper: understand who it is for, follow the recommended study path, then take the first-run route before diving into deeper reference material."
+  actions-aria-label="Primary landing actions"
+  :actions='[
+    { href: "/en/getting-started/quickstart", label: "Start with the quickstart", primary: true },
+    { href: "/en/guides/learning-path", label: "Open the study path" },
+    { href: "/en/academy/", label: "Read the academy overview" },
+    { href: "https://github.com/LessUp/cpp-high-performance-guide", label: "Browse GitHub" },
   ]'
+  guides-aria-label="Recommended guide sequence"
+  :guides='[
+    {
+      href: "/en/academy/module-atlas",
+      title: "Map the repository before optimizing",
+      description: "Use the module atlas to connect examples, tests, and supporting headers before treating any claim as authoritative.",
+    },
+    {
+      href: "/en/academy/validation-doctrine",
+      title: "Learn the repository proof standard",
+      description: "This guide explains what counts as enough evidence for correctness, optimization, and concurrency claims.",
+    },
+    {
+      href: "/en/architecture/performance-methodology",
+      title: "Measure only after the baseline is stable",
+      description: "Move to benchmark and profiler methodology once the basic debug and sanitizer routes are already understood.",
+    },
+  ]'
+  metrics-aria-label="Homepage evidence metrics"
   :metrics='[
-    { value: "5", label: "Teaching Modules" },
-    { value: "6", label: "Whitepaper Sections" },
-    { value: "Debug→UBSan", label: "Validation Ladder" },
+    { value: "5", label: "Teaching modules" },
+    { value: "6", label: "Whitepaper sections" },
+    { value: "debug→ubsan", label: "Validation ladder" },
   ]'
 />
 
-## Thesis
+## Who should read this guide?
 
-Performance guidance becomes credible only when the argumentative chain stays visible. In this repository, each layer is inspectable:
+This guide is for readers who want more than isolated tips:
 
-- **code** lives in runnable example modules under `examples/`
-- **evidence** lives in CMake presets, unit tests, property tests, sanitizer runs, and benchmark executables
-- **interpretation** lives in the academy, architecture, playbook, reference, and research sections
-- **governance** lives in `openspec/`, where non-trivial changes record intent before they land
+- engineers revisiting modern C++ performance work and wanting a structured re-entry point
+- reviewers or interviewers who need to inspect claims against runnable code and verification surfaces
+- maintainers who must understand how examples, tests, presets, and whitepaper narrative fit together
 
-An expert reader should be able to move from a claim on this page to the corresponding source file, preset, benchmark, or test target without guesswork.
+The repository treats performance advice as something to compile, test, benchmark, and falsify. An expert reader should be able to move from a claim on this page to the corresponding source file, preset, benchmark, or test target without guesswork.
+
+## Recommended study path
+
+Start with orientation before specialization:
+
+1. Read the [Academy overview](/en/academy/) to learn the repository's teaching model.
+2. Use [Module Atlas](/en/academy/module-atlas) to map each module to concrete code surfaces.
+3. Read [Validation Doctrine](/en/academy/validation-doctrine) before trusting any optimization claim.
+4. Continue into [Architecture](/en/architecture/) once you want repository topology and methodology.
+5. Keep [Playbook](/en/playbook/) and [Reference](/en/reference/) nearby for operational detail.
+
+## First-run route
+
+Use the preset-driven path first. It is the shortest route that still preserves architectural intent.
+
+<div class="wp-figure-shell wp-quick-start">
+  <div class="wp-meta-strip" title="Quick Start">Quick Start</div>
+  <div class="wp-quick-start-body">
+    <p>Run the baseline before browsing advanced optimization pages. That keeps the learning sequence anchored to a known-good build and test loop.</p>
+    <div class="wp-command-block">
+      <code>cmake --preset=debug && cmake --build build/debug && ctest --preset=debug</code>
+    </div>
+    For a broader operational path, continue with the <BaseAwareLink href="/en/getting-started/quickstart">Quick Start guide</BaseAwareLink>.
+  </div>
+</div>
 
 ## Validation claims
 

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { createSSRApp, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { compileScript, compileTemplate, parse } from '@vue/compiler-sfc'
+import { transformWithEsbuild } from 'vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const themeDir = path.resolve(__dirname, '..', 'theme')
@@ -15,11 +16,39 @@ function read(relativePath) {
   return fs.readFileSync(path.join(themeDir, relativePath), 'utf8')
 }
 
-function extractHeroLinks(content) {
-  const linksMatch = content.match(/:links='\[(.*?)\]'/s)
-  assert.ok(linksMatch, 'expected SectionHero links array')
+function extractLandingArray(content, propName) {
+  const match = content.match(new RegExp(`:${propName}='\\[(.*?)\\]'`, 's'))
 
-  return [...linksMatch[1].matchAll(/href:\s*"([^"]+)"/g)].map(([, href]) => href)
+  assert.ok(match, `expected LandingHero ${propName} array`)
+  return match[1]
+}
+
+function extractLandingActions(content) {
+  return [...extractLandingArray(content, 'actions').matchAll(/href:\s*"([^"]+)"/g)].map(([, href]) => href)
+}
+
+function extractLandingGuides(content) {
+  return [...extractLandingArray(content, 'guides').matchAll(/href:\s*"([^"]+)"/g)].map(([, href]) => href)
+}
+
+function extractLandingMetricValues(content) {
+  return [...extractLandingArray(content, 'metrics').matchAll(/value:\s*"([^"]+)"/g)].map(([, value]) => value)
+}
+
+function extractSectionIndexLinkGroups(content) {
+  return [...content.matchAll(/<SectionIndex\b[\s\S]*?\/?>/g)].map(([block]) => {
+    return [...block.matchAll(/href:\s*"([^"]+)"/g)].map(([, href]) => href)
+  })
+}
+
+function countModuleMapRows(content, startHeading, endHeading) {
+  const escapedStart = startHeading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const escapedEnd = endHeading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const sectionMatch = content.match(new RegExp(`## ${escapedStart}[\\s\\S]*?## ${escapedEnd}`))
+
+  assert.ok(sectionMatch, `expected section between ${startHeading} and ${endHeading}`)
+
+  return [...sectionMatch[0].matchAll(/^\| (?:0[1-9]|[1-9][0-9]*)\./gm)].length
 }
 
 function normalizeHeroLink(href) {
@@ -30,63 +59,61 @@ function normalizeHeroLink(href) {
   return href.replace(/^\/(?:en|zh)(?=\/|$)/, '') || '/'
 }
 
-async function renderComponent(relativePath, props) {
-  const source = read(relativePath)
-  const { descriptor } = parse(source, { filename: relativePath })
-  const script = compileScript(descriptor, {
-    id: relativePath,
-    inlineTemplate: false,
-  })
+async function loadSfcComponent(relativePath) {
+  const filename = path.join(themeDir, relativePath)
+  const source = fs.readFileSync(filename, 'utf8')
+  const { descriptor } = parse(source, { filename })
+  const script = compileScript(descriptor, { id: relativePath })
   const template = compileTemplate({
     id: relativePath,
+    filename,
     source: descriptor.template.content,
-    filename: relativePath,
-  })
-  const moduleSource = `${script.content
-    .replace(/^type\s+\w+\s*=\s*\{[\s\S]*?^\}\n*/gm, '')
-    .replace(/__props:\s*any/g, '__props')
-    .replace('export default', 'const component =')}
-${template.code.replace('export function render', 'function render')}
-component.render = render
-export default component`
-    .replaceAll("'vue'", `'${vueModuleUrl}'`)
-    .replaceAll('"vue"', `"${vueModuleUrl}"`)
-  const dataUrl = `data:text/javascript;base64,${Buffer.from(moduleSource).toString('base64')}`
-  const { default: component } = await import(dataUrl)
-  const app = createSSRApp(component, props)
-  app.component('BaseAwareLink', {
-    props: ['href'],
-    setup(linkProps, { slots, attrs }) {
-      return () => h('a', { ...attrs, href: linkProps.href }, slots.default?.())
+    compilerOptions: {
+      bindingMetadata: script.bindings,
     },
   })
-  return renderToString(app)
+
+  const combined = [
+    script.content.replace('export default', 'const __sfc__ ='),
+    template.code,
+    'const __component__ = __sfc__',
+    '__component__.render = render',
+    'export default __component__',
+  ].join('\n')
+
+  const transformed = await transformWithEsbuild(combined, filename, {
+    loader: 'ts',
+    format: 'esm',
+    target: 'es2022',
+  })
+
+  const moduleSource = transformed.code.replace(/from\s+['"]vue['"]/g, `from '${vueModuleUrl}'`)
+  return import(`data:text/javascript;charset=utf-8,${encodeURIComponent(moduleSource)}`)
 }
 
 test('style.css keeps tokenized selectors for the live homepage, Mermaid, and SVG surfaces', () => {
   const css = read('style.css')
+  const colorTokens = read('tokens/colors.css')
 
   for (const token of [
     '--wp-paper-1',
     '--wp-ink-1',
-    '--wp-panel-bg',
-    '--wp-figure-bg',
-    '--wp-meta-bg',
-    '--wp-section-index-bg',
-    '--wp-section-index-border',
+    '--wp-surface-figure',
+    '--wp-surface-meta',
+    '--wp-surface-section-index',
+    '--wp-surface-reference',
+    '--wp-line-1',
     '--wp-surface-1',
     '--wp-surface-2',
-    '--wp-surface-section-index',
     '--wp-pill-bg',
     '--wp-diagram-stroke',
     '--wp-icon-muted',
   ]) {
-    assert.match(css, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+    assert.match(colorTokens, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
   for (const selector of [
-    '.wp-hero',
-    '.wp-metric-strip',
+    '.landing-hero',
     '.wp-section-index',
     '.wp-figure-shell',
     '.wp-meta-strip',
@@ -110,6 +137,15 @@ test('style.css suppresses VitePress built-in translation widgets in favor of th
   }
 })
 
+test('style.css includes dedicated nav-density selectors for the redesigned homepage', () => {
+  const css = read('style.css')
+
+  assert.match(css, /\.VPNavBarMenu\s*\{[\s\S]*?gap:\s*clamp\(0\.45rem,\s*1vw,\s*1rem\);/)
+  assert.match(css, /\.VPNavBarMenuLink,[\s\S]*?\.VPNavBarMenuGroup \.button\s*\{[\s\S]*?font-size:\s*0\.94rem;/)
+  assert.match(css, /\.VPNavBarExtra\s*\{[\s\S]*?gap:\s*0\.55rem;/)
+  assert.match(css, /\.landing-hero__shell\s*\{/) 
+})
+
 test('language switcher markup keeps native navigation when JavaScript is unavailable', () => {
   const switcher = read('LanguageSwitcher.vue')
 
@@ -125,8 +161,12 @@ test('language switcher markup keeps native navigation when JavaScript is unavai
 test('theme index wires only the active language chrome', () => {
   const themeIndex = read('index.ts')
 
-  for (const componentName of ['BaseAwareLink', 'LanguageRedirect', 'LanguageSwitcher', 'SectionHero', 'MetricStrip', 'SectionIndex']) {
+  for (const componentName of ['BaseAwareLink', 'LanguageRedirect', 'LanguageSwitcher', 'LandingHero', 'SectionIndex']) {
     assert.match(themeIndex, new RegExp(componentName))
+  }
+
+  for (const componentName of ['SectionHero', 'MetricStrip']) {
+    assert.doesNotMatch(themeIndex, new RegExp(componentName))
   }
 })
 
@@ -136,63 +176,19 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   const zhIndex = fs.readFileSync(path.join(docsRoot, 'zh', 'index.md'), 'utf8')
 
   for (const content of [enIndex, zhIndex]) {
-    assert.match(content, /<SectionHero\b/)
-    assert.match(content, /<MetricStrip\b/)
+    assert.match(content, /<LandingHero\b/)
     assert.match(content, /<SectionIndex\b/)
+    assert.doesNotMatch(content, /<SectionHero\b/)
+    assert.doesNotMatch(content, /<MetricStrip\b/)
     assert.doesNotMatch(content, /class="home-header"/)
     assert.doesNotMatch(content, /class="home-intro-row"/)
     assert.doesNotMatch(content, /class="feature-map"/)
   }
 
-  assert.match(enIndex, /title="C\+\+ High Performance Guide"/)
-  assert.match(enIndex, /This repository treats performance advice as something to compile, test, benchmark, and falsify\./)
-  assert.match(enIndex, /title="Quick Start"/)
-  assert.match(zhIndex, /title="C\+\+ 高性能指南"/)
-  assert.match(zhIndex, /这个仓库把性能建议视为必须能够编译、测试、基准比较并被证伪的对象。/)
-  assert.match(zhIndex, /title="快速开始"/)
-  assert.match(enIndex, /links-aria-label="Landing page links"/)
-  assert.match(enIndex, /aria-label="Project metrics"/)
-  assert.match(zhIndex, /links-aria-label="落地页链接"/)
-  assert.match(zhIndex, /aria-label="项目指标"/)
-  assert.match(read('SectionHero.vue'), /BaseAwareLink/)
-  assert.match(read('SectionIndex.vue'), /BaseAwareLink/)
-
-  for (const href of [
-    '/en/reference/',
-    '/en/getting-started/quickstart',
-    '/en/guides/learning-path',
-    '/en/exercises/module-02-memory',
-    '/en/exercises/module-04-simd',
-    '/en/exercises/module-05-concurrency',
-    '/en/getting-started/prerequisites',
-    '/en/guides/profiling-guide',
-    '/en/guides/optimization-decision-tree',
-    '/en/guides/validation',
-    '/en/guides/best-practices',
-    '/zh/',
-  ]) {
-    assert.match(enIndex, new RegExp(`href: "${href.replaceAll('/', '\\/')}"`))
-  }
-
-  for (const href of [
-    '/zh/reference/',
-    '/zh/getting-started/quickstart',
-    '/zh/guides/learning-path',
-    '/en/exercises/module-02-memory',
-    '/en/exercises/module-04-simd',
-    '/en/exercises/module-05-concurrency',
-    '/zh/getting-started/prerequisites',
-    '/zh/guides/profiling-guide',
-    '/zh/guides/optimization-decision-tree',
-    '/zh/guides/validation',
-    '/zh/guides/best-practices',
-    '/en/',
-  ]) {
-    assert.match(zhIndex, new RegExp(`href: "${href.replaceAll('/', '\\/')}"`))
-  }
-
   assert.match(enIndex, /<BaseAwareLink href="\/en\/getting-started\/quickstart">Quick Start guide<\/BaseAwareLink>/)
   assert.match(zhIndex, /<BaseAwareLink href="\/zh\/getting-started\/quickstart">快速开始指南<\/BaseAwareLink>/)
+  assert.match(enIndex, /:actions='/)
+  assert.match(zhIndex, /:actions='/)
   assert.doesNotMatch(enIndex, /href: "\.\//)
   assert.doesNotMatch(enIndex, /href: "\.\.\//)
   assert.doesNotMatch(zhIndex, /href: "\.\//)
@@ -201,32 +197,101 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   assert.doesNotMatch(zhIndex, /<a href="\/zh\//)
 })
 
-test('shared landing components render localized aria labels', async () => {
-  const heroHtml = await renderComponent('SectionHero.vue', {
-    title: 'C++ 高性能指南',
-    intro: '一份实用的 C++20 指南。',
-    linksAriaLabel: '落地页链接',
-    links: [{ href: '../en/', label: 'English' }],
-  })
-  const metricHtml = await renderComponent('MetricStrip.vue', {
-    ariaLabel: '项目指标',
-    items: [{ value: '双语', label: '文档' }],
-  })
-
-  assert.match(heroHtml, /aria-label="落地页链接"/)
-  assert.doesNotMatch(heroHtml, /aria-label="Landing page links"/)
-  assert.match(metricHtml, /<section\b/)
-  assert.match(metricHtml, /aria-label="项目指标"/)
-  assert.doesNotMatch(metricHtml, /aria-label="Project metrics"/)
-})
-
-test('bilingual landing pages promote equivalent hero links', () => {
+test('bilingual landing pages promote equivalent landing actions', () => {
   const docsRoot = path.resolve(themeDir, '..', '..')
   const enIndex = fs.readFileSync(path.join(docsRoot, 'en', 'index.md'), 'utf8')
   const zhIndex = fs.readFileSync(path.join(docsRoot, 'zh', 'index.md'), 'utf8')
 
-  const enHeroLinks = extractHeroLinks(enIndex).map(normalizeHeroLink)
-  const zhHeroLinks = extractHeroLinks(zhIndex).map(normalizeHeroLink)
+  assert.deepEqual(
+    extractLandingActions(zhIndex).map(normalizeHeroLink),
+    extractLandingActions(enIndex).map(normalizeHeroLink),
+  )
+})
 
-  assert.deepEqual(zhHeroLinks, enHeroLinks)
+test('bilingual landing pages keep equivalent guide routes and summary metrics', () => {
+  const docsRoot = path.resolve(themeDir, '..', '..')
+  const enIndex = fs.readFileSync(path.join(docsRoot, 'en', 'index.md'), 'utf8')
+  const zhIndex = fs.readFileSync(path.join(docsRoot, 'zh', 'index.md'), 'utf8')
+
+  assert.deepEqual(
+    extractLandingGuides(zhIndex).map(normalizeHeroLink),
+    extractLandingGuides(enIndex).map(normalizeHeroLink),
+  )
+
+  assert.deepEqual(extractLandingMetricValues(zhIndex), extractLandingMetricValues(enIndex))
+})
+
+test('bilingual landing pages keep equivalent section index routes and module map rows', () => {
+  const docsRoot = path.resolve(themeDir, '..', '..')
+  const enIndex = fs.readFileSync(path.join(docsRoot, 'en', 'index.md'), 'utf8')
+  const zhIndex = fs.readFileSync(path.join(docsRoot, 'zh', 'index.md'), 'utf8')
+
+  const enSectionIndexGroups = extractSectionIndexLinkGroups(enIndex)
+  const zhSectionIndexGroups = extractSectionIndexLinkGroups(zhIndex)
+
+  assert.equal(enSectionIndexGroups.length, 2)
+  assert.equal(zhSectionIndexGroups.length, 2)
+  assert.deepEqual(
+    zhSectionIndexGroups.map(group => group.map(normalizeHeroLink)),
+    enSectionIndexGroups.map(group => group.map(normalizeHeroLink)),
+  )
+
+  assert.equal(countModuleMapRows(enIndex, 'Module map', 'Expert reader callouts'), 5)
+  assert.equal(countModuleMapRows(zhIndex, '模块地图', '面向熟练读者的提示'), 5)
+})
+
+test('LandingHero renders split hero props and base-aware links through shared link nodes', async () => {
+  const { default: LandingHero } = await loadSfcComponent('LandingHero.vue')
+
+  const app = createSSRApp({
+    render() {
+      return h(LandingHero, {
+        badge: 'Updated for 2026',
+        title: 'Learn modern C++',
+        titleAccent: 'systematically',
+        subtitle: 'A practical path from foundations to validation.',
+        intro: 'Use the guided module sequence, then branch into reference material.',
+        actionsAriaLabel: 'Primary learning actions',
+        actions: [
+          { href: '/en/getting-started/quickstart', label: 'Start here', primary: true },
+          { href: '/en/reference/', label: 'Browse references' },
+        ],
+        guidesAriaLabel: 'Recommended guide sequence',
+        guides: [
+          {
+            href: '/en/guides/learning-path',
+            title: 'Learn the module sequence',
+            description: 'Follow the staged reading order.',
+          },
+        ],
+        metricsAriaLabel: 'Learning metrics',
+        metrics: [
+          { value: '12+', label: 'Core modules' },
+          { value: '3', label: 'Practice tracks' },
+        ],
+      })
+    },
+  })
+
+  app.component('BaseAwareLink', {
+    props: {
+      href: {
+        type: String,
+        required: true,
+      },
+    },
+    setup(props, { slots, attrs }) {
+      return () => h('a', { ...attrs, href: `resolved:${props.href}` }, slots.default?.())
+    },
+  })
+
+  const html = await renderToString(app)
+
+  assert.match(html, /Primary learning actions/)
+  assert.match(html, /Recommended guide sequence/)
+  assert.match(html, /Learning metrics/)
+  assert.match(html, /Learn the module sequence/)
+  assert.match(html, /href="resolved:\/en\/getting-started\/quickstart"/)
+  assert.match(html, /href="resolved:\/en\/guides\/learning-path"/)
+  assert.match(html, /class="landing-hero__guide-title"/)
 })

@@ -63,8 +63,28 @@ test('landing page states the stronger thesis and validation ladder', () => {
 
   assert.match(content, /performance advice as something to compile, test, benchmark, and falsify/i)
   assert.match(content, /debug→ubsan/)
+  assert.match(content, /## Who should read this guide\?/) 
+  assert.match(content, /## Recommended study path/)
+  assert.match(content, /## First-run route/)
   assert.match(content, /Validation claims/)
   assert.match(content, /Expert reader callouts/)
+})
+
+test('homepages expose the new learning-first whitepaper headings in both languages', () => {
+  const enContent = read('en/index.md')
+  const zhContent = read('zh/index.md')
+
+  for (const heading of [
+    '## Who should read this guide?',
+    '## Recommended study path',
+    '## First-run route',
+  ]) {
+    assert.match(enContent, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
+
+  for (const heading of ['## 这份指南适合谁？', '## 建议学习顺序', '## 首次运行路线']) {
+    assert.match(zhContent, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
 })
 
 test('architecture pages describe preset-driven validation and profiling methodology', () => {

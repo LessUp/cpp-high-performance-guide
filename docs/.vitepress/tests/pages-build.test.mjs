@@ -14,6 +14,12 @@ const distRoot = path.resolve(docsRoot, '.vitepress', 'dist')
 
 const cachedLandingPages = new Map()
 
+function extractLandingHeroSection(html) {
+  const heroMatch = html.match(/<section class="landing-hero"[\s\S]*?<\/section>/)
+  assert.ok(heroMatch, 'expected built homepage LandingHero section')
+  return heroMatch[0]
+}
+
 function readBuiltLandingPages(base = '/cpp-high-performance-guide/') {
   if (!cachedLandingPages.has(base)) {
     const result = spawnSync(process.execPath, [buildPagesScriptPath], {
@@ -58,6 +64,8 @@ test('build:pages uses a cross-platform Node wrapper while preserving external b
 
 test('build:pages prefixes homepage landing links with the GitHub Pages base and .html leaf routes', () => {
   const { en, zh } = readBuiltLandingPages()
+  const enHero = extractLandingHeroSection(en)
+  const zhHero = extractLandingHeroSection(zh)
 
   for (const href of [
     '/cpp-high-performance-guide/en/reference/',
@@ -80,6 +88,20 @@ test('build:pages prefixes homepage landing links with the GitHub Pages base and
   ]) {
     assert.match(zh, new RegExp(`href="${href.replaceAll('/', '\\/')}"`))
   }
+
+  assert.match(enHero, /href="\/cpp-high-performance-guide\/en\/getting-started\/quickstart(?:\.html)?"/)
+  assert.match(enHero, /href="\/cpp-high-performance-guide\/en\/academy\/"/)
+  assert.match(enHero, /href="\/cpp-high-performance-guide\/en\/academy\/module-atlas(?:\.html)?"/)
+  assert.match(enHero, /href="\/cpp-high-performance-guide\/en\/academy\/validation-doctrine(?:\.html)?"/)
+  assert.match(enHero, /href="\/cpp-high-performance-guide\/en\/architecture\/performance-methodology(?:\.html)?"/)
+  assert.doesNotMatch(enHero, /href="\/(?:en|zh)\//)
+
+  assert.match(zhHero, /href="\/cpp-high-performance-guide\/zh\/getting-started\/quickstart(?:\.html)?"/)
+  assert.match(zhHero, /href="\/cpp-high-performance-guide\/zh\/academy\/"/)
+  assert.match(zhHero, /href="\/cpp-high-performance-guide\/zh\/academy\/module-atlas(?:\.html)?"/)
+  assert.match(zhHero, /href="\/cpp-high-performance-guide\/zh\/academy\/validation-doctrine(?:\.html)?"/)
+  assert.match(zhHero, /href="\/cpp-high-performance-guide\/zh\/architecture\/performance-methodology(?:\.html)?"/)
+  assert.doesNotMatch(zhHero, /href="\/(?:en|zh)\//)
 
   for (const rawHref of [
     'href="/en/reference/"',
