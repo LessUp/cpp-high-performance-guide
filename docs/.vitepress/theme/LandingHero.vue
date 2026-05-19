@@ -38,11 +38,10 @@ const props = withDefaults(defineProps<{
 })
 
 const isVisible = ref(false)
-
 const actionItems = props.actions ?? props.links ?? []
 
 onMounted(() => {
-  // Trigger entrance animation after mount
+  // Trigger entrance animation after mount.
   requestAnimationFrame(() => {
     setTimeout(() => {
       isVisible.value = true
@@ -86,8 +85,18 @@ onMounted(() => {
             :class="{ 'landing-hero__cta--primary': action.primary }"
           >
             {{ action.label }}
-            <svg v-if="action.primary" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
+            <svg
+              v-if="action.primary"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </BaseAwareLink>
         </nav>

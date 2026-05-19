@@ -16,6 +16,21 @@ function read(relativePath) {
   return fs.readFileSync(path.join(themeDir, relativePath), 'utf8')
 }
 
+function readAllCss() {
+  const mainCss = read('style.css')
+  const tokensDir = path.join(themeDir, 'tokens')
+  let allCss = mainCss
+
+  if (fs.existsSync(tokensDir)) {
+    const tokenFiles = fs.readdirSync(tokensDir).filter(file => file.endsWith('.css'))
+    for (const file of tokenFiles) {
+      allCss += `\n${fs.readFileSync(path.join(tokensDir, file), 'utf8')}`
+    }
+  }
+
+  return allCss
+}
+
 function extractLandingArray(content, propName) {
   const match = content.match(new RegExp(`:${propName}='\\[(.*?)\\]'`, 's'))
 
@@ -92,8 +107,7 @@ async function loadSfcComponent(relativePath) {
 }
 
 test('style.css keeps tokenized selectors for the live homepage, Mermaid, and SVG surfaces', () => {
-  const css = read('style.css')
-  const colorTokens = read('tokens/colors.css')
+  const css = readAllCss()
 
   for (const token of [
     '--wp-paper-1',
@@ -109,7 +123,7 @@ test('style.css keeps tokenized selectors for the live homepage, Mermaid, and SV
     '--wp-diagram-stroke',
     '--wp-icon-muted',
   ]) {
-    assert.match(colorTokens, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+    assert.match(css, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
   for (const selector of [
@@ -187,6 +201,7 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
 
   assert.match(enIndex, /<BaseAwareLink href="\/en\/getting-started\/quickstart">Quick Start guide<\/BaseAwareLink>/)
   assert.match(zhIndex, /<BaseAwareLink href="\/zh\/getting-started\/quickstart">快速开始指南<\/BaseAwareLink>/)
+  assert.match(read('SectionIndex.vue'), /BaseAwareLink/)
   assert.match(enIndex, /:actions='/)
   assert.match(zhIndex, /:actions='/)
   assert.doesNotMatch(enIndex, /href: "\.\//)
