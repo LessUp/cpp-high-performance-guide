@@ -123,6 +123,23 @@
     color: var(--wp-accent-primary);
   }
 
+  .VPNavBarMenu {
+    gap: clamp(0.45rem, 1vw, 1rem);
+  }
+
+  .VPNavBarMenuLink,
+  .VPNavBarMenuGroup .button {
+    font-size: 0.94rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .VPNavBarExtra {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
   /* === Sidebar === */
   .VPSidebar {
     background: var(--wp-paper-2);
@@ -1183,10 +1200,9 @@
   /* === Landing Hero Component === */
   .landing-hero {
     position: relative;
-    min-height: 85vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    min-height: min(85vh, 56rem);
+    display: grid;
+    align-items: center;
     padding: var(--wp-space-8) 0;
     overflow: hidden;
   }
@@ -1222,29 +1238,52 @@
     filter: blur(80px);
   }
 
-  .landing-hero__content {
+  .landing-hero__shell {
     position: relative;
     z-index: 1;
-    max-width: 56rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 1fr);
+    gap: var(--wp-space-6);
+    align-items: start;
+  }
+
+  .landing-hero__content,
+  .landing-hero__rail {
+    display: grid;
+    align-content: start;
+  }
+
+  .landing-hero__content {
+    gap: var(--wp-space-4);
+    max-width: 42rem;
+  }
+
+  .landing-hero__rail {
+    gap: var(--wp-space-4);
   }
 
   .landing-hero__badge {
     display: inline-flex;
     align-items: center;
-    gap: var(--wp-space-2);
-    padding: 0.35rem 0.85rem;
+    justify-self: start;
+    max-width: 100%;
+    min-height: 2rem;
+    padding: 0.4rem 0.9rem;
     border-radius: var(--wp-radius-full);
-    background: var(--wp-accent-soft);
+    border: 1px solid color-mix(in oklch, var(--wp-accent-primary) 22%, var(--wp-line-1));
+    background: color-mix(in oklch, var(--wp-paper-1) 82%, var(--wp-accent-primary) 8%);
     color: var(--wp-accent-primary);
     font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
     text-transform: uppercase;
-    margin-bottom: var(--wp-space-5);
   }
 
   .landing-hero__title {
-    margin: 0 0 var(--wp-space-4);
+    display: grid;
+    gap: 0.15em;
+    margin: 0;
     font-size: clamp(2.5rem, 6vw, 4rem);
     font-weight: 800;
     line-height: 1.05;
@@ -1252,35 +1291,33 @@
   }
 
   .landing-hero__title-accent {
-    background: linear-gradient(
-      135deg,
-      var(--wp-accent-primary) 0%,
-      var(--wp-accent-secondary) 50%,
-      var(--wp-accent-tertiary) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--wp-accent-primary);
   }
 
   .landing-hero__subtitle {
-    margin: 0 0 var(--wp-space-6);
+    margin: 0;
     color: var(--wp-ink-2);
     font-size: clamp(1.1rem, 2vw, 1.35rem);
-    line-height: 1.6;
-    max-width: 40rem;
+    line-height: 1.55;
+  }
+
+  .landing-hero__intro {
+    margin: 0;
+    color: var(--wp-ink-3);
+    font-size: 1rem;
+    line-height: 1.8;
   }
 
   .landing-hero__actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--wp-space-3);
-    margin-bottom: var(--wp-space-8);
   }
 
   .landing-hero__cta {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--wp-space-2);
     padding: 0.7rem 1.25rem;
     border-radius: var(--wp-radius-2);
@@ -1291,11 +1328,7 @@
   }
 
   .landing-hero__cta--primary {
-    background: linear-gradient(
-      135deg,
-      var(--wp-accent-primary) 0%,
-      var(--wp-accent-secondary) 100%
-    );
+    background: var(--wp-accent-primary);
     color: white;
     box-shadow: var(--wp-shadow-2);
   }
@@ -1307,7 +1340,7 @@
 
   .landing-hero__cta:not(.landing-hero__cta--primary) {
     border: 1px solid var(--wp-line-2);
-    background: var(--wp-paper-1);
+    background: color-mix(in oklch, var(--wp-paper-1) 90%, var(--wp-paper-2));
     color: var(--wp-ink-2);
   }
 
@@ -1316,27 +1349,74 @@
     color: var(--wp-accent-primary);
   }
 
+  .landing-hero__guides,
   .landing-hero__metrics {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--wp-space-6);
+    display: grid;
+    gap: var(--wp-space-3);
+  }
+
+  .landing-hero__guide,
+  .landing-hero__metric {
+    display: grid;
+    gap: var(--wp-space-1);
+    padding: var(--wp-space-4);
+    border: 1px solid var(--wp-line-1);
+    border-radius: var(--wp-radius-2);
+    background: color-mix(in oklch, var(--wp-surface-1) 92%, var(--wp-paper-1));
+    box-shadow: var(--wp-shadow-card);
+    text-decoration: none;
+    transition:
+      border-color var(--wp-transition-fast),
+      box-shadow var(--wp-transition-fast),
+      transform var(--wp-transition-fast),
+      background-color var(--wp-transition-slow);
+  }
+
+  .landing-hero__guide:hover {
+    border-color: color-mix(in oklch, var(--wp-accent-primary) 42%, var(--wp-line-2));
+    transform: translateY(-2px);
+    box-shadow: var(--wp-shadow-2);
+  }
+
+  .dark .landing-hero__guide:hover {
+    box-shadow: var(--wp-shadow-glow);
+  }
+
+  .landing-hero__guide-title {
+    color: var(--wp-ink-1);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .landing-hero__guide-description {
+    color: var(--wp-ink-2);
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+
+  .landing-hero__metrics {
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   }
 
   .landing-hero__metric {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp-space-1);
+    flex-wrap: wrap;
+    align-content: start;
   }
 
   .landing-hero__metric-value {
+    margin: 0;
     font-size: 1.5rem;
     font-weight: 800;
     color: var(--wp-ink-1);
+    line-height: 1.1;
   }
 
   .landing-hero__metric-label {
+    margin: 0;
     font-size: 0.85rem;
     color: var(--wp-ink-3);
+    line-height: 1.5;
   }
 
   /* Landing Hero Animations */
@@ -1627,6 +1707,10 @@
       min-height: auto;
       padding: var(--wp-space-6) 0;
     }
+
+    .landing-hero__shell {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 720px) {
@@ -1657,13 +1741,12 @@
     }
 
     .landing-hero__cta {
-      justify-content: center;
       width: 100%;
     }
 
+    .landing-hero__guides,
     .landing-hero__metrics {
-      flex-direction: column;
-      gap: var(--wp-space-4);
+      grid-template-columns: 1fr;
     }
   }
 
