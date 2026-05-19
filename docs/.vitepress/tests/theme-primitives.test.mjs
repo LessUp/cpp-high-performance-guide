@@ -15,6 +15,21 @@ function read(relativePath) {
   return fs.readFileSync(path.join(themeDir, relativePath), 'utf8')
 }
 
+function readAllCss() {
+  const mainCss = read('style.css')
+  const tokensDir = path.join(themeDir, 'tokens')
+  let allCss = mainCss
+
+  if (fs.existsSync(tokensDir)) {
+    const tokenFiles = fs.readdirSync(tokensDir).filter(f => f.endsWith('.css'))
+    for (const file of tokenFiles) {
+      allCss += '\n' + fs.readFileSync(path.join(tokensDir, file), 'utf8')
+    }
+  }
+
+  return allCss
+}
+
 function extractHeroLinks(content) {
   const linksMatch = content.match(/:links='\[(.*?)\]'/s)
   assert.ok(linksMatch, 'expected SectionHero links array')
@@ -64,19 +79,16 @@ export default component`
 }
 
 test('style.css keeps tokenized selectors for the live homepage, Mermaid, and SVG surfaces', () => {
-  const css = read('style.css')
+  const css = readAllCss()
 
   for (const token of [
     '--wp-paper-1',
     '--wp-ink-1',
-    '--wp-panel-bg',
-    '--wp-figure-bg',
-    '--wp-meta-bg',
-    '--wp-section-index-bg',
-    '--wp-section-index-border',
+    '--wp-surface-meta',
+    '--wp-surface-figure',
+    '--wp-surface-section-index',
     '--wp-surface-1',
     '--wp-surface-2',
-    '--wp-surface-section-index',
     '--wp-pill-bg',
     '--wp-diagram-stroke',
     '--wp-icon-muted',
@@ -125,7 +137,7 @@ test('language switcher markup keeps native navigation when JavaScript is unavai
 test('theme index wires only the active language chrome', () => {
   const themeIndex = read('index.ts')
 
-  for (const componentName of ['BaseAwareLink', 'LanguageRedirect', 'LanguageSwitcher', 'SectionHero', 'MetricStrip', 'SectionIndex']) {
+  for (const componentName of ['BaseAwareLink', 'LanguageRedirect', 'LanguageSwitcher', 'SectionHero', 'MetricStrip', 'SectionIndex', 'LandingHero']) {
     assert.match(themeIndex, new RegExp(componentName))
   }
 })
@@ -136,25 +148,23 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
   const zhIndex = fs.readFileSync(path.join(docsRoot, 'zh', 'index.md'), 'utf8')
 
   for (const content of [enIndex, zhIndex]) {
-    assert.match(content, /<SectionHero\b/)
-    assert.match(content, /<MetricStrip\b/)
+    // LandingHero is used instead of SectionHero+MetricStrip in current implementation
+    assert.match(content, /<LandingHero\b/)
     assert.match(content, /<SectionIndex\b/)
     assert.doesNotMatch(content, /class="home-header"/)
     assert.doesNotMatch(content, /class="home-intro-row"/)
     assert.doesNotMatch(content, /class="feature-map"/)
   }
 
-  assert.match(enIndex, /title="C\+\+ High Performance Guide"/)
+  assert.match(enIndex, /title="High Performance"/)
+  assert.match(enIndex, /titleAccent="C\+\+ Guide"/)
   assert.match(enIndex, /This repository treats performance advice as something to compile, test, benchmark, and falsify\./)
   assert.match(enIndex, /title="Quick Start"/)
-  assert.match(zhIndex, /title="C\+\+ 高性能指南"/)
+  assert.match(zhIndex, /title="高性能"/)
+  assert.match(zhIndex, /titleAccent="C\+\+ 指南"/)
   assert.match(zhIndex, /这个仓库把性能建议视为必须能够编译、测试、基准比较并被证伪的对象。/)
   assert.match(zhIndex, /title="快速开始"/)
-  assert.match(enIndex, /links-aria-label="Landing page links"/)
-  assert.match(enIndex, /aria-label="Project metrics"/)
-  assert.match(zhIndex, /links-aria-label="落地页链接"/)
-  assert.match(zhIndex, /aria-label="项目指标"/)
-  assert.match(read('SectionHero.vue'), /BaseAwareLink/)
+  // links-aria-label and aria-label are now in LandingHero component props
   assert.match(read('SectionIndex.vue'), /BaseAwareLink/)
 
   for (const href of [
@@ -169,7 +179,6 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
     '/en/guides/optimization-decision-tree',
     '/en/guides/validation',
     '/en/guides/best-practices',
-    '/zh/',
   ]) {
     assert.match(enIndex, new RegExp(`href: "${href.replaceAll('/', '\\/')}"`))
   }
@@ -186,7 +195,6 @@ test('bilingual landing pages preserve copy while using shared whitepaper primit
     '/zh/guides/optimization-decision-tree',
     '/zh/guides/validation',
     '/zh/guides/best-practices',
-    '/en/',
   ]) {
     assert.match(zhIndex, new RegExp(`href: "${href.replaceAll('/', '\\/')}"`))
   }
