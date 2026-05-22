@@ -12,7 +12,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "simd_utils.hpp"
+#include <hpc/simd.hpp>
 
 // Include SIMD headers based on availability
 #ifdef HPC_HAS_SSE2
@@ -253,7 +253,7 @@ float dot_product_avx512(const float* a, const float* b, size_t n) {
 // Unified interface with runtime dispatch
 // ============================================================================
 
-void add_arrays(const float* a, const float* b, float* c, size_t n) {
+void demo_add_arrays(const float* a, const float* b, float* c, size_t n) {
 #ifdef HPC_HAS_AVX512
     add_arrays_avx512(a, b, c, n);
 #elif defined(HPC_HAS_AVX2)
@@ -265,7 +265,7 @@ void add_arrays(const float* a, const float* b, float* c, size_t n) {
 #endif
 }
 
-void multiply_arrays(const float* a, const float* b, float* c, size_t n) {
+void demo_multiply_arrays(const float* a, const float* b, float* c, size_t n) {
 #ifdef HPC_HAS_AVX512
     multiply_arrays_avx512(a, b, c, n);
 #elif defined(HPC_HAS_AVX2)
@@ -277,7 +277,7 @@ void multiply_arrays(const float* a, const float* b, float* c, size_t n) {
 #endif
 }
 
-float dot_product(const float* a, const float* b, size_t n) {
+float demo_dot_product(const float* a, const float* b, size_t n) {
 #ifdef HPC_HAS_AVX512
     return dot_product_avx512(a, b, n);
 #elif defined(HPC_HAS_AVX2)
@@ -347,7 +347,7 @@ void demonstrate_intrinsics() {
 
     // Verify correctness
     float scalar_result = dot_product_scalar(a.data(), b.data(), N);
-    float simd_result = dot_product(a.data(), b.data(), N);
+    float simd_result = demo_dot_product(a.data(), b.data(), N);
     std::cout << std::endl << "Correctness check:" << std::endl;
     std::cout << "Scalar dot product: " << scalar_result << std::endl;
     std::cout << "SIMD dot product:   " << simd_result << std::endl;

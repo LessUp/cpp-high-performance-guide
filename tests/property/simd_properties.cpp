@@ -20,8 +20,7 @@
 #include <random>
 #include <vector>
 
-// Include SIMD wrapper
-#include "simd_wrapper.hpp"
+#include <hpc/simd.hpp>
 
 namespace {
 
