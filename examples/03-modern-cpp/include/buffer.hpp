@@ -86,6 +86,7 @@ public:
     }
 
     size_t size() const { return size_; }
+    bool empty() const { return size_ == 0 || data_ == nullptr; }
     char* data() { return data_; }
     const char* data() const { return data_; }
 
@@ -104,6 +105,15 @@ private:
     }
 };
 
+inline void observe_buffer(const Buffer& buf) {
+    if (buf.empty()) {
+        return;
+    }
+
+    volatile char c = buf.data()[0];
+    (void)c;
+}
+
 //------------------------------------------------------------------------------
 // Functions demonstrating copy vs move
 //------------------------------------------------------------------------------
@@ -112,18 +122,14 @@ private:
  * @brief Process buffer by copy (expensive)
  */
 inline void process_by_copy(Buffer buf) {
-    // Do something with buf
-    volatile char c = buf.data()[0];
-    (void)c;
+    observe_buffer(buf);
 }
 
 /**
  * @brief Process buffer by const reference (no copy)
  */
 inline void process_by_ref(const Buffer& buf) {
-    // Do something with buf
-    volatile char c = buf.data()[0];
-    (void)c;
+    observe_buffer(buf);
 }
 
 }  // namespace hpc::move_semantics

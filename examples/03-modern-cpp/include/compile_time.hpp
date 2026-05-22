@@ -26,7 +26,7 @@ namespace hpc::compile_time {
 /**
  * @brief Runtime factorial (for comparison)
  */
-int64_t factorial_runtime(int n) {
+inline int64_t factorial_runtime(int n) {
     int64_t result = 1;
     for (int i = 2; i <= n; ++i) {
         result *= i;

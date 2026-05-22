@@ -29,7 +29,7 @@ namespace hpc::ranges {
 /**
  * @brief Transform using raw loop
  */
-void transform_raw_loop(const std::vector<int>& input, std::vector<int>& output) {
+inline void transform_raw_loop(const std::vector<int>& input, std::vector<int>& output) {
     output.resize(input.size());
     for (size_t i = 0; i < input.size(); ++i) {
         output[i] = input[i] * 2 + 1;
@@ -39,7 +39,7 @@ void transform_raw_loop(const std::vector<int>& input, std::vector<int>& output)
 /**
  * @brief Transform using std::transform
  */
-void transform_algorithm(const std::vector<int>& input, std::vector<int>& output) {
+inline void transform_algorithm(const std::vector<int>& input, std::vector<int>& output) {
     output.resize(input.size());
     std::transform(input.begin(), input.end(), output.begin(), [](int x) { return x * 2 + 1; });
 }
@@ -47,7 +47,7 @@ void transform_algorithm(const std::vector<int>& input, std::vector<int>& output
 /**
  * @brief Transform using ranges
  */
-void transform_ranges(const std::vector<int>& input, std::vector<int>& output) {
+inline void transform_ranges(const std::vector<int>& input, std::vector<int>& output) {
     output.resize(input.size());
     std::ranges::transform(input, output.begin(), [](int x) { return x * 2 + 1; });
 }
@@ -59,7 +59,7 @@ void transform_ranges(const std::vector<int>& input, std::vector<int>& output) {
 /**
  * @brief Filter using raw loop
  */
-std::vector<int> filter_raw_loop(const std::vector<int>& input) {
+inline std::vector<int> filter_raw_loop(const std::vector<int>& input) {
     std::vector<int> output;
     output.reserve(input.size() / 2);  // Estimate
     for (int x : input) {
@@ -73,7 +73,7 @@ std::vector<int> filter_raw_loop(const std::vector<int>& input) {
 /**
  * @brief Filter using std::copy_if
  */
-std::vector<int> filter_algorithm(const std::vector<int>& input) {
+inline std::vector<int> filter_algorithm(const std::vector<int>& input) {
     std::vector<int> output;
     output.reserve(input.size() / 2);
     std::copy_if(input.begin(), input.end(), std::back_inserter(output),
@@ -84,7 +84,7 @@ std::vector<int> filter_algorithm(const std::vector<int>& input) {
 /**
  * @brief Filter using ranges view (lazy)
  */
-auto filter_ranges_view(const std::vector<int>& input) {
+inline auto filter_ranges_view(const std::vector<int>& input) {
     return input | std::views::filter([](int x) { return x % 2 == 0; });
 }
 
@@ -95,7 +95,7 @@ auto filter_ranges_view(const std::vector<int>& input) {
 /**
  * @brief Filter then transform using raw loops
  */
-std::vector<int> chain_raw_loop(const std::vector<int>& input) {
+inline std::vector<int> chain_raw_loop(const std::vector<int>& input) {
     std::vector<int> output;
     output.reserve(input.size() / 2);
     for (int x : input) {
@@ -109,7 +109,7 @@ std::vector<int> chain_raw_loop(const std::vector<int>& input) {
 /**
  * @brief Filter then transform using ranges (lazy, single pass)
  */
-auto chain_ranges_view(const std::vector<int>& input) {
+inline auto chain_ranges_view(const std::vector<int>& input) {
     return input | std::views::filter([](int x) { return x % 2 == 0; }) |
            std::views::transform([](int x) { return x * 2 + 1; });
 }
@@ -133,7 +133,7 @@ std::vector<std::ranges::range_value_t<R>> to_vector(R&& range) {
 /**
  * @brief Sum using raw loop
  */
-int64_t sum_raw_loop(const std::vector<int>& input) {
+inline int64_t sum_raw_loop(const std::vector<int>& input) {
     int64_t sum = 0;
     for (int x : input) {
         sum += x;
@@ -144,7 +144,7 @@ int64_t sum_raw_loop(const std::vector<int>& input) {
 /**
  * @brief Sum using std::accumulate
  */
-int64_t sum_algorithm(const std::vector<int>& input) {
+inline int64_t sum_algorithm(const std::vector<int>& input) {
     return std::accumulate(input.begin(), input.end(), int64_t{0});
 }
 
@@ -154,7 +154,7 @@ int64_t sum_algorithm(const std::vector<int>& input) {
  * C++23 introduces std::ranges::fold_left for this purpose.
  * In C++20 we iterate over a ranges::subrange to stay within the ranges API.
  */
-int64_t sum_ranges(const std::vector<int>& input) {
+inline int64_t sum_ranges(const std::vector<int>& input) {
     int64_t sum = 0;
     for (int x : std::ranges::subrange(input)) {
         sum += x;

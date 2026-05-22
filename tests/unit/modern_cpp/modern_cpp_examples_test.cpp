@@ -58,6 +58,18 @@ TEST(MoveSemanticsExamplesTest, ProcessByCopyAndRefCountDifferently) {
     EXPECT_EQ(metrics.copy_count, 0u);
 }
 
+TEST(MoveSemanticsExamplesTest, EmptyBuffersAreSafeToProcess) {
+    using hpc::move_semantics::Buffer;
+
+    Buffer empty_default;
+    Buffer empty_sized(0);
+
+    hpc::move_semantics::process_by_ref(empty_default);
+    hpc::move_semantics::process_by_copy(empty_default);
+    hpc::move_semantics::process_by_ref(empty_sized);
+    hpc::move_semantics::process_by_copy(empty_sized);
+}
+
 TEST(VectorReserveExamplesTest, ReserveReducesAllocationCount) {
     using Alloc = hpc::vector_reserve::CountingAllocator<int>;
 

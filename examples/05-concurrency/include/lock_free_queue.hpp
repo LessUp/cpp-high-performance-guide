@@ -19,6 +19,7 @@
 #include <atomic>
 #include <optional>
 #include <thread>
+#include <utility>
 
 #include "concurrency_utils.hpp"
 
@@ -150,7 +151,7 @@ class MPMCQueue {
 
     struct Cell {
         std::atomic<size_t> sequence;
-        T data;
+        std::optional<T> data;
     };
 
 public:
@@ -166,33 +167,16 @@ public:
      * @return true if successful, false if queue is full
      */
     bool push(const T& value) {
-        Cell* cell;
-        size_t pos = enqueue_pos_.load(std::memory_order_relaxed);
-        int backoff = 1;
+        return push_impl(value);
+    }
 
-        for (;;) {
-            cell = &cells_[pos & MASK];
-            size_t seq = cell->sequence.load(std::memory_order_acquire);
-            intptr_t diff = static_cast<intptr_t>(seq) - static_cast<intptr_t>(pos);
-
-            if (diff == 0) {
-                if (enqueue_pos_.compare_exchange_weak(pos, pos + 1, std::memory_order_relaxed)) {
-                    break;
-                }
-            } else if (diff < 0) {
-                return false;
-            } else {
-                for (int i = 0; i < backoff; ++i) {
-                    std::this_thread::yield();
-                }
-                backoff = std::min(backoff * 2, 64);
-                pos = enqueue_pos_.load(std::memory_order_relaxed);
-            }
-        }
-
-        cell->data = value;
-        cell->sequence.store(pos + 1, std::memory_order_release);
-        return true;
+    /**
+     * @brief Push an element with move semantics (thread-safe)
+     * @param value Element to push
+     * @return true if successful, false if queue is full
+     */
+    bool push(T&& value) {
+        return push_impl(std::move(value));
     }
 
     /**
@@ -224,12 +208,43 @@ public:
             }
         }
 
-        T value = std::move(cell->data);
+        T value = std::move(*cell->data);
+        cell->data.reset();
         cell->sequence.store(pos + Capacity, std::memory_order_release);
         return value;
     }
 
 private:
+    template <typename U>
+    bool push_impl(U&& value) {
+        Cell* cell;
+        size_t pos = enqueue_pos_.load(std::memory_order_relaxed);
+        int backoff = 1;
+
+        for (;;) {
+            cell = &cells_[pos & MASK];
+            size_t seq = cell->sequence.load(std::memory_order_acquire);
+            intptr_t diff = static_cast<intptr_t>(seq) - static_cast<intptr_t>(pos);
+
+            if (diff == 0) {
+                if (enqueue_pos_.compare_exchange_weak(pos, pos + 1, std::memory_order_relaxed)) {
+                    break;
+                }
+            } else if (diff < 0) {
+                return false;
+            } else {
+                for (int i = 0; i < backoff; ++i) {
+                    std::this_thread::yield();
+                }
+                backoff = std::min(backoff * 2, 64);
+                pos = enqueue_pos_.load(std::memory_order_relaxed);
+            }
+        }
+
+        cell->data.emplace(std::forward<U>(value));
+        cell->sequence.store(pos + 1, std::memory_order_release);
+        return true;
+    }
     static constexpr size_t MASK = Capacity - 1;
 
     alignas(hpc::core::CACHE_LINE_SIZE) Cell cells_[Capacity];
