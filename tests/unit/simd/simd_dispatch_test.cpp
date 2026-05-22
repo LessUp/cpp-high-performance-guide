@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "simd_utils.hpp"
+#include <hpc/simd.hpp>
 
 namespace hpc::simd {
 
