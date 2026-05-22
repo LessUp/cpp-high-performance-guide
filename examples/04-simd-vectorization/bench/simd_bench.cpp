@@ -14,8 +14,7 @@
 #include <random>
 #include <vector>
 
-#include "simd_utils.hpp"
-#include "simd_wrapper.hpp"
+#include <hpc/simd.hpp>
 
 namespace {
 

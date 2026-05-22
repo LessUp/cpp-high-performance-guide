@@ -14,6 +14,10 @@
 #include <cstddef>
 #include <thread>
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+
 // POSIX headers for sysconf
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
