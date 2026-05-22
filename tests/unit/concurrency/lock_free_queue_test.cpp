@@ -18,6 +18,22 @@
 
 namespace hpc::concurrency::test {
 
+namespace {
+
+struct MoveOnlyPayload {
+    int value;
+
+    explicit MoveOnlyPayload(int v) : value(v) {}
+
+    MoveOnlyPayload() = delete;
+    MoveOnlyPayload(const MoveOnlyPayload&) = delete;
+    MoveOnlyPayload& operator=(const MoveOnlyPayload&) = delete;
+    MoveOnlyPayload(MoveOnlyPayload&&) noexcept = default;
+    MoveOnlyPayload& operator=(MoveOnlyPayload&&) noexcept = default;
+};
+
+}  // namespace
+
 //------------------------------------------------------------------------------
 // SPSCQueue Tests
 //------------------------------------------------------------------------------
@@ -210,6 +226,16 @@ TEST(MPMCQueueTest, ConcurrentMultipleProducersConsumers) {
     int expected = NUM_PRODUCERS * ITEMS_PER_PRODUCER;
     EXPECT_EQ(items_produced.load(), expected);
     EXPECT_EQ(items_consumed.load(), expected);
+}
+
+TEST(MPMCQueueTest, SupportsNonDefaultConstructiblePayloads) {
+    MPMCQueue<MoveOnlyPayload, 16> queue;
+
+    EXPECT_TRUE(queue.push(MoveOnlyPayload{7}));
+
+    auto value = queue.pop();
+    ASSERT_TRUE(value.has_value());
+    EXPECT_EQ(value->value, 7);
 }
 
 //------------------------------------------------------------------------------
