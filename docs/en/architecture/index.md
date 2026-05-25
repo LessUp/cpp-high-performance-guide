@@ -12,7 +12,7 @@ That promise shapes the architecture:
 - reusable headers stay small and explicit
 - presets provide the common entry point for builds and tests
 - benchmarks and profilers provide the measurement layer
-- docs and OpenSpec preserve interpretation and intent
+- docs preserve interpretation and intent
 
 ## Architecture routes
 
@@ -44,7 +44,7 @@ This loop is architectural, not merely procedural. It gives the project a stable
 | checking whether the repo is coherent | [Repository Topology](/en/architecture/repository-topology) | [Playbook](/en/playbook/) |
 | checking whether performance claims are rigorous | [Performance Methodology](/en/architecture/performance-methodology) | [Research References](/en/research/references) |
 | trying to understand one module quickly | [Module Atlas](/en/academy/module-atlas) | the corresponding example directory |
-| maintaining docs and repository policy | [Research Evolution](/en/research/evolution) | `openspec/` and contributor guidance on GitHub |
+| maintaining docs and repository policy | [Research Evolution](/en/research/evolution) | contributor guidance on GitHub |
 
 ## What this section does not do
 

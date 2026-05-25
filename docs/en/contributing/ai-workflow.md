@@ -1,24 +1,18 @@
 # AI-Assisted Workflow
 
-This repository uses **OpenSpec-first development** with a small set of explicit AI instruction files.
+This repository uses a simplified AI workflow with a single guidance file.
 
-## Canonical guidance files
+## Canonical guidance file
 
-- `openspec/` — requirements, change intent, and task order
-- `AGENTS.md` — shared repo guidance for terminal copilots and Codex-style agents
-- `CLAUDE.md` — Claude Code guidance
-- `.github/copilot-instructions.md` — GitHub Copilot repository guidance
+- `CLAUDE.md` — Claude Code guidance (the authoritative AI instruction file)
 
-When these surfaces drift, fix the drift instead of inventing a fourth workflow.
+When documentation drifts from code, fix the drift instead of working around it.
 
 ## Recommended flow
 
-1. Read the affected capability specs in `openspec/specs/`.
-2. Create or update one change under `openspec/changes/<change-id>/`.
-3. Implement tasks in dependency order.
-4. Run the relevant preset-driven validation commands.
-5. Use `/review` before merge or after a major cleanup phase.
-6. Archive the change when the work is complete.
+1. Keep documentation and code in sync.
+2. Run the relevant preset-driven validation commands.
+3. Use `/review` before merge or after a major cleanup phase.
 
 ## Tool choices
 

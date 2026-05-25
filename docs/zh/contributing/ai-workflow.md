@@ -1,24 +1,18 @@
 # AI 辅助开发流程
 
-本仓库采用 **OpenSpec 优先** 的开发方式，并为主要 AI 工具保留少量但明确的说明文件。
+本仓库采用简化的 AI 开发流程，使用单一说明文件。
 
 ## 权威说明文件
 
-- `openspec/` —— 需求、变更意图与任务顺序
-- `AGENTS.md` —— 终端 copilot / Codex 风格代理共享说明
-- `CLAUDE.md` —— Claude Code 说明
-- `.github/copilot-instructions.md` —— GitHub Copilot 仓库说明
+- `CLAUDE.md` —— Claude Code 说明（权威 AI 指导文件）
 
-如果这些文件之间出现漂移，优先修正漂移，而不是再引入新的流程文档。
+如果文档与代码之间出现漂移，优先修正漂移，而不是绕过问题。
 
 ## 推荐流程
 
-1. 先阅读 `openspec/specs/` 中受影响的 capability spec。
-2. 在 `openspec/changes/<change-id>/` 下创建或更新一个变更。
-3. 按任务依赖顺序实施。
-4. 使用仓库已有的 preset 驱动验证命令。
-5. 在合并前或一个较大的清理阶段结束后使用 `/review`。
-6. 完成后归档该 change。
+1. 保持文档与代码同步。
+2. 使用仓库已有的 preset 驱动验证命令。
+3. 在合并前或一个较大的清理阶段结束后使用 `/review`。
 
 ## 工具选择
 

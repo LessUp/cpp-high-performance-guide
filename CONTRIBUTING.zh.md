@@ -18,13 +18,9 @@ ctest --preset=debug
 
 ## 默认开发流程
 
-1. 先阅读 `openspec/specs/` 中相关的 capability spec。
-2. 在 `openspec/changes/<change-id>/` 下创建或更新一个 change。
-3. 按任务依赖顺序实施。
-4. 保持 docs、specs 与代码同步。
-5. 运行要求的验证命令。
-6. 对非 trivial 修改在合并前使用 `/review`。
-7. 完成后归档该 change。
+1. 保持文档与代码同步。
+2. 运行要求的验证命令。
+3. 对非 trivial 修改在合并前使用 `/review`。
 
 ## 验证命令
 
@@ -69,9 +65,4 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 
 ## 如果你需要 AI 开发流程
 
-参见：
-
-- `AGENTS.md`
-- `CLAUDE.md`
-- `.github/copilot-instructions.md`
-- `docs/zh/contributing/ai-workflow.md`
+参见 `CLAUDE.md`。

@@ -43,7 +43,6 @@
 | `examples/04-simd-vectorization/` | 自动向量化、intrinsics、SIMD 封装 |
 | `examples/05-concurrency/` | 原子操作、无锁队列、OpenMP |
 | `docs/` | 双语 Pages 白皮书，覆盖学院 / 架构 / 实践手册 / 参考 / 研究 |
-| `openspec/` | 规格驱动开发流程与 change 历史 |
 
 ## 快速开始
 
@@ -89,23 +88,6 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 - **性能分析指南：** [`docs/zh/guides/profiling-guide.md`](docs/zh/guides/profiling-guide.md)
 - **验证与 Sanitizer：** [`docs/zh/guides/validation.md`](docs/zh/guides/validation.md)
 - **英文入口：** `README.md` 与 `docs/en/`
-
-## 开发流程
-
-本仓库对非 trivial 修改使用 **OpenSpec**：
-
-1. 先阅读 `openspec/specs/` 中受影响的 capability spec。
-2. 在 `openspec/changes/<change-id>/` 下创建或更新一个 change。
-3. 按任务依赖顺序实施。
-4. 使用 preset 驱动的命令做验证。
-5. 非 trivial 修改在合并前使用 `/review`。
-6. 完成后归档 change。
-
-仓库也为 AI 工具保留了明确说明：
-
-- `AGENTS.md`
-- `CLAUDE.md`
-- `.github/copilot-instructions.md`
 
 ## 技术栈
 

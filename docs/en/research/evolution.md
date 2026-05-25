@@ -25,7 +25,7 @@ Three pressures shape the current maintenance model:
 - preset-driven validation as the public operational contract
 - benchmark and profiling workflows that keep performance claims inspectable
 - bilingual reader-facing landing surfaces where the site intends to serve both audiences
-- OpenSpec and repository guidance that explain structural decisions before future cleanup is needed
+- repository guidance that explain structural decisions before future cleanup is needed
 
 ## What is intentionally resisted
 

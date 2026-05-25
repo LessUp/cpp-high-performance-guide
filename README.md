@@ -43,7 +43,6 @@ Every major topic is meant to be **readable, buildable, and measurable**.
 | `examples/04-simd-vectorization/` | auto-vectorization, intrinsics, SIMD wrappers |
 | `examples/05-concurrency/` | atomics, lock-free queue, OpenMP |
 | `docs/` | bilingual Pages whitepaper covering academy, architecture, playbook, reference, research |
-| `openspec/` | spec-driven development workflow and change history |
 
 ## Quick start
 
@@ -88,23 +87,6 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 - **Profiling guide:** [`docs/en/guides/profiling-guide.md`](docs/en/guides/profiling-guide.md)
 - **Validation & sanitizers:** [`docs/en/guides/validation.md`](docs/en/guides/validation.md)
 - **Chinese entry:** `README.zh-CN.md` and `docs/zh/`
-
-## Development workflow
-
-This repository uses **OpenSpec** for non-trivial changes.
-
-1. Read the affected capability specs in `openspec/specs/`.
-2. Create or update a change under `openspec/changes/<change-id>/`.
-3. Implement tasks in dependency order.
-4. Run preset-driven validation.
-5. Use `/review` before merge for non-trivial work.
-6. Archive completed changes.
-
-The repository also keeps AI tool guidance in:
-
-- `AGENTS.md`
-- `CLAUDE.md`
-- `.github/copilot-instructions.md`
 
 ## Tech stack
 

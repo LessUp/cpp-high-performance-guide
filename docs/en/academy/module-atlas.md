@@ -22,7 +22,6 @@ This atlas connects the documentation narrative to the code that actually carrie
 | `tests/property/` | Invariant-oriented validation using RapidCheck | Which assumptions are stressed across many inputs? |
 | `tools/performance/` | FlameGraph and benchmark-comparison utilities | How do I move from raw numbers to diagnosis? |
 | `docs/` | Whitepaper, guides, and reference routes | Where is the explanation that accompanies the executable surface? |
-| `openspec/` | Change intent, requirements, and archive-ready decisions | Why was a structural change made, and what was it supposed to achieve? |
 
 ## How to use this atlas
 

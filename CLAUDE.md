@@ -1,25 +1,8 @@
 # CLAUDE.md
 
-## Mission
-
-Help finish this repository cleanly. Prioritize hardening, consistency, and removal of stale surfaces over feature expansion.
-
 ## Project position
 
-This repository is in **closure and hardening mode** (archive-ready for low-frequency maintenance).
-
-## Working style
-
-1. Read the relevant capability specs in `openspec/specs/`.
-2. Work inside an OpenSpec change under `openspec/changes/`.
-3. Prefer aggressive cleanup when a file or workflow is stale, duplicated, or no longer part of the final repo story.
-4. Keep user-facing guidance aligned across:
-   - `README.md`
-   - `README.zh-CN.md`
-   - `docs/`
-   - `AGENTS.md`
-   - `.github/copilot-instructions.md`
-5. Use `/review` before merge or after a large cleanup phase.
+This repository is in **closure and hardening mode** (archive-ready for low-frequency maintenance). Prefer normalization, defect fixing, and removal of stale or low-signal surfaces over adding new features.
 
 ## C++ Standards and Style
 
@@ -28,16 +11,26 @@ This repository is in **closure and hardening mode** (archive-ready for low-freq
 - **Memory safety**: prefer RAII, smart pointers, avoid raw `new/delete`
 - **Performance**: always measure with benchmarks before claiming improvement
 - **Concurrency**: use `std::atomic` with explicit memory ordering
+- **Header-only design**: all library code in `include/hpc/` and `examples/*/include/` is header-only. Platform-specific code is hidden behind preprocessor conditionals within headers.
 
-## Project facts
+## Repository layout
 
-- Docs stack: **VitePress**, published via GitHub Pages
-- Build system: **CMake + presets**
-- Language server: **clangd** — configured via `.clangd` at repo root (`CompilationDatabase: build/debug`); all CMake presets export `compile_commands.json` via `CMAKE_EXPORT_COMPILE_COMMANDS=ON`
-- Primary maintenance target: **Linux**
-- Repo posture: **archive-ready / low-frequency maintenance**
+```text
+cpp-high-performance-guide/
+├── CMakeLists.txt
+├── CMakePresets.json
+├── cmake/
+├── examples/
+├── tests/
+├── benchmarks/
+├── tools/
+├── scripts/
+├── docs/                  # VitePress site and bilingual learning docs
+├── .githooks/             # Project-managed Git hooks
+└── .github/
+```
 
-## Commands
+## Standard commands
 
 ```bash
 # Build and test
@@ -58,9 +51,30 @@ cmake --preset=release && cmake --build build/release
 ./scripts/setup-hooks.sh
 ```
 
-## Process expectations
+## Engineering rules
 
-- Do not add new generic documentation just to fill space.
-- Do not reintroduce GitBook / HonKit / `.kiro` assumptions.
-- Keep workflows meaningful; delete low-value automation rather than preserving it.
-- Prefer one long-running implementation session to quota-heavy parallelism unless the work clearly benefits from it.
+- Prefer **deleting or archiving stale content** instead of preserving redundant surfaces.
+- Keep **README** focused on repository entry and onboarding; use the docs site for the richer narrative.
+- Treat **GitHub Pages** as a project landing page, not a thin README mirror.
+- Keep user-facing documentation **English + Chinese** where the surface is meant to be bilingual.
+- Use **CMake presets** as the default build and test entry points.
+- Keep workflows **preset-driven, low-noise, and meaningful**.
+- Avoid over-engineering with extra plugins, MCP servers, or automation layers unless they clearly reduce maintenance cost.
+
+## AI tooling policy
+
+- **CLAUDE.md**: Claude Code specific guidance (this file).
+- **LSP**: prefer `clangd` backed by `compile_commands.json`. The `.clangd` config at the repo root points `CompilationDatabase` to `build/debug`.
+- **Review model**: use `/review` before merge or after major cleanup phases.
+
+## Editor integration
+
+The `.vscode/` directory is **gitignored**. Use `.clangd`, `.editorconfig`, and `CMakePresets.json` for machine-readable project conventions.
+
+## Things to avoid reintroducing
+
+- HonKit / GitBook-era configuration
+- `.kiro/`-style legacy spec structures
+- duplicate changelog surfaces with no maintenance value
+- non-blocking CI steps that hide real failures
+- generic AI instructions that do not reflect this repository

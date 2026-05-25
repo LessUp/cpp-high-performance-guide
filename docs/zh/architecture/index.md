@@ -12,7 +12,7 @@
 - 可复用头文件保持小而明确
 - preset 提供构建与测试的统一入口
 - 基准与 profiler 构成测量层
-- 文档与 OpenSpec 保留解释与意图
+- 文档保留解释与意图
 
 ## 架构入口
 
@@ -44,7 +44,7 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 | 检查仓库是否整体一致 | [仓库拓扑](/zh/architecture/repository-topology) | [实践手册](/zh/playbook/) |
 | 审视性能结论是否严谨 | [性能方法论](/zh/architecture/performance-methodology) | [研究参考资料](/zh/research/references) |
 | 想快速理解某个模块 | [模块总览](/zh/academy/module-atlas) | 对应的示例目录 |
-| 维护文档与仓库策略 | [研究演进](/zh/research/evolution) | GitHub 上的 `openspec/` 与贡献者指导 |
+| 维护文档与仓库策略 | [研究演进](/zh/research/evolution) | GitHub 上的贡献者指导 |
 
 ## 本节不做什么
 

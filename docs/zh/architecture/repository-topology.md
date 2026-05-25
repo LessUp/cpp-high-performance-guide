@@ -7,7 +7,6 @@
 ```mermaid
 flowchart TD
     A[docs/] --> E[读者与维护者]
-    B[openspec/] --> E
     C[CMakeLists.txt + CMakePresets.json + cmake/] --> D[配置与构建]
     D --> F[examples/]
     D --> G[tests/]
@@ -29,7 +28,7 @@ flowchart TD
 | 共享头文件与辅助 | `include/hpc/`、各示例局部 `include/`、`benchmarks/common/` | 让可复用代码保持显式，同时避免被庞大库表面遮蔽教学重点 | 哪些工具是共享的，哪些故意只在模块内部存在？ |
 | 验证 | `tests/unit/`、`tests/property/`、`ctest` preset | 保护行为与低层不变量 | 如果这个假设不成立，会在哪里失败？ |
 | 发布 | `docs/` | 呈现白皮书、操作手册与参考入口 | 一个持怀疑态度的读者去哪里看解释？ |
-| 治理 | `openspec/`、`AGENTS.md`、`CLAUDE.md` | 记录变更意图与维护规则 | 某个结构选择为什么存在，后续应如何演进？ |
+| 治理 | `CLAUDE.md` | 记录维护规则与 AI 工作流指导 | 仓库应如何演进？ |
 
 ## 目录级阅读指南
 
@@ -41,7 +40,6 @@ flowchart TD
 | `benchmarks/common/` | 共享基准支撑代码 | 把测量辅助集中管理，又不把仓库变成通用框架 |
 | `tools/performance/` | FlameGraph 与基准比较脚本 | 连接原始执行数据与分析 |
 | `docs/.vitepress/` | 文档配置、主题原语与文档测试 | 让发布层也能纳入版本控制并在本地验证 |
-| `openspec/changes/` | 活跃与归档的变更记录 | 说明非平凡仓库改动为什么发生 |
 
 ## 按工作流理解拓扑
 
@@ -57,7 +55,6 @@ flowchart TD
 1. 从 `docs/` 与 `docs/.vitepress/` 开始。
 2. 确认新路由与当前信息架构一致。
 3. 在把页面视为完成前，先运行文档测试与 Pages 构建输出。
-4. 让仓库级指导继续与 `openspec/` 及根部说明文档对齐。
 
 ### 如果你在审查可维护性
 

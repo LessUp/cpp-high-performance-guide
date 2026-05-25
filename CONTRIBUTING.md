@@ -18,13 +18,9 @@ ctest --preset=debug
 
 ## Default workflow
 
-1. Read the relevant capability specs in `openspec/specs/`.
-2. Create or update one change under `openspec/changes/<change-id>/`.
-3. Implement tasks in dependency order.
-4. Keep docs, specs, and code in sync.
-5. Run the required validation commands.
-6. Use `/review` before merge for non-trivial work.
-7. Archive the change after completion.
+1. Keep docs and code in sync.
+2. Run the required validation commands.
+3. Use `/review` before merge for non-trivial work.
 
 ## Validation commands
 
@@ -69,9 +65,4 @@ The repository hooks currently enforce:
 
 ## Need the AI workflow?
 
-See:
-
-- `AGENTS.md`
-- `CLAUDE.md`
-- `.github/copilot-instructions.md`
-- `docs/en/contributing/ai-workflow.md`
+See `CLAUDE.md` for Claude Code specific guidance.
