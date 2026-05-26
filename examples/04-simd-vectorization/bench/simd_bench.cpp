@@ -11,10 +11,9 @@
 #include <benchmark/benchmark.h>
 
 #include <cmath>
+#include <hpc/simd.hpp>
 #include <random>
 #include <vector>
-
-#include <hpc/simd.hpp>
 
 namespace {
 

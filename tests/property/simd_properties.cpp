@@ -15,12 +15,11 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <hpc/simd.hpp>
 #include <iostream>
 #include <numeric>
 #include <random>
 #include <vector>
-
-#include <hpc/simd.hpp>
 
 namespace {
 

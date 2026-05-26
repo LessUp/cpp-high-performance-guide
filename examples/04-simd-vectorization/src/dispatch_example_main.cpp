@@ -1,6 +1,5 @@
-#include <iostream>
-
 #include <hpc/simd.hpp>
+#include <iostream>
 
 int main() {
     constexpr size_t kSize = 8;

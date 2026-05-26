@@ -11,11 +11,10 @@
  */
 
 #include <cmath>
+#include <hpc/simd.hpp>
 #include <iostream>
 #include <numeric>
 #include <vector>
-
-#include <hpc/simd.hpp>
 
 namespace hpc::simd {
 
