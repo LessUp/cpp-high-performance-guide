@@ -54,11 +54,7 @@ inline std::size_t cache_line_size() {
  * Use this when the value must be a compile-time constant (e.g., alignas).
  * For runtime detection, prefer cache_line_size() function.
  */
-#if defined(__cpp_lib_hardware_interference_size)
-constexpr std::size_t CACHE_LINE_SIZE = std::hardware_destructive_interference_size;
-#else
 constexpr std::size_t CACHE_LINE_SIZE = 64;
-#endif
 
 //------------------------------------------------------------------------------
 // Page Size
@@ -72,19 +68,19 @@ constexpr std::size_t CACHE_LINE_SIZE = 64;
  * @return Page size in bytes
  */
 inline std::size_t page_size() {
-    static const std::size_t ps = []() {
+    static const std::size_t page_size_value = []() {
 #if defined(_WIN32)
         SYSTEM_INFO sysInfo;
         GetSystemInfo(&sysInfo);
         return static_cast<std::size_t>(sysInfo.dwPageSize);
 #elif defined(__unix__) || defined(__APPLE__)
-        long ps = sysconf(_SC_PAGESIZE);
-        return ps > 0 ? static_cast<std::size_t>(ps) : 4096;
+        long queried_page_size = sysconf(_SC_PAGESIZE);
+        return queried_page_size > 0 ? static_cast<std::size_t>(queried_page_size) : 4096;
 #else
         return 4096;  // Fallback
 #endif
     }();
-    return ps;
+    return page_size_value;
 }
 
 /**
