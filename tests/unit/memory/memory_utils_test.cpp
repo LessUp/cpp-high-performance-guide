@@ -12,6 +12,18 @@ using hpc::core::PAGE_SIZE;
 
 namespace hpc::memory::test {
 
+namespace {
+
+struct TrackedObject {
+    inline static int constructions = 0;
+    inline static int destructions = 0;
+
+    TrackedObject() { ++constructions; }
+    ~TrackedObject() { ++destructions; }
+};
+
+}  // namespace
+
 // ---------------------------------------------------------------------------
 // AlignedAllocator tests
 // ---------------------------------------------------------------------------
@@ -60,6 +72,20 @@ TEST(AlignedAllocTest, MakeAlignedUniquePtr) {
     auto ptr = make_aligned<float>(256, CACHE_LINE_SIZE);
     ASSERT_NE(ptr.get(), nullptr);
     EXPECT_EQ(reinterpret_cast<uintptr_t>(ptr.get()) % CACHE_LINE_SIZE, 0u);
+}
+
+TEST(AlignedAllocTest, MakeAlignedConstructsAndDestroysObjects) {
+    TrackedObject::constructions = 0;
+    TrackedObject::destructions = 0;
+
+    {
+        auto ptr = make_aligned<TrackedObject>(3, CACHE_LINE_SIZE);
+        ASSERT_NE(ptr.get(), nullptr);
+        EXPECT_EQ(TrackedObject::constructions, 3);
+        EXPECT_EQ(reinterpret_cast<uintptr_t>(ptr.get()) % CACHE_LINE_SIZE, 0u);
+    }
+
+    EXPECT_EQ(TrackedObject::destructions, 3);
 }
 
 // ---------------------------------------------------------------------------

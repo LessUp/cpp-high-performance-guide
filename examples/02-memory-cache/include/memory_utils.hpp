@@ -63,18 +63,24 @@ inline void aligned_free(void* ptr) {
 #endif
 }
 
-/**
- * @brief Custom deleter for aligned memory
- */
+template <typename T>
 struct AlignedDeleter {
-    void operator()(void* ptr) const { aligned_free(ptr); }
+    std::size_t count = 0;
+
+    void operator()(T* ptr) const noexcept {
+        if (ptr == nullptr) {
+            return;
+        }
+        std::destroy_n(ptr, count);
+        aligned_free(ptr);
+    }
 };
 
 /**
  * @brief Unique pointer with aligned memory
  */
 template <typename T>
-using aligned_unique_ptr = std::unique_ptr<T, AlignedDeleter>;
+using aligned_unique_ptr = std::unique_ptr<T[], AlignedDeleter<T>>;
 
 /**
  * @brief Create aligned unique pointer
@@ -82,11 +88,24 @@ using aligned_unique_ptr = std::unique_ptr<T, AlignedDeleter>;
 template <typename T>
 aligned_unique_ptr<T> make_aligned(std::size_t count,
                                    std::size_t alignment = hpc::core::CACHE_LINE_SIZE) {
+    if (count == 0) {
+        return aligned_unique_ptr<T>(nullptr, AlignedDeleter<T>{});
+    }
+
     void* ptr = aligned_alloc(count * sizeof(T), alignment);
     if (!ptr) {
         throw std::bad_alloc();
     }
-    return aligned_unique_ptr<T>(static_cast<T*>(ptr));
+
+    T* typed_ptr = static_cast<T*>(ptr);
+    try {
+        std::uninitialized_default_construct_n(typed_ptr, count);
+    } catch (...) {
+        aligned_free(typed_ptr);
+        throw;
+    }
+
+    return aligned_unique_ptr<T>(typed_ptr, AlignedDeleter<T>{count});
 }
 
 //------------------------------------------------------------------------------

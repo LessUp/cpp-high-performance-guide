@@ -16,6 +16,7 @@ hpc_add_example(
     NAME auto_vectorize
     SOURCES src/auto_vectorize.cpp
     LIBRARIES simd_utils
+    ENABLE_OPENMP
     ENABLE_SIMD AVX2
 )
 

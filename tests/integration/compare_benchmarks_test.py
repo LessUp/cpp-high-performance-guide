@@ -8,11 +8,11 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-SCRIPT_PATH = PROJECT_ROOT / "scripts" / "compare_benchmarks.py"
+SCRIPT_PATH = PROJECT_ROOT / "tools" / "performance" / "benchmark_compare.py"
 
 
 class CompareBenchmarksScriptTest(unittest.TestCase):
-    def run_script(self, baseline_payload, candidate_payload, threshold=10):
+    def run_script(self, baseline_payload, candidate_payload, threshold=0.1, fail_on_regression=False):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir)
             baseline_path = tmp_path / "baseline.json"
@@ -20,15 +20,19 @@ class CompareBenchmarksScriptTest(unittest.TestCase):
             baseline_path.write_text(json.dumps(baseline_payload), encoding="utf-8")
             candidate_path.write_text(json.dumps(candidate_payload), encoding="utf-8")
 
+            args = [
+                sys.executable,
+                str(SCRIPT_PATH),
+                str(baseline_path),
+                str(candidate_path),
+                "--threshold",
+                str(threshold),
+            ]
+            if fail_on_regression:
+                args.append("--fail-on-regression")
+
             return subprocess.run(
-                [
-                    sys.executable,
-                    str(SCRIPT_PATH),
-                    str(baseline_path),
-                    str(candidate_path),
-                    "--threshold",
-                    str(threshold),
-                ],
+                args,
                 capture_output=True,
                 text=True,
                 check=False,
@@ -46,11 +50,11 @@ class CompareBenchmarksScriptTest(unittest.TestCase):
             ]
         }
 
-        result = self.run_script(baseline, candidate, threshold=10)
+        result = self.run_script(baseline, candidate, threshold=0.10)
 
         self.assertEqual(result.returncode, 0, msg=result.stderr or result.stdout)
         self.assertIn("BM_AddArrays/1024", result.stdout)
-        self.assertIn("+8.00%", result.stdout)
+        self.assertIn("+8.0%", result.stdout)
 
     def test_exit_one_when_any_benchmark_regresses_beyond_threshold(self):
         baseline = {
@@ -64,11 +68,16 @@ class CompareBenchmarksScriptTest(unittest.TestCase):
             ]
         }
 
-        result = self.run_script(baseline, candidate, threshold=10)
+        result = self.run_script(
+            baseline,
+            candidate,
+            threshold=0.10,
+            fail_on_regression=True,
+        )
 
         self.assertEqual(result.returncode, 1, msg=result.stderr or result.stdout)
-        self.assertIn("Regression detected", result.stdout)
-        self.assertIn("+20.00%", result.stdout)
+        self.assertIn("regression(s) detected", result.stdout)
+        self.assertIn("+20.0%", result.stdout)
 
 
 if __name__ == "__main__":
