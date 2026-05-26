@@ -166,18 +166,14 @@ public:
      * @param value Element to push
      * @return true if successful, false if queue is full
      */
-    bool push(const T& value) {
-        return push_impl(value);
-    }
+    bool push(const T& value) { return push_impl(value); }
 
     /**
      * @brief Push an element with move semantics (thread-safe)
      * @param value Element to push
      * @return true if successful, false if queue is full
      */
-    bool push(T&& value) {
-        return push_impl(std::move(value));
-    }
+    bool push(T&& value) { return push_impl(std::move(value)); }
 
     /**
      * @brief Pop an element from the queue (thread-safe)

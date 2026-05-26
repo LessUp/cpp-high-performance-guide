@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cmath>
-
 #include <hpc/simd.hpp>
 
 namespace hpc::simd::test {

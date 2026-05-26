@@ -10,9 +10,8 @@
 
 #include <chrono>
 #include <cmath>
-#include <iostream>
-
 #include <hpc/simd.hpp>
+#include <iostream>
 
 // Include SIMD headers based on availability
 #ifdef HPC_HAS_SSE2

@@ -3,11 +3,10 @@
  * @brief Unit tests for simd_utils.hpp and simd_wrapper.hpp
  */
 
-#include <hpc/simd.hpp>
-
 #include <gtest/gtest.h>
 
 #include <cmath>
+#include <hpc/simd.hpp>
 #include <numeric>
 
 namespace hpc::simd::test {
