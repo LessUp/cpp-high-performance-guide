@@ -4,12 +4,6 @@
 
 Brief description of what this PR adds or fixes.
 
-## OpenSpec
-
-- [ ] This change is trivial and does not need an OpenSpec change
-- [ ] I updated or created the relevant OpenSpec change under `openspec/changes/`
-- [ ] I reviewed the affected capability specs under `openspec/specs/`
-
 ## Type of Change
 
 - [ ] Bug fix (non-breaking change which fixes an issue)

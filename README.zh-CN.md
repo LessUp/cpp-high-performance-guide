@@ -100,4 +100,4 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 
 ## 贡献
 
-贡献流程、hooks 配置与 OpenSpec 约定见 `CONTRIBUTING.zh.md`。
+贡献流程与 hooks 配置见 `CONTRIBUTING.zh.md`。

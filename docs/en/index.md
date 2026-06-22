@@ -170,7 +170,7 @@ Use the preset-driven path first. It is the shortest route that still preserves 
 ## Expert reader callouts
 
 - **Interviewer or reviewer:** start with [Architecture](/en/architecture/) and [Research](/en/research/). Those pages expose the validation model and external context fastest.
-- **Future maintainer:** read [Module Atlas](/en/academy/module-atlas), [Repository Topology](/en/architecture/repository-topology), and the repository-level guidance in `AGENTS.md` and `CLAUDE.md` on GitHub.
+- **Future maintainer:** read [Module Atlas](/en/academy/module-atlas), [Repository Topology](/en/architecture/repository-topology), and the repository-level guidance in `CLAUDE.md` on GitHub.
 - **Practicing engineer:** use the [Playbook](/en/playbook/) for commands, then move to profiling and sanitizer routes only after a baseline run succeeds.
 
 ## Operational routes

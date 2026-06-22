@@ -99,4 +99,4 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 
 ## Contributing
 
-See `CONTRIBUTING.md` for the contributor workflow, hooks setup, and OpenSpec process.
+See `CONTRIBUTING.md` for the contributor workflow and hooks setup.

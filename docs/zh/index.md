@@ -170,7 +170,7 @@ layout: home
 ## 面向熟练读者的提示
 
 - **面试官或评审者：** 先读[架构](/zh/architecture/)和[研究](/zh/research/)。这两部分最快暴露验证模型与外部上下文。
-- **未来维护者：** 阅读[模块总览](/zh/academy/module-atlas)、[仓库拓扑](/zh/architecture/repository-topology)，以及 GitHub 上的 `AGENTS.md` 与 `CLAUDE.md`。
+- **未来维护者：** 阅读[模块总览](/zh/academy/module-atlas)、[仓库拓扑](/zh/architecture/repository-topology)，以及 GitHub 上的 `CLAUDE.md`。
 - **实践工程师：** 先用[实践手册](/zh/playbook/)获取命令，再在基线通过后进入 profiling 与 sanitizer 路线。
 
 ## 操作路线

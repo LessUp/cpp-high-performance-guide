@@ -28,9 +28,3 @@ body:
     attributes:
       label: Alternatives
       description: Any alternative solutions you've considered
-
-  - type: textarea
-    id: openspec
-    attributes:
-      label: OpenSpec notes
-      description: If you already know the affected capability or a proposed change id, note it here.
