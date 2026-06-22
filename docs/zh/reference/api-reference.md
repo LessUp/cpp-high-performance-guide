@@ -8,7 +8,7 @@
 
 本文档记录以下位置的实用工具：
 - `examples/02-memory-cache/include/memory_utils.hpp`
-- `examples/04-simd-vectorization/include/simd_wrapper.hpp`
+- `include/hpc/simd.hpp`
 - `benchmarks/common/benchmark_utils.hpp`
 
 ---

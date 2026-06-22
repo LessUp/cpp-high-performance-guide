@@ -14,8 +14,8 @@ This module demonstrates why target-based CMake is superior to directory-based a
 
 ## Contents
 
-- `anti-patterns/` - Common CMake mistakes to avoid
-- `best-practices/` - Modern CMake approaches
+- `best-practices/` - Modern CMake patterns (documentation-only `CMakeLists.txt` plus runnable `src/`)
+- `cmake_demo` - Runnable demo target built from `best-practices/src/`
 
 ---
 
@@ -73,7 +73,7 @@ cmake --build build/release
 ```bash
 # From project root
 cmake --preset=release
-cmake --build build/release --target cmake_anti_patterns cmake_best_practices
+cmake --build build/release --target cmake_demo
 ```
 
 ---

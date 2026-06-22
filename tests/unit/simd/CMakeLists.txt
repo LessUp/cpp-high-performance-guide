@@ -4,10 +4,6 @@ add_executable(simd_utils_test
     simd_utils_test.cpp
 )
 
-target_include_directories(simd_utils_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/examples/04-simd-vectorization/include
-)
-
 target_link_libraries(simd_utils_test PRIVATE
     GTest::gtest
     GTest::gtest_main
@@ -44,10 +40,6 @@ gtest_add_tests(TARGET hpc_simd_test)
 # simd_dispatch_test - now uses header-only implementation
 add_executable(simd_dispatch_test
     simd_dispatch_test.cpp
-)
-
-target_include_directories(simd_dispatch_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/examples/04-simd-vectorization/include
 )
 
 target_link_libraries(simd_dispatch_test PRIVATE

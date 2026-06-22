@@ -118,8 +118,8 @@ aligned_unique_ptr<T> make_aligned(std::size_t count,
  * Uses a compile-time constant alignment (default: CACHE_LINE_SIZE).
  * Designed for false-sharing elimination in multi-threaded code.
  *
- * See CONTEXT.md: cache-line allocator for the domain rationale.
- * For SIMD-width alignment, see hpc::simd::AlignedAllocator in simd_utils.hpp.
+ * See docs/META.md: cache-line allocator for the domain rationale.
+ * For SIMD-width alignment, see hpc::simd::AlignedAllocator in include/hpc/simd.hpp.
  */
 template <typename T, std::size_t Alignment = hpc::core::CACHE_LINE_SIZE>
 class AlignedAllocator {

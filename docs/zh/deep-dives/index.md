@@ -15,21 +15,21 @@ description: 深入探索 C++ 高性能编程核心概念的技术文章。
       title: '内存布局',
       description: 'AOS 与 SOA 布局对比、缓存行对齐、伪共享消除以及内存预取策略。',
       links: [
-        { text: '阅读', href: '/en/deep-dives/memory-layout' }
+        { text: '阅读', href: '/zh/deep-dives/memory-layout' }
       ]
     },
     {
       title: '无锁队列',
       description: 'SPSC 和 MPMC 队列实现、内存序语义以及无锁算法设计。',
       links: [
-        { text: '阅读', href: '/en/deep-dives/lock-free-queue' }
+        { text: '阅读', href: '/zh/deep-dives/lock-free-queue' }
       ]
     },
     {
       title: 'SIMD 内部机制',
       description: '自动向量化条件、内联函数封装、运行时分发以及 AVX-512 掩码操作。',
       links: [
-        { text: '阅读', href: '/en/deep-dives/simd-internals' }
+        { text: '阅读', href: '/zh/deep-dives/simd-internals' }
       ]
     }
   ]"
@@ -51,7 +51,3 @@ description: 深入探索 C++ 高性能编程核心概念的技术文章。
 2. **动手实验** - 所有示例都可以在 examples/ 目录中运行
 3. **自行基准测试** - 使用提供的基准测试验证性能声明
 4. **查阅参考文献** - 每篇文章都引用了原始资料以供深入研究
-
-::: tip
-深度技术专题目前以英文为主，以保持技术术语的准确性。中文用户可参考学院和架构章节的中文内容获取基础理解。
-:::

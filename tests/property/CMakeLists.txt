@@ -30,10 +30,6 @@ add_executable(simd_properties_test
     simd_properties.cpp
 )
 
-target_include_directories(simd_properties_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/examples/04-simd-vectorization/include
-)
-
 target_link_libraries(simd_properties_test PRIVATE
     GTest::gtest
     rapidcheck

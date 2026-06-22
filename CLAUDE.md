@@ -78,3 +78,9 @@ The `.vscode/` directory is **gitignored**. Use `.clangd`, `.editorconfig`, and 
 - duplicate changelog surfaces with no maintenance value
 - non-blocking CI steps that hide real failures
 - generic AI instructions that do not reflect this repository
+- per-example shim headers that only re-export a canonical `include/hpc/` header
+- CMake anti-pattern directories with no runnable target
+- wrapper scripts that duplicate `cmake --preset` commands
+- split root-level design md files (consolidated into `docs/META.md`)
+- English-only documentation surfaces (all bilingual surfaces now have zh parity)
+- unused custom Vue components in the docs theme

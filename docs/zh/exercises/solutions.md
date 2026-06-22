@@ -1,23 +1,23 @@
-# Exercise Solutions
+# 练习解答
 
-Solutions and hints for the interactive exercises.
-
----
-
-## How to Use This Page
-
-1. **Attempt exercises first** - Don't read solutions until you've tried
-2. **Use hints before solutions** - Hints guide without giving answers
-3. **Understand, don't copy** - Make sure you understand *why* the solution works
+交互式练习的解答与提示。
 
 ---
 
-## Memory Exercises Solutions
+## 如何使用本页
 
-### Exercise 1: AOS to SOA Conversion
+1. **先独立完成练习**——在尝试之前不要阅读解答
+2. **先看提示再看解答**——提示能引导你而不直接给出答案
+3. **理解而非复制**——确保你理解解答*为什么*有效
+
+---
+
+## Memory 练习解答
+
+### 练习 1：AOS 到 SOA 的转换
 
 <details>
-<summary>Solution</summary>
+<summary>解答</summary>
 
 ```cpp
 // AOS version with mass field
@@ -44,13 +44,13 @@ void update_positions_soa(ParticleSOA& p, float dt, size_t n) {
 }
 ```
 
-The SOA version maintains cache efficiency for field-wise operations even after adding the new field.
+SOA 版本即使在添加新字段后，仍能保持按字段操作的 cache 效率。
 </details>
 
-### Exercise 2: Fix False Sharing
+### 练习 2：修复 false sharing
 
 <details>
-<summary>Solution</summary>
+<summary>解答</summary>
 
 ```cpp
 #include <atomic>
@@ -80,17 +80,17 @@ void increment_counters_padded(hpc::memory::CacheLinePadded<std::atomic<int>>* c
 }
 ```
 
-Expected speedup: 2-10x depending on thread count and CPU architecture.
+预期加速比：2-10 倍，取决于线程数和 CPU 架构。
 </details>
 
 ---
 
-## SIMD Exercises Solutions
+## SIMD 练习解答
 
-### Exercise 1: Enable Auto-Vectorization
+### 练习 1：启用自动向量化
 
 <details>
-<summary>Solution</summary>
+<summary>解答</summary>
 
 ```cpp
 // Add __restrict to tell compiler pointers don't overlap
@@ -110,13 +110,13 @@ void add_arrays(float* restrict a,
                 size_t n);
 ```
 
-Compile with: `g++ -O3 -march=native -fopt-info-vec-optimized` to verify vectorization.
+编译时使用：`g++ -O3 -march=native -fopt-info-vec-optimized` 验证向量化。
 </details>
 
-### Exercise 2: Convert Scalar to SIMD
+### 练习 2：将标量代码转换为 SIMD
 
 <details>
-<summary>Solution</summary>
+<summary>解答</summary>
 
 ```cpp
 #include <immintrin.h>
@@ -141,13 +141,13 @@ void scale_array_avx2(float* arr, float scalar, size_t n) {
 }
 ```
 
-For aligned arrays, use `_mm256_load_ps` and `_mm256_store_ps` for potentially better performance.
+对于已对齐的数组，使用 `_mm256_load_ps` 和 `_mm256_store_ps` 可能获得更好的性能。
 </details>
 
-### Exercise 4: Dot Product
+### 练习 4：点积
 
 <details>
-<summary>Solution</summary>
+<summary>解答</summary>
 
 ```cpp
 #include <immintrin.h>
@@ -189,7 +189,7 @@ float dot_product_avx2(const float* a, const float* b, size_t n) {
 }
 ```
 
-Using SIMD wrapper (cleaner):
+使用 SIMD wrapper（更简洁）：
 
 ```cpp
 #include <hpc/simd.hpp>
@@ -219,12 +219,12 @@ float dot_product_wrapped(const float* a, const float* b, size_t n) {
 
 ---
 
-## Concurrency Exercises Solutions
+## Concurrency 练习解答
 
-### Exercise 1: Debug a Data Race
+### 练习 1：调试 data race
 
 <details>
-<summary>Solution</summary>
+<summary>解答</summary>
 
 ```cpp
 #include <atomic>
@@ -260,16 +260,16 @@ int main() {
 }
 ```
 
-Key fixes:
-1. Changed `int` to `std::atomic<int>`
-2. Used `fetch_add` instead of `++`
-3. Used `memory_order_relaxed` since we only need atomicity, not ordering
+关键修复：
+1. 将 `int` 改为 `std::atomic<int>`
+2. 用 `fetch_add` 替代 `++`
+3. 使用 `memory_order_relaxed`，因为我们只需要原子性，不需要顺序约束
 </details>
 
-### Exercise 3: Thread-Safe Counter
+### 练习 3：线程安全计数器
 
 <details>
-<summary>Solution</summary>
+<summary>解答</summary>
 
 ```cpp
 #include <atomic>
@@ -306,12 +306,12 @@ struct CounterArray {
 
 ---
 
-## Challenge Solutions
+## 挑战题解答
 
 ### Mandelbrot SIMD
 
 <details>
-<summary>Solution (partial)</summary>
+<summary>解答（部分）</summary>
 
 ```cpp
 #include <immintrin.h>
@@ -364,23 +364,23 @@ void mandelbrot_avx2(float* cx, float* cy, int* result,
 }
 ```
 
-Note: This is a simplified version. A complete solution needs proper handling of the result storage and may need additional optimizations.
+注意：这是一个简化版本。完整解答需要正确处理结果存储，并可能需要额外的优化。
 </details>
 
 ---
 
-## Tips for Success
+## 成功要诀
 
-1. **Always measure** - Don't assume optimizations work
-2. **Use sanitizers** - TSAN catches data races you might miss
-3. **Check compiler output** - Verify vectorization happened
-4. **Profile first** - Find bottlenecks before optimizing
-5. **Understand the hardware** - Cache, memory, CPU architecture matter
+1. **始终测量**——不要假设优化有效
+2. **使用 sanitizer**——TSAN 能发现你可能遗漏的 data race
+3. **检查编译器输出**——验证向量化确实发生了
+4. **先剖析再优化**——在优化之前先找到瓶颈
+5. **理解硬件**——cache、内存、CPU 架构都很重要
 
 ---
 
-## Need More Help?
+## 需要更多帮助？
 
 - [FAQ](../reference/faq.md)
-- [Troubleshooting](../reference/troubleshooting.md)
+- [故障排查](../reference/troubleshooting.md)
 - [GitHub Discussions](https://github.com/LessUp/cpp-high-performance-guide/discussions)

@@ -136,7 +136,7 @@ test('research pages cite concrete external repositories and references', () => 
   }
 })
 
-test('translation scope names bilingual whitepaper routes and English-only detail areas', () => {
+test('translation scope names bilingual whitepaper routes', () => {
   const content = read('TRANSLATION_SCOPE.md')
 
   for (const needle of [
@@ -161,8 +161,7 @@ test('module atlas uses explicit repository paths for supporting headers', () =>
     'examples/03-modern-cpp/include/compile_time.hpp',
     'examples/03-modern-cpp/include/ranges_utils.hpp',
     'examples/03-modern-cpp/include/vector_reserve.hpp',
-    'examples/04-simd-vectorization/include/simd_utils.hpp',
-    'examples/04-simd-vectorization/include/simd_wrapper.hpp',
+    'include/hpc/simd.hpp',
     'examples/05-concurrency/include/concurrency_utils.hpp',
     'examples/05-concurrency/include/lock_free_queue.hpp',
   ]) {
@@ -174,8 +173,6 @@ test('module atlas uses explicit repository paths for supporting headers', () =>
     '`compile_time.hpp`',
     '`ranges_utils.hpp`',
     '`vector_reserve.hpp`',
-    '`simd_utils.hpp`',
-    '`simd_wrapper.hpp`',
     '`concurrency_utils.hpp`',
     '`lock_free_queue.hpp`',
   ]) {

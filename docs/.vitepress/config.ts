@@ -122,6 +122,9 @@ const zhPlaybookItems = [
 const zhReferenceItems = [
   { text: '参考概览', link: '/zh/reference/' },
   { text: 'API 入口', link: '/zh/reference/api-reference' },
+  { text: '内存工具', link: '/zh/reference/api/memory-utils' },
+  { text: 'SIMD Wrapper', link: '/zh/reference/api/simd-wrapper' },
+  { text: 'Benchmark 工具', link: '/zh/reference/api/benchmark-utils' },
   { text: '常见问题', link: '/zh/reference/faq' },
   { text: '故障排查', link: '/zh/reference/troubleshooting' },
   { text: '参考概览（英文）', link: englishReferenceHub },
@@ -146,17 +149,17 @@ const zhAlgorithmsItems = [
 
 const zhDeepDivesItems = [
   { text: '深度专题概览', link: '/zh/deep-dives/' },
-  { text: '内存布局（英文）', link: '/en/deep-dives/memory-layout' },
-  { text: '无锁队列（英文）', link: '/en/deep-dives/lock-free-queue' },
-  { text: 'SIMD 内部机制（英文）', link: '/en/deep-dives/simd-internals' },
+  { text: '内存布局', link: '/zh/deep-dives/memory-layout' },
+  { text: '无锁队列', link: '/zh/deep-dives/lock-free-queue' },
+  { text: 'SIMD 内部机制', link: '/zh/deep-dives/simd-internals' },
 ]
 
 const zhExerciseItems = [
-  { text: '练习总览（英文）', link: '/en/exercises/' },
-  { text: '内存练习（英文）', link: '/en/exercises/module-02-memory' },
-  { text: 'SIMD 练习（英文）', link: '/en/exercises/module-04-simd' },
-  { text: '并发练习（英文）', link: '/en/exercises/module-05-concurrency' },
-  { text: '解答（英文）', link: '/en/exercises/solutions' },
+  { text: '练习总览', link: '/zh/exercises/' },
+  { text: '内存练习', link: '/zh/exercises/module-02-memory' },
+  { text: 'SIMD 练习', link: '/zh/exercises/module-04-simd' },
+  { text: '并发练习', link: '/zh/exercises/module-05-concurrency' },
+  { text: '解答', link: '/zh/exercises/solutions' },
 ]
 
 export default withMermaid(defineConfig({

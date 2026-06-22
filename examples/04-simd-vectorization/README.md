@@ -77,9 +77,9 @@ flowchart TD
 |------|-------|-------------|
 | `src/auto_vectorize.cpp` | Auto-Vectorization | Compiler-friendly patterns |
 | `src/intrinsics_intro.cpp` | SIMD Intrinsics | Manual SSE/AVX/AVX-512 |
-| `src/runtime_dispatch.cpp` | Runtime Dispatch | One binary, best available path |
 | `src/dispatch_example_main.cpp` | Dispatch Demo | Runtime-gated array addition |
-| `include/simd_wrapper.hpp` | SIMD Wrapper | Readable abstractions |
+
+The canonical SIMD wrapper lives in [`include/hpc/simd.hpp`](../../include/hpc/simd.hpp) and provides the `hpc::simd` namespace used across these examples.
 
 ## Key Concepts
 
@@ -142,12 +142,12 @@ void add_avx2(float* a, const float* b, const float* c, size_t n) {
 
 ### SIMD Wrapper
 
-Use the provided wrapper for readable SIMD code:
+Use the canonical `hpc::simd` module for readable SIMD code:
 
 ```cpp
-#include "simd_wrapper.hpp"
+#include <hpc/simd.hpp>
 
-using Vec = simd::Vec256<float>;
+using Vec = hpc::simd::Vec256<float>;
 
 void add_wrapped(float* a, const float* b, const float* c, size_t n) {
     for (size_t i = 0; i < n; i += Vec::size()) {

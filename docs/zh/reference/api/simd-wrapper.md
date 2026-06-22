@@ -1,49 +1,49 @@
 # SIMD Wrapper API
 
-C++ wrapper for SIMD intrinsics providing a clean, portable interface for vectorized operations.
+为 SIMD intrinsic 提供的 C++ wrapper，为向量化运算提供简洁、可移植的接口。
 
 ---
 
-## Overview
+## 概览
 
-**Header:** `include/hpc/simd.hpp`
+**头文件：** `include/hpc/simd.hpp`
 
-**Namespace:** `hpc::simd`
+**命名空间：** `hpc::simd`
 
 ---
 
-## SIMD Level Detection
+## SIMD 级别检测
 
-The library automatically detects available SIMD instruction sets at compile time:
+该库在编译期自动检测可用的 SIMD 指令集：
 
-| Macro | Instruction Set | Width |
+| 宏 | 指令集 | 宽度 |
 |-------|-----------------|-------|
-| `HPC_HAS_SSE2` | SSE2 | 128-bit (4 floats) |
-| `HPC_HAS_AVX` | AVX | 256-bit (8 floats) |
-| `HPC_HAS_AVX2` | AVX2 | 256-bit (8 floats) |
-| `HPC_HAS_AVX512` | AVX-512 | 512-bit (16 floats) |
+| `HPC_HAS_SSE2` | SSE2 | 128 位（4 个 float） |
+| `HPC_HAS_AVX` | AVX | 256 位（8 个 float） |
+| `HPC_HAS_AVX2` | AVX2 | 256 位（8 个 float） |
+| `HPC_HAS_AVX512` | AVX-512 | 512 位（16 个 float） |
 
 ---
 
-## SimdVec Class
+## SimdVec 类
 
-### Template Parameters
+### 模板参数
 
 ```cpp
 template<typename T, size_t Width>
 class SimdVec;
 ```
 
-- `T` - Element type (currently `float` is specialized)
-- `Width` - Number of elements (4, 8, or 16)
+- `T` - 元素类型（目前对 `float` 做了特化）
+- `Width` - 元素数量（4、8 或 16）
 
 ---
 
-### Common Interface
+## 通用接口
 
-All SIMD vector types share this interface:
+所有 SIMD 向量类型共享以下接口：
 
-#### Construction
+#### 构造
 
 ```cpp
 // Default constructor - zero initialized
@@ -59,7 +59,7 @@ SimdVec(const float* ptr);
 static SimdVec load_aligned(const float* ptr);
 ```
 
-#### Storage
+#### 存储
 
 ```cpp
 // Store to unaligned memory
@@ -69,14 +69,14 @@ void store(float* ptr) const;
 void store_aligned(float* ptr) const;
 ```
 
-#### Element Access
+#### 元素访问
 
 ```cpp
 // Get element at index (slow, for debugging)
 float operator[](size_t i) const;
 ```
 
-#### Arithmetic Operators
+#### 算术运算符
 
 ```cpp
 SimdVec operator+(const SimdVec& other) const;
@@ -89,7 +89,7 @@ SimdVec& operator-=(const SimdVec& other);
 SimdVec& operator*=(const SimdVec& other);
 ```
 
-#### Mathematical Operations
+#### 数学运算
 
 ```cpp
 // Sum all lanes into a single value
@@ -110,7 +110,7 @@ SimdVec max(const SimdVec& other) const;
 
 ---
 
-## Type Aliases
+## 类型别名
 
 ### FloatVec
 
@@ -118,14 +118,14 @@ SimdVec max(const SimdVec& other) const;
 using FloatVec = SimdVec<float, WIDTH>;  // WIDTH depends on available SIMD
 ```
 
-Default SIMD vector type, automatically selects the widest available instruction set.
+默认 SIMD 向量类型，自动选择可用的最宽指令集。
 
-| Available SIMD | FloatVec Width |
+| 可用 SIMD | FloatVec 宽度 |
 |----------------|----------------|
-| AVX-512 | 16 floats |
-| AVX2 | 8 floats |
-| SSE2 | 4 floats |
-| None | 4 floats (scalar fallback) |
+| AVX-512 | 16 个 float |
+| AVX2 | 8 个 float |
+| SSE2 | 4 个 float |
+| 无 | 4 个 float（标量回退） |
 
 ### FLOAT_VEC_WIDTH
 
@@ -133,11 +133,11 @@ Default SIMD vector type, automatically selects the widest available instruction
 constexpr size_t FLOAT_VEC_WIDTH;  // 4, 8, or 16
 ```
 
-Number of floats in the default `FloatVec` type.
+默认 `FloatVec` 类型中 float 的数量。
 
 ---
 
-## High-Level Operations
+## 高层操作
 
 ### add_arrays_wrapped
 
@@ -145,9 +145,9 @@ Number of floats in the default `FloatVec` type.
 void add_arrays_wrapped(const float* a, const float* b, float* c, size_t n);
 ```
 
-Add two arrays element-wise: `c[i] = a[i] + b[i]`
+逐元素相加两个数组：`c[i] = a[i] + b[i]`
 
-**Example:**
+**示例：**
 ```cpp
 float a[1024], b[1024], c[1024];
 // ... initialize a and b ...
@@ -163,9 +163,9 @@ hpc::simd::add_arrays_wrapped(a, b, c, 1024);
 float dot_product_wrapped(const float* a, const float* b, size_t n);
 ```
 
-Compute dot product: `sum(a[i] * b[i])`
+计算点积：`sum(a[i] * b[i])`
 
-**Example:**
+**示例：**
 ```cpp
 float a[1024], b[1024];
 // ... initialize ...
@@ -181,7 +181,7 @@ float result = hpc::simd::dot_product_wrapped(a, b, 1024);
 void scale_array_wrapped(float* arr, float scalar, size_t n);
 ```
 
-Scale array by scalar: `arr[i] *= scalar`
+以标量缩放数组：`arr[i] *= scalar`
 
 ---
 
@@ -191,13 +191,13 @@ Scale array by scalar: `arr[i] *= scalar`
 void clamp_array_wrapped(float* arr, float min_val, float max_val, size_t n);
 ```
 
-Clamp array values to range: `arr[i] = clamp(arr[i], min_val, max_val)`
+将数组值限制在范围内：`arr[i] = clamp(arr[i], min_val, max_val)`
 
 ---
 
-## Usage Examples
+## 用法示例
 
-### Basic Vector Operations
+### 基本向量运算
 
 ```cpp
 #include <hpc/simd.hpp>
@@ -226,7 +226,7 @@ void process_arrays(float* a, float* b, float* result, size_t n) {
 }
 ```
 
-### Using Fused Multiply-Add
+### 使用融合乘加
 
 ```cpp
 float compute_weighted_sum(const float* values, const float* weights, 
@@ -251,7 +251,7 @@ float compute_weighted_sum(const float* values, const float* weights,
 }
 ```
 
-### Aligned Memory for Best Performance
+### 使用对齐内存以获得最佳性能
 
 ```cpp
 #include "memory_utils.hpp"
@@ -278,17 +278,17 @@ void aligned_operations() {
 
 ---
 
-## Performance Considerations
+## 性能注意事项
 
-### Alignment
+### 对齐
 
-For best performance:
-- Use `load_aligned()` and `store_aligned()` when data is 64-byte aligned
-- Aligned loads avoid extra instructions on some architectures
+为获得最佳性能：
+- 当数据为 64 字节对齐时，使用 `load_aligned()` 和 `store_aligned()`
+- 对齐加载在某些架构上可避免额外指令
 
-### Remainder Handling
+### 余数处理
 
-Always handle elements that don't fit in a full SIMD vector:
+始终处理无法填满完整 SIMD 向量的剩余元素：
 
 ```cpp
 size_t i = 0;
@@ -300,33 +300,33 @@ for (; i < n; ++i) {
 }
 ```
 
-### Memory Bandwidth
+### 内存带宽
 
-SIMD is most beneficial when:
-- Data is in cache (memory-bound operations won't benefit as much)
-- Operations are compute-intensive
-- Data access is sequential
+SIMD 在以下情况最为有利：
+- 数据已在 cache 中（内存带宽受限的操作收益较小）
+- 运算为计算密集型
+- 数据访问是顺序的
 
 ---
 
-## Quick Reference
+## 快速参考
 
-| Operation | Method | SIMD Equivalent |
+| 运算 | 方法 | SIMD 等价物 |
 |-----------|--------|-----------------|
-| Add | `a + b` | `_mm_add_ps` |
-| Subtract | `a - b` | `_mm_sub_ps` |
-| Multiply | `a * b` | `_mm_mul_ps` |
-| Divide | `a / b` | `_mm_div_ps` |
+| 加法 | `a + b` | `_mm_add_ps` |
+| 减法 | `a - b` | `_mm_sub_ps` |
+| 乘法 | `a * b` | `_mm_mul_ps` |
+| 除法 | `a / b` | `_mm_div_ps` |
 | FMA | `fmadd(a,b,c)` | `_mm_fmadd_ps` |
-| Sqrt | `a.sqrt()` | `_mm_sqrt_ps` |
-| Horizontal sum | `a.horizontal_sum()` | Manual reduction |
-| Min | `a.min(b)` | `_mm_min_ps` |
-| Max | `a.max(b)` | `_mm_max_ps` |
+| 平方根 | `a.sqrt()` | `_mm_sqrt_ps` |
+| 水平求和 | `a.horizontal_sum()` | 手动归约 |
+| 最小值 | `a.min(b)` | `_mm_min_ps` |
+| 最大值 | `a.max(b)` | `_mm_max_ps` |
 
 ---
 
-## See Also
+## 另请参阅
 
-- [SIMD Module Examples](https://github.com/LessUp/cpp-high-performance-guide/tree/master/examples/04-simd-vectorization)
-- [Memory Utilities API](memory-utils.md) - For aligned allocation
-- [Optimization Decision Tree](../../guides/optimization-decision-tree.md)
+- [SIMD 模块示例](https://github.com/LessUp/cpp-high-performance-guide/tree/master/examples/04-simd-vectorization)
+- [Memory 工具 API](memory-utils.md) - 用于对齐分配
+- [优化决策树](../../guides/optimization-decision-tree.md)

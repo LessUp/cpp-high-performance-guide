@@ -6,7 +6,10 @@
 
 | 如果你需要…… | 从这里开始 | 范围 |
 | --- | --- | --- |
-| 可复用辅助 API 与模块级头文件 | [API 入口](/zh/reference/api-reference) | 已文档化、但更深入细节页仍以英文为主的 API 入口页 |
+| 可复用辅助 API 与模块级头文件 | [API 入口](/zh/reference/api-reference) | 已文档化的 API 入口页与底层细节页 |
+| 内存工具 API 细节 | [内存工具](/zh/reference/api/memory-utils) | `hpc::memory` 命名空间的对齐分配器与缓存行填充工具 |
+| SIMD Wrapper API 细节 | [SIMD Wrapper](/zh/reference/api/simd-wrapper) | `hpc::simd` 命名空间的运行时分发与向量类型 |
+| Benchmark 工具 API 细节 | [Benchmark 工具](/zh/reference/api/benchmark-utils) | `hpc::bench` 命名空间的辅助函数与结果比较工具 |
 | 对高频安装与工作流问题的快速回答 | [常见问题](/zh/reference/faq) | 高频问题与简明答案 |
 | 构建、运行时或基准失败后的恢复路径 | [故障排查](/zh/reference/troubleshooting) | 操作层诊断路线 |
 | 方法论背后的来源材料 | [研究参考资料](/zh/research/references) | 标准、手册、仓库与文章 |
@@ -21,10 +24,6 @@
 | 内存安全检查 | `cmake --preset=asan && cmake --build build/asan && ctest --preset=asan` |
 | 竞态检测 | `cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan` |
 | 未定义行为检查 | `cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan` |
-
-## 英文优先的细节页
-
-`reference/api/` 下的低层细节页按设计继续保持英文优先。它们记录诸如内存工具、SIMD wrapper 与 benchmark helper 之类的代码表面，此处更强调精确性，而不是完整翻译覆盖。
 
 ## 与其他部分的关系
 

@@ -37,7 +37,7 @@ Every major topic is meant to be **readable, buildable, and measurable**.
 
 | Area | What it covers |
 | --- | --- |
-| `examples/01-cmake-modern/` | modern CMake structure and anti-patterns |
+| `examples/01-cmake-modern/` | modern CMake structure and best practices |
 | `examples/02-memory-cache/` | AOS vs SOA, false sharing, alignment, prefetch |
 | `examples/03-modern-cpp/` | constexpr, move semantics, reserve, ranges |
 | `examples/04-simd-vectorization/` | auto-vectorization, intrinsics, SIMD wrappers |

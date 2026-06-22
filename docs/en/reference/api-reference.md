@@ -8,7 +8,7 @@ Utility functions and helper classes available in the project.
 
 This reference documents utilities found in:
 - `examples/02-memory-cache/include/memory_utils.hpp`
-- `examples/04-simd-vectorization/include/simd_wrapper.hpp`
+- `include/hpc/simd.hpp`
 - `benchmarks/common/benchmark_utils.hpp`
 
 ---
@@ -72,7 +72,7 @@ Benchmarking helpers and result export.
 | Header | Namespace | Purpose |
 |--------|-----------|---------|
 | `memory_utils.hpp` | `hpc::memory` | Memory optimization |
-| `simd_wrapper.hpp` | `hpc::simd` | SIMD operations |
+| `hpc/simd.hpp` | `hpc::simd` | SIMD operations |
 | `benchmark_utils.hpp` | `hpc::bench` | Benchmarking |
 
 ---

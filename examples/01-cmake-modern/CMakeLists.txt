@@ -5,12 +5,12 @@ message(STATUS "")
 message(STATUS "=== Modern CMake Examples ===")
 message(STATUS "")
 message(STATUS "This module contains:")
-message(STATUS "  - anti-patterns/  : Examples of what NOT to do")
 message(STATUS "  - best-practices/ : Modern CMake patterns to follow")
+message(STATUS "  - cmake_demo      : Runnable demo built from best-practices/src/")
 message(STATUS "")
 
-# Note: The subdirectories are for documentation purposes
-# They are not added as subdirectories to avoid polluting the main build
+# Note: best-practices/ is a documentation-only CMakeLists (not add_subdirectory'd)
+# to avoid polluting the main build. The demo below is the runnable surface.
 
 # Create a simple demo target
 add_executable(cmake_demo

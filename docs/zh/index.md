@@ -182,15 +182,15 @@ layout: home
       description: "保留原有主题顺序，但把它视为导读程序，而不是唯一的文档策略。",
       links: [
         { href: "/zh/guides/learning-path", label: "学习路径" },
-        { href: "/en/exercises/module-02-memory", label: "内存练习（英文）" },
+        { href: "/zh/exercises/module-02-memory", label: "内存练习" },
       ],
     },
     {
       title: "SIMD 与并发",
       description: "当你已掌握基础并想直接查看 ISA 或线程取舍时，可以直接切入性能最重的模块。",
       links: [
-        { href: "/en/exercises/module-04-simd", label: "SIMD 练习（英文）" },
-        { href: "/en/exercises/module-05-concurrency", label: "并发练习（英文）" },
+        { href: "/zh/exercises/module-04-simd", label: "SIMD 练习" },
+        { href: "/zh/exercises/module-05-concurrency", label: "并发练习" },
       ],
     },
     {
@@ -223,4 +223,4 @@ layout: home
 ## 次要入口
 
 - [贡献流程](/zh/contributing/ai-workflow) 继续为仓库贡献者保留，但不属于主要的专家阅读弧线。
-- [练习](/en/exercises/) 继续作为刻意练习表面存在，但有意保持为次级入口，而不是主要架构叙事。
+- [练习](/zh/exercises/) 继续作为刻意练习表面存在，但有意保持为次级入口，而不是主要架构叙事。

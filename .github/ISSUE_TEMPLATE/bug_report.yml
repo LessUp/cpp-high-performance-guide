@@ -44,8 +44,8 @@ body:
       description: Relevant log output
       render: shell
 
-  - type: textarea
-    id: spec-impact
+  - type: input
+    id: affected-module
     attributes:
-      label: Related capability or OpenSpec change
-      description: Which capability spec or OpenSpec change does this affect, if known?
+      label: Affected module
+      description: Which example module or include header does this affect, if known?

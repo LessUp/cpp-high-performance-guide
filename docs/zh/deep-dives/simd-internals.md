@@ -2,20 +2,20 @@
 type: deep-dive
 difficulty: advanced
 prerequisites:
-  - /en/academy/module-atlas
-  - /en/architecture/repository-topology
-description: Deep dive into SIMD vectorization internals including auto-vectorization conditions, intrinsic wrappers, and runtime dispatch mechanisms.
+  - /zh/academy/module-atlas
+  - /zh/architecture/repository-topology
+description: 深入探讨 SIMD 向量化内部机制，涵盖自动向量化条件、intrinsic 封装、运行时分发机制。
 ---
 
-# SIMD Internals Deep Dive
+# SIMD 内部机制深度专题
 
-This deep dive explores the internal mechanisms of SIMD (Single Instruction Multiple Data) vectorization in modern C++ applications.
+本深度专题探讨现代 C++ 应用中 SIMD（单指令多数据）向量化的内部机制。
 
-## SIMD Fundamentals
+## SIMD 基础
 
-### The Vector Advantage
+### 向量化的优势
 
-SIMD processes multiple data elements with a single instruction:
+SIMD 用一条指令处理多个数据元素：
 
 ```
 Scalar: 4 operations for 4 floats
@@ -29,19 +29,19 @@ SIMD (SSE): 1 operation for 4 floats
 └─────────────────────┘
 ```
 
-### SIMD Register Sizes
+### SIMD 寄存器大小
 
-| ISA | Register Size | Floats | Doubles | Int32 |
+| ISA | 寄存器大小 | Float 数 | Double 数 | Int32 数 |
 |-----|---------------|--------|---------|-------|
-| SSE2 | 128-bit | 4 | 2 | 4 |
-| AVX | 256-bit | 8 | 4 | 8 |
-| AVX-512 | 512-bit | 16 | 8 | 16 |
+| SSE2 | 128 位 | 4 | 2 | 4 |
+| AVX | 256 位 | 8 | 4 | 8 |
+| AVX-512 | 512 位 | 16 | 8 | 16 |
 
-## Auto-Vectorization Conditions
+## 自动向量化条件
 
-The compiler can automatically vectorize loops when specific conditions are met.
+当满足特定条件时，编译器可以自动对循环进行向量化。
 
-### Good Patterns
+### 良好模式
 
 ```cpp
 // ✅ Simple, contiguous access
@@ -68,7 +68,7 @@ void process_known(float data[N]) {
 }
 ```
 
-### Bad Patterns
+### 不良模式
 
 ```cpp
 // ❌ Data dependency (prefix sum)
@@ -102,7 +102,7 @@ void with_call(float* data, size_t n) {
 }
 ```
 
-### Compiler Hints
+### 编译器提示
 
 ```cpp
 // GCC/Clang: Suggest vectorization
@@ -124,9 +124,9 @@ std::transform(std::execution::par_unseq,
                [](float x, float y) { return x + y; });
 ```
 
-## SIMD Wrapper Design
+## SIMD 封装设计
 
-### Layered Abstraction
+### 分层抽象
 
 ```cpp
 // hpc/simd.hpp - Layered SIMD abstraction
@@ -171,7 +171,7 @@ struct AVX {
     static inline Vec add(Vec a, Vec b) { return _mm256_add_ps(a, b); }
     static inline Vec mul(Vec a, Vec b) { return _mm256_mul_ps(a, b); }
     static inline Vec load(const float* p) { return _mm256_loadu_ps(p); }
-    static inline void store(float* p, Vec v) { _mm256_storeu_ps(p, v); }
+    static inline void store(float* p, Vec v) { return _mm256_storeu_ps(p, v); }
 };
 #endif
 
@@ -185,14 +185,14 @@ struct AVX512 {
     static inline Vec add(Vec a, Vec b) { return _mm512_add_ps(a, b); }
     static inline Vec mul(Vec a, Vec b) { return _mm512_mul_ps(a, b); }
     static inline Vec load(const float* p) { return _mm512_loadu_ps(p); }
-    static inline void store(float* p, Vec v) { _mm512_storeu_ps(p, v); }
+    static inline void store(float* p, Vec v) { return _mm512_storeu_ps(p, v); }
 };
 #endif
 
 } // namespace hpc::simd
 ```
 
-### Operator Overloading
+### 运算符重载
 
 ```cpp
 // Natural syntax through operator overloading
@@ -231,9 +231,9 @@ void add_arrays(float* a, float* b, float* c, size_t n) {
 } // namespace hpc::simd
 ```
 
-## Runtime Dispatch
+## 运行时分发
 
-### Function Multi-Versioning
+### 函数多版本化
 
 ```cpp
 // Generate multiple versions at compile time
@@ -272,7 +272,7 @@ inline void add_arrays(float* a, float* b, float* c, size_t n) {
 }
 ```
 
-### Manual Runtime Dispatch
+### 手动运行时分发
 
 ```cpp
 #include <cpuid.h>
@@ -312,9 +312,9 @@ AddFunc select_add_func() {
 }
 ```
 
-## Masked Operations (AVX-512)
+## 掩码操作（AVX-512）
 
-AVX-512 introduces mask registers for predicated execution:
+AVX-512 引入了掩码寄存器，支持谓词化执行：
 
 ```cpp
 // AVX-512 masked operation
@@ -337,23 +337,23 @@ void conditional_scale(float* data, size_t n, float threshold) {
 }
 ```
 
-### Mask Benefits
+### 掩码的收益
 
-1. **No branches**: Eliminates branch misprediction
-2. **Full vector utilization**: All lanes active, just with different operations
-3. **Cleaner code**: Natural expression of conditional logic
+1. **无分支**：消除分支误预测
+2. **完整的向量利用率**：所有 lane 均活跃，仅执行不同操作
+3. **更清晰的代码**：条件逻辑的表达更自然
 
-## Performance Analysis
+## 性能分析
 
-### Throughput Comparison
+### 吞吐对比
 
-| Operation | Scalar | SSE2 | AVX2 | AVX-512 |
+| 操作 | Scalar | SSE2 | AVX2 | AVX-512 |
 |-----------|--------|------|------|---------|
-| Add (GFLOPS) | 2.0 | 8.0 | 16.0 | 32.0 |
-| Mul (GFLOPS) | 2.0 | 8.0 | 16.0 | 32.0 |
+| 加法 (GFLOPS) | 2.0 | 8.0 | 16.0 | 32.0 |
+| 乘法 (GFLOPS) | 2.0 | 8.0 | 16.0 | 32.0 |
 | FMA (GFLOPS) | N/A | N/A | 32.0 | 64.0 |
 
-### Latency vs Throughput
+### 延迟与吞吐
 
 ```cpp
 // High latency operation - hide with independent work
@@ -366,23 +366,23 @@ __m256 z = _mm256_add_ps(e, f);  // ~3 cycles
 // Now use x - latency hidden
 ```
 
-## Practical Guidelines
+## 实践指南
 
-### When to Use Explicit SIMD
+### 何时使用显式 SIMD
 
-✅ **Use explicit SIMD when:**
-- Auto-vectorization fails (check compiler reports)
-- Performance is critical and vectorization is key
-- You need masked operations (AVX-512)
-- Algorithm has specific SIMD-friendly structure
+✅ **使用显式 SIMD 的场景：**
+- 自动向量化失败（检查编译器报告）
+- 性能至关重要且向量化是关键
+- 需要掩码操作（AVX-512）
+- 算法具有特定的 SIMD 友好结构
 
-❌ **Prefer auto-vectorization when:**
-- Code simplicity is important
-- Compiler can vectorize effectively
-- Portability across architectures matters
-- Maintenance cost is a concern
+❌ **优先使用自动向量化的场景：**
+- 代码简洁性重要
+- 编译器能有效向量化
+- 跨架构可移植性重要
+- 维护成本是一个考量因素
 
-### Debugging Vectorization
+### 调试向量化
 
 ```bash
 # GCC: Show vectorization reports
@@ -397,7 +397,7 @@ clang++ -O3 -Rpass-missed=loop-vectorize
 icpc -O3 -qopt-report=5 -qopt-report-phase=vec
 ```
 
-## References
+## 参考文献
 
 <Citation
   :references="[

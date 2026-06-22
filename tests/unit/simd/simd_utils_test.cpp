@@ -1,6 +1,6 @@
 /**
  * @file simd_utils_test.cpp
- * @brief Unit tests for simd_utils.hpp and simd_wrapper.hpp
+ * @brief Unit tests for the canonical hpc::simd module
  */
 
 #include <gtest/gtest.h>
