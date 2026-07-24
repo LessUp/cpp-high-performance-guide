@@ -150,7 +150,7 @@ inline float compute_energy_soa(const ParticleSOA& particles) {
  * @brief Initialize AOS particles with deterministic random values
  */
 inline void initialize_particles(std::vector<ParticleAOS>& particles, size_t n) {
-    // 使用确定性初始化而非随机，避免 <random> 依赖
+    // Deterministic init instead of random to avoid <random> dependency
     particles.resize(n);
     for (size_t i = 0; i < n; ++i) {
         float fi = static_cast<float>(i);

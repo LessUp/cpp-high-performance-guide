@@ -19,17 +19,13 @@
 #include <atomic>
 #include <cmath>
 #include <cstdlib>
+#include <hpc/core.hpp>
 #include <thread>
 #include <vector>
 
-// 使用共享的粒子类型定义，确保测试与示例代码一致
-#include "particle_types.hpp"
-// 使用核心平台常量
-#include "hpc/core.hpp"
-// 使用并发工具（AlignedCounter）
-#include "concurrency_utils.hpp"
-// 使用基准测试计时工具
 #include "benchmark_utils.hpp"
+#include "concurrency_utils.hpp"
+#include "particle_types.hpp"
 
 namespace {
 
@@ -81,7 +77,7 @@ RC_GTEST_PROP(MemoryProperties, SOAPerformanceAdvantage, ()) {
         update_particles_aos(aos, dt);
     }
     aos_timer.stop();
-    const auto aos_time = aos_timer.elapsed_us();  // 微秒
+    const auto aos_time = aos_timer.elapsed_us();
 
     // Measure SOA time using hpc::bench::Timer
     Timer soa_timer;
@@ -90,7 +86,7 @@ RC_GTEST_PROP(MemoryProperties, SOAPerformanceAdvantage, ()) {
         update_particles_soa(soa, dt);
     }
     soa_timer.stop();
-    const auto soa_time = soa_timer.elapsed_us();  // 微秒
+    const auto soa_time = soa_timer.elapsed_us();
 
     // SOA should be faster (or at least not significantly slower)
     // Allow 20% tolerance for system noise
@@ -111,9 +107,8 @@ RC_GTEST_PROP(MemoryProperties, SOAPerformanceAdvantage, ()) {
 // Validates: Requirements 2.2, 5.3
 //------------------------------------------------------------------------------
 
-// 使用 hpc::concurrency::AlignedCounter 和 std::atomic<int> 进行对比测试
-// 注意：UnalignedCounter 已被删除，因为它没有任何价值
-// 对于未对齐的情况，直接使用 std::atomic<int>
+// Compare hpc::concurrency::AlignedCounter vs plain std::atomic<int>.
+// For the unaligned case, use std::atomic<int> directly.
 
 RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
     // Feature: hpc-optimization-guide, Property 4: Cache-Line Aligned Counters
@@ -123,7 +118,7 @@ RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
     const int increments = *rc::gen::inRange(10000, 100001);
 
     // Test with unaligned counters (false sharing)
-    // 直接使用 std::atomic<int64_t> 来演示未对齐的情况
+    // Use plain std::atomic<int64_t> to demonstrate the unaligned case
     std::vector<std::atomic<int64_t>> unaligned(static_cast<size_t>(num_threads));
 
     Timer unaligned_timer;
@@ -142,7 +137,7 @@ RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
         }
     }
     unaligned_timer.stop();
-    const auto unaligned_time = unaligned_timer.elapsed_us();  // 微秒
+    const auto unaligned_time = unaligned_timer.elapsed_us();
 
     // Test with aligned counters (no false sharing)
     std::vector<AlignedCounter> aligned(static_cast<size_t>(num_threads));
@@ -163,7 +158,7 @@ RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
         }
     }
     aligned_timer.stop();
-    const auto aligned_time = aligned_timer.elapsed_us();  // 微秒
+    const auto aligned_time = aligned_timer.elapsed_us();
 
     // Verify correctness
     for (int t = 0; t < num_threads; ++t) {

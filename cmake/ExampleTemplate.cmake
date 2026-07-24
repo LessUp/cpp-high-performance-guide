@@ -40,6 +40,9 @@ function(hpc_add_example)
     
     # Enable sanitizers if configured
     hpc_enable_sanitizers(${ARG_NAME})
+
+    # Canonical headers (include/hpc/)
+    target_link_libraries(${ARG_NAME} PRIVATE hpc_headers)
     
     # Add include directories (target-based, not directory-based!)
     if(ARG_INCLUDE_DIRS)
@@ -74,6 +77,7 @@ function(hpc_add_example)
         target_link_libraries(${bench_name} PRIVATE
             benchmark::benchmark
             benchmark::benchmark_main
+            hpc_headers
         )
         
         if(ARG_INCLUDE_DIRS)
@@ -173,6 +177,7 @@ function(hpc_add_benchmark)
     target_link_libraries(${ARG_NAME} PRIVATE
         benchmark::benchmark
         benchmark::benchmark_main
+        hpc_headers
     )
     
     if(ARG_INCLUDE_DIRS)

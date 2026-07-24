@@ -78,20 +78,14 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 ## Documentation entry points
 
 - **Docs site:** <https://lessup.github.io/cpp-high-performance-guide/>
-- **Academy:** [`docs/en/academy/index.md`](docs/en/academy/index.md)
-- **Architecture:** [`docs/en/architecture/index.md`](docs/en/architecture/index.md)
 - **Playbook:** [`docs/en/playbook/index.md`](docs/en/playbook/index.md)
 - **Reference:** [`docs/en/reference/index.md`](docs/en/reference/index.md)
-- **Research:** [`docs/en/research/index.md`](docs/en/research/index.md)
-- **Quick start inside the playbook:** [`docs/en/getting-started/quickstart.md`](docs/en/getting-started/quickstart.md)
-- **Profiling guide:** [`docs/en/guides/profiling-guide.md`](docs/en/guides/profiling-guide.md)
-- **Validation & sanitizers:** [`docs/en/guides/validation.md`](docs/en/guides/validation.md)
 - **Chinese entry:** `README.zh-CN.md` and `docs/zh/`
 
 ## Tech stack
 
 - **Language:** C++20
-- **Build:** CMake 3.22+, Ninja
+- **Build:** CMake 3.20+, Ninja
 - **Testing:** Google Test, RapidCheck
 - **Benchmarking:** Google Benchmark
 - **Docs:** VitePress + GitHub Pages

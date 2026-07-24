@@ -11,6 +11,7 @@ target_include_directories(memory_utils_test PRIVATE
 target_link_libraries(memory_utils_test PRIVATE
     GTest::gtest
     GTest::gtest_main
+    hpc_headers
 )
 
 hpc_set_compiler_options(memory_utils_test)

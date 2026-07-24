@@ -85,5 +85,3 @@ BENCHMARK(BM_Atomic_Relaxed)
     ->UseRealTime();
 
 }  // namespace
-
-BENCHMARK_MAIN();

@@ -6,7 +6,7 @@ This repository is in **closure and hardening mode** (archive-ready for low-freq
 
 ## C++ Standards and Style
 
-- **Target**: C++17 minimum, C++20 where beneficial
+- **Target**: C++20 (required, `CMAKE_CXX_STANDARD_REQUIRED ON`)
 - **Style**: enforced via `.clang-format` (Google style, 100 chars)
 - **Memory safety**: prefer RAII, smart pointers, avoid raw `new/delete`
 - **Performance**: always measure with benchmarks before claiming improvement
@@ -73,14 +73,7 @@ The `.vscode/` directory is **gitignored**. Use `.clangd`, `.editorconfig`, and 
 
 ## Things to avoid reintroducing
 
-- HonKit / GitBook-era configuration
-- `.kiro/`-style legacy spec structures
-- duplicate changelog surfaces with no maintenance value
 - non-blocking CI steps that hide real failures
-- generic AI instructions that do not reflect this repository
 - per-example shim headers that only re-export a canonical `include/hpc/` header
-- CMake anti-pattern directories with no runnable target
 - wrapper scripts that duplicate `cmake --preset` commands
-- split root-level design md files (consolidated into `docs/META.md`)
-- English-only documentation surfaces (all bilingual surfaces now have zh parity)
-- unused custom Vue components in the docs theme
+- English-only documentation surfaces (all bilingual surfaces must have zh parity)

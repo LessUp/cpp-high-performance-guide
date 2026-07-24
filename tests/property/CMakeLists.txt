@@ -9,7 +9,6 @@ add_executable(memory_properties_test
 target_include_directories(memory_properties_test PRIVATE
     ${CMAKE_SOURCE_DIR}/examples/02-memory-cache/include
     ${CMAKE_SOURCE_DIR}/examples/05-concurrency/include
-    ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/benchmarks/common
 )
 
@@ -19,6 +18,7 @@ target_link_libraries(memory_properties_test PRIVATE
     rapidcheck
     rapidcheck_gtest
     benchmark::benchmark
+    hpc_headers
 )
 
 hpc_set_compiler_options(memory_properties_test)
@@ -35,6 +35,7 @@ target_link_libraries(simd_properties_test PRIVATE
     rapidcheck
     rapidcheck_gtest
     benchmark::benchmark
+    hpc_headers
 )
 
 hpc_set_compiler_options(simd_properties_test)
@@ -64,6 +65,7 @@ target_link_libraries(concurrency_properties_test PRIVATE
     rapidcheck
     rapidcheck_gtest
     Threads::Threads
+    hpc_headers
 )
 
 # Link OpenMP if available

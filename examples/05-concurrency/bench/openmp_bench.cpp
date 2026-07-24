@@ -85,5 +85,3 @@ BENCHMARK(BM_OpenMP_Reduction)
     ->UseRealTime();
 
 }  // namespace
-
-BENCHMARK_MAIN();

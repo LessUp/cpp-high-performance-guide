@@ -72,5 +72,3 @@ BENCHMARK(BM_Vector_Resize)
     ->Unit(benchmark::kMicrosecond);
 
 }  // namespace
-
-BENCHMARK_MAIN();

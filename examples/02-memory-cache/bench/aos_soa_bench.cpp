@@ -138,5 +138,3 @@ BENCHMARK(BM_SOA_Update)
     ->Unit(benchmark::kMicrosecond);
 
 }  // namespace
-
-BENCHMARK_MAIN();

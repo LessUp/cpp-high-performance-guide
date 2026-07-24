@@ -78,21 +78,14 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 ## 文档入口
 
 - **文档站：** <https://lessup.github.io/cpp-high-performance-guide/>
-- **学院：** [`docs/zh/academy/index.md`](docs/zh/academy/index.md)
-- **架构：** [`docs/zh/architecture/index.md`](docs/zh/architecture/index.md)
 - **实践手册：** [`docs/zh/playbook/index.md`](docs/zh/playbook/index.md)
 - **参考：** [`docs/zh/reference/index.md`](docs/zh/reference/index.md)
-- **研究：** [`docs/zh/research/index.md`](docs/zh/research/index.md)
-- **实践手册内的快速开始：** [`docs/zh/getting-started/quickstart.md`](docs/zh/getting-started/quickstart.md)
-- **学习路径：** [`docs/zh/guides/learning-path.md`](docs/zh/guides/learning-path.md)
-- **性能分析指南：** [`docs/zh/guides/profiling-guide.md`](docs/zh/guides/profiling-guide.md)
-- **验证与 Sanitizer：** [`docs/zh/guides/validation.md`](docs/zh/guides/validation.md)
 - **英文入口：** `README.md` 与 `docs/en/`
 
 ## 技术栈
 
 - **语言：** C++20
-- **构建：** CMake 3.22+、Ninja
+- **构建：** CMake 3.20+、Ninja
 - **测试：** Google Test、RapidCheck
 - **基准测试：** Google Benchmark
 - **文档：** VitePress + GitHub Pages

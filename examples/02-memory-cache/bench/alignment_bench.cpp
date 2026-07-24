@@ -142,5 +142,3 @@ BENCHMARK(BM_AVX_Unaligned)
 #endif
 
 }  // namespace
-
-BENCHMARK_MAIN();

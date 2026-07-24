@@ -99,5 +99,3 @@ BENCHMARK(BM_FalseSharing_Padded)
     ->UseRealTime();
 
 }  // namespace
-
-BENCHMARK_MAIN();

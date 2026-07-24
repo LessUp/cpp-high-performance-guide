@@ -15,19 +15,18 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <hpc/core.hpp>  // platform constants
 #include <memory>
 #include <new>
 #include <vector>
 
-#include "hpc/core.hpp"  // 平台常量
-
 namespace hpc::memory {
 
 //------------------------------------------------------------------------------
-// 使用核心头文件中的常量
+// Constants from the canonical core header
 //------------------------------------------------------------------------------
 
-// CACHE_LINE_SIZE 和 PAGE_SIZE 来自 hpc::core 命名空间
+// CACHE_LINE_SIZE and PAGE_SIZE come from the hpc::core namespace
 
 //------------------------------------------------------------------------------
 // Aligned Memory Allocation

@@ -33,7 +33,7 @@ cmake --build build/release
 4. Compare the two runs:
 
 ```bash
-python3 scripts/compare_benchmarks.py simd-baseline.json simd-candidate.json --threshold 10
+python3 tools/performance/benchmark_compare.py simd-baseline.json simd-candidate.json --threshold 10
 ```
 
 The script prints a per-benchmark table with baseline time, candidate time, and

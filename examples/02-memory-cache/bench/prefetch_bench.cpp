@@ -156,5 +156,3 @@ BENCHMARK(BM_Random_WithPrefetch)
     ->Unit(benchmark::kMillisecond);
 
 }  // namespace
-
-BENCHMARK_MAIN();

@@ -298,5 +298,3 @@ static void BM_FloatVec_HorizontalSum(benchmark::State& state) {
 }
 
 BENCHMARK(BM_FloatVec_HorizontalSum);
-
-BENCHMARK_MAIN();

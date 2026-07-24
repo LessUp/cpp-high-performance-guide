@@ -211,7 +211,7 @@ Use the preset-driven path first. It is the shortest route that still preserves 
 
 | Surface | Detail |
 | --- | --- |
-| C++ standard | C++17 minimum, C++20 where beneficial |
+| C++ standard | C++20 (required) |
 | Build system | CMake 3.20+ with presets |
 | Platforms | Linux primary; macOS and Windows via cross-platform headers |
 | Compilers | GCC 11+, Clang 14+, MSVC 2022+ |

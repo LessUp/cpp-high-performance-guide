@@ -18,22 +18,21 @@
 #include <chrono>
 #include <concepts>  // C++20 concepts
 #include <functional>
-#include <mutex>  // for std::lock_guard, std::unique_lock
+#include <hpc/core.hpp>  // platform constants
+#include <mutex>         // for std::lock_guard, std::unique_lock
 #include <thread>
 #include <vector>
-
-#include "hpc/core.hpp"  // 平台常量
 
 namespace hpc::concurrency {
 
 //------------------------------------------------------------------------------
-// 使用核心头文件中的常量和函数
+// Constants and utilities from the canonical core header
 //------------------------------------------------------------------------------
 
-// CACHE_LINE_SIZE 来自 hpc::core 命名空间
-// hardware_concurrency() 在 hpc::core 中定义
+// CACHE_LINE_SIZE comes from the hpc::core namespace
+// hardware_concurrency() is defined in hpc::core
 
-// 为了向后兼容，在当前命名空间中提供别名
+// Backward-compatibility alias in the current namespace
 using hpc::core::hardware_concurrency;
 
 //------------------------------------------------------------------------------
@@ -70,7 +69,7 @@ struct alignas(hpc::core::CACHE_LINE_SIZE) AlignedCounter {
 };
 
 //------------------------------------------------------------------------------
-// Spin Lock - 符合 C++ BasicLockable 和 Lockable 概念
+// Spin Lock - satisfies C++ BasicLockable and Lockable concepts
 //------------------------------------------------------------------------------
 
 /**

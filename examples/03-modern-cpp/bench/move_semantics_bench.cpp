@@ -111,5 +111,3 @@ BENCHMARK(BM_Vector_EmplaceBack)
     ->Unit(benchmark::kMillisecond);
 
 }  // namespace
-
-BENCHMARK_MAIN();

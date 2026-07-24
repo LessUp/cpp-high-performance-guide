@@ -6,8 +6,11 @@ set -euo pipefail
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
+# Compare against the upstream tracking branch (or origin/master as fallback)
+upstream=$(git rev-parse --abbrev-ref @{push} 2>/dev/null || echo "origin/master")
+
 # Only run format check if there are C++ files changed
-if git diff --name-only --cached | grep -qE '\.(cpp|hpp|h|cxx|cc)$'; then
+if git diff --name-only "$upstream"..HEAD | grep -qE '\.(cpp|hpp|h|cxx|cc)$'; then
     echo "Checking C++ formatting..."
     ./scripts/format.sh --check || {
         echo "❌ Format check failed. Run ./scripts/format.sh to fix."

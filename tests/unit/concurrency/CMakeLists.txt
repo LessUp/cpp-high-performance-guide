@@ -12,6 +12,7 @@ target_link_libraries(concurrency_utils_test PRIVATE
     GTest::gtest
     GTest::gtest_main
     Threads::Threads
+    hpc_headers
 )
 
 hpc_set_compiler_options(concurrency_utils_test)
@@ -25,7 +26,6 @@ add_executable(lock_free_queue_test
 )
 
 target_include_directories(lock_free_queue_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/examples/05-concurrency/include
 )
 
@@ -33,6 +33,7 @@ target_link_libraries(lock_free_queue_test PRIVATE
     GTest::gtest
     GTest::gtest_main
     Threads::Threads
+    hpc_headers
 )
 
 hpc_set_compiler_options(lock_free_queue_test)

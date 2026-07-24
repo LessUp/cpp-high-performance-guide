@@ -7,6 +7,7 @@ add_executable(simd_utils_test
 target_link_libraries(simd_utils_test PRIVATE
     GTest::gtest
     GTest::gtest_main
+    hpc_headers
 )
 
 hpc_set_compiler_options(simd_utils_test)
@@ -30,6 +31,7 @@ add_executable(hpc_simd_test
 target_link_libraries(hpc_simd_test PRIVATE
     GTest::gtest
     GTest::gtest_main
+    hpc_headers
 )
 
 hpc_set_compiler_options(hpc_simd_test)
@@ -45,6 +47,7 @@ add_executable(simd_dispatch_test
 target_link_libraries(simd_dispatch_test PRIVATE
     GTest::gtest
     GTest::gtest_main
+    hpc_headers
 )
 
 hpc_set_compiler_options(simd_dispatch_test)

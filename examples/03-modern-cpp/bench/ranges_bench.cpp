@@ -166,5 +166,3 @@ BENCHMARK(BM_Chain_RangesView)
     ->Unit(benchmark::kMicrosecond);
 
 }  // namespace
-
-BENCHMARK_MAIN();
