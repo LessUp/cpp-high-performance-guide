@@ -1,259 +1,323 @@
----
-type: deep-dive
-difficulty: advanced
-description: 深入探讨内存布局优化技术，涵盖 AOS 与 SOA、cache line 对齐以及 false sharing 消除。
----
+# 内存布局与缓存
 
-# 内存布局深度专题
+> 本文所有示例均可在本仓库中直接编译运行。运行基准测试查看你的硬件上的实际数据。
 
-本深度专题探讨现代 C++ 应用中数据结构设计与内存性能之间的关键关系。
+## 为什么内存布局决定性能
 
-## 内存层级的现实
+现代 CPU 的运算速度远超内存带宽。处理器通过多级缓存弥合这一鸿沟：
 
-现代 CPU 拥有复杂的内存层级，其访问延迟差异巨大：
+| 层级 | 典型容量 | 访问延迟 | 带宽 |
+|------|----------|----------|------|
+| L1 Data Cache | 32–64 KB | ~1 ns (4 cycles) | ~2 TB/s |
+| L2 Cache | 256 KB – 1 MB | ~4 ns (12 cycles) | ~1 TB/s |
+| L3 Cache (shared) | 8–64 MB | ~10–20 ns (40–80 cycles) | ~400 GB/s |
+| Main Memory (DDR5) | 16–256 GB | ~80–120 ns (200–300 cycles) | ~50–100 GB/s |
 
-| 层级 | 容量 | 延迟 | 周期数 |
-|-------|------|---------|--------|
-| L1 缓存 | 32-64 KB | ~1 ns | 3-4 |
-| L2 缓存 | 256-512 KB | ~4 ns | 10-12 |
-| L3 缓存 | 2-32 MB | ~12 ns | 40-50 |
-| 主存 | GB 级 | ~100 ns | 200-300 |
+**关键洞察：一次 L1 命中约 4 个时钟周期，一次 DRAM 访问约 200–300 个周期——代价相差近 100 倍。**
 
-**关键洞察**：一次 cache miss 的代价可达 cache hit 的 100 倍。内存布局优化的核心在于最大化缓存利用率。
+这意味着数据局部性是性能的第一决定因素。相同算法、相同数据量，缓存命中率不同，实测性能可以差 5–10 倍。而内存布局直接决定了访问模式——相同数据不同排列，缓存行为截然不同。
 
-## AOS 与 SOA：布局之争
-
-### 结构体数组（AOS）
+本仓库 `include/hpc/core.hpp` 提供平台常量：
 
 ```cpp
-// Traditional approach - intuitive but often suboptimal
-struct Particle {
-    float x, y, z;      // Position (12 bytes)
-    float vx, vy, vz;   // Velocity (12 bytes)
-    float mass;         // Property (4 bytes)
-};  // Total: 28 bytes per particle
+namespace hpc::core {
+constexpr std::size_t CACHE_LINE_SIZE = 64;  // 编译期常量，用于 alignas
 
-std::vector<Particle> particles(10000);
+inline std::size_t cache_line_size() {       // 运行时检测
+#if defined(__cpp_lib_hardware_interference_size)
+    return std::hardware_destructive_interference_size;
+#else
+    return 64;
+#endif
+}
+}
 ```
 
-**AOS 的问题：**
-1. **缓存利用率差**：更新位置时，速度与质量被不必要地载入缓存
-2. **对 SIMD 不友好**：数据交错，向量化困难
-3. **false sharing 风险**：多线程场景下相邻粒子可能共享 cache line
+---
 
-### 数组结构体（SOA）
+## AOS vs SOA
+
+### 问题
+
+粒子系统中每个粒子有位置 `(x, y, z)` 和速度 `(vx, vy, vz)`。AOS 是最自然的写法：
 
 ```cpp
-// Performance-oriented approach
-struct ParticleSystem {
-    std::vector<float> x, y, z;      // All x positions contiguous
-    std::vector<float> vx, vy, vz;   // All velocities contiguous
-    std::vector<float> mass;          // All masses contiguous
+// examples/02-memory-cache/include/particle_types.hpp
+struct ParticleAOS {
+    float x, y, z;     // Position
+    float vx, vy, vz;  // Velocity
+};
+// 内存布局: [x,y,z,vx,vy,vz][x,y,z,vx,vy,vz][x,y,z,vx,vy,vz]...
+```
+
+更新位置时，每个 cache line（64B）装约 2.67 个粒子（每个 24B），但只需 12B 位置数据——**缓存利用率不到 50%**，且跨字段访问阻止编译器向量化。
+
+### SOA 方案
+
+```cpp
+// examples/02-memory-cache/include/particle_types.hpp
+struct ParticleSOA {
+    std::vector<float> x, y, z;     // Positions
+    std::vector<float> vx, vy, vz;  // Velocities
 };
 
-ParticleSystem particles;
-particles.x.resize(10000);
-particles.y.resize(10000);
-// ... etc.
-```
-
-**SOA 的收益：**
-1. **完美的缓存利用率**：处理位置时，只有位置数据进入缓存
-2. **对 SIMD 友好**：连续数组使向量化自然成立
-3. **更好的预取**：硬件预取器能够预测访问模式
-
-### 性能对比
-
-```cpp
-// AOS update - scattered memory access
-void updateAOS(std::vector<Particle>& p, float dt) {
-    for (auto& particle : p) {
-        particle.x += particle.vx * dt;
-        particle.y += particle.vy * dt;
-        particle.z += particle.vz * dt;
-    }
-}
-
-// SOA update - contiguous memory access, SIMD-friendly
-void updateSOA(ParticleSystem& p, float dt) {
-    for (size_t i = 0; i < p.x.size(); ++i) {
-        p.x[i] += p.vx[i] * dt;
-        p.y[i] += p.vy[i] * dt;
-        p.z[i] += p.vz[i] * dt;
-    }
+inline void update_particles_soa(ParticleSOA& particles, float dt) {
+    const size_t n = particles.size();
+    for (size_t i = 0; i < n; ++i) particles.x[i] += particles.vx[i] * dt;
+    for (size_t i = 0; i < n; ++i) particles.y[i] += particles.vy[i] * dt;
+    for (size_t i = 0; i < n; ++i) particles.z[i] += particles.vz[i] * dt;
 }
 ```
 
-**基准测试结果**（100 万个粒子，启用 AVX2）：
+每个数组连续存储，一个 cache line 装 16 个 float，利用率 100%，且编译器可自动向量化。
 
-| 布局 | 时间 (ms) | 加速比 | SIMD 利用率 |
-|--------|-----------|---------|------------------|
-| AOS | 8.2 | 1.0x | ~15% |
-| SOA | 2.1 | 3.9x | ~85% |
+| 维度 | AOS | SOA |
+|------|-----|-----|
+| 缓存利用率（仅访问位置） | ~50% | ~100% |
+| 自动向量化 | 困难 | 容易 |
+| 随机访问单个粒子 | 好 | 差（多次访问） |
+| 适用场景 | 游戏对象、OOP | 物理模拟、列式处理 |
+
+### 运行验证
+
+```bash
+./build/release/examples/02-memory-cache/src/aos_vs_soa
+./build/release/examples/02-memory-cache/bench/aos_soa_bench
+```
+
+SOA 的优势在数据量超过 L2 缓存后尤为显著。
+
+---
 
 ## Cache Line 对齐
 
-### 64 字节边界
+### 为什么对齐重要
 
-现代 x86 CPU 使用 64 字节的 cache line。跨越 cache line 边界的数据需要两次内存访问。
+当 SIMD 指令操作未对齐地址时：跨 cache line 的 32 字节 AVX load 需要两次缓存查找；对齐指令在某些微架构上比非对齐少一个解码 μop。
 
-```cpp
-#include <hpc/core.hpp>
+### 仓库示例
 
-// BAD: Unaligned structure
-struct UnalignedCounter {
-    std::atomic<int64_t> counter1;  // 8 bytes
-    std::atomic<int64_t> counter2;  // 8 bytes
-    std::atomic<int64_t> counter3;  // 8 bytes
-    std::atomic<int64_t> counter4;  // 8 bytes
-};  // Total: 32 bytes - all in one cache line!
-```
-
-**问题**：当线程 A 更新 `counter1`、线程 B 更新 `counter2` 时，会引发 **false sharing**——两个线程争夺同一 cache line 的独占所有权。
-
-### 正确的对齐
+`examples/02-memory-cache/src/alignment.cpp` 对比对齐与非对齐 AVX 加载：
 
 ```cpp
-// GOOD: Each counter on its own cache line
-struct alignas(64) PaddedCounter {
-    std::atomic<int64_t> value;
-    // Implicit padding to 64 bytes
-};
+constexpr size_t SIMD_ALIGNMENT = 32;  // AVX alignment
 
-struct AlignedCounters {
-    PaddedCounter counter1;  // 64 bytes (cache line 0)
-    PaddedCounter counter2;  // 64 bytes (cache line 1)
-    PaddedCounter counter3;  // 64 bytes (cache line 2)
-    PaddedCounter counter4;  // 64 bytes (cache line 3)
-};
-```
-
-### 内存对齐 API
-
-本项目提供对齐相关的工具：
-
-```cpp
-#include <hpc/core.hpp>
-
-// Compile-time cache line size for alignas
-struct alignas(hpc::CACHE_LINE_SIZE) MyData {
-    // ... fields ...
-};
-
-// Runtime cache line size detection
-size_t line_size = hpc::cache_line_size();
-
-// Aligned allocator for STL containers
-std::vector<float, hpc::AlignedAllocator<float, 64>> aligned_data;
-```
-
-## False Sharing：无声的杀手
-
-### 检测模式
-
-false sharing 的症状：
-- 多线程扩展性低于预期
-- 缓存一致性流量的 `perf` 指标偏高
-- 随线程数增加，加速比呈非线性退化
-
-### 示例：并行计数器
-
-```cpp
-// BAD: False sharing
-std::vector<int> counters(num_threads);  // Contiguous memory!
-
-#pragma omp parallel for
-for (int i = 0; i < num_threads; ++i) {
-    for (int j = 0; j < 1000000; ++j) {
-        counters[i]++;  // False sharing!
+// 对齐版本
+void add_avx_aligned(const float* a, const float* b, float* c, size_t n) {
+    size_t i = 0;
+    for (; i + 8 <= n; i += 8) {
+        __m256 va = _mm256_load_ps(a + i);   // 要求 32 字节对齐
+        __m256 vb = _mm256_load_ps(b + i);
+        _mm256_store_ps(c + i, _mm256_add_ps(va, vb));
     }
+    for (; i < n; ++i) c[i] = a[i] + b[i];
 }
 
-// GOOD: Cache-line padded
-struct alignas(64) PaddedInt { int value; };
-std::vector<PaddedInt> counters(num_threads);
+// 非对齐版本
+void add_avx_unaligned(const float* a, const float* b, float* c, size_t n) {
+    size_t i = 0;
+    for (; i + 8 <= n; i += 8) {
+        __m256 va = _mm256_loadu_ps(a + i);  // 无对齐要求
+        __m256 vb = _mm256_loadu_ps(b + i);
+        _mm256_storeu_ps(c + i, _mm256_add_ps(va, vb));
+    }
+    for (; i < n; ++i) c[i] = a[i] + b[i];
+}
 ```
 
-### 性能影响
+### 对齐工具
 
-| 线程数 | 错误写法 (ms) | 正确写法 (ms) | 损失的加速比 |
-|---------|----------|-----------|--------------|
-| 1 | 100 | 100 | 0% |
-| 2 | 95 | 50 | 47% |
-| 4 | 90 | 25 | 72% |
-| 8 | 85 | 12 | 86% |
-
-## 内存预取
-
-### 软件预取
+`examples/02-memory-cache/include/memory_utils.hpp` 提供跨平台对齐分配和 cache line padding：
 
 ```cpp
-#include <xmmintrin.h>  // SSE intrinsics
+inline void* aligned_alloc(std::size_t size, std::size_t alignment) {
+#if defined(_MSC_VER)
+    return _aligned_malloc(size, alignment);
+#else
+    void* ptr = nullptr;
+    if (posix_memalign(&ptr, alignment, size) != 0) return nullptr;
+    return ptr;
+#endif
+}
 
-void processWithPrefetch(const std::vector<float>& data) {
-    const size_t prefetch_distance = 8;  // Prefetch 8 elements ahead
+template <typename T, std::size_t Alignment = hpc::core::CACHE_LINE_SIZE>
+class AlignedAllocator { /* ... */ };
 
-    for (size_t i = 0; i < data.size(); ++i) {
-        // Prefetch future data
-        if (i + prefetch_distance < data.size()) {
-            _mm_prefetch(reinterpret_cast<const char*>(&data[i + prefetch_distance]),
-                         _MM_HINT_T0);  // Prefetch into L1
+template <typename T>
+struct alignas(hpc::core::CACHE_LINE_SIZE) CacheLinePadded {
+    T value;
+};
+```
+
+### 运行验证
+
+```bash
+./build/release/examples/02-memory-cache/src/alignment
+./build/release/examples/02-memory-cache/bench/alignment_bench
+```
+
+在现代 CPU（Skylake+）上对齐与非对齐差距已很小，但对齐仍是最佳实践——确保所有微架构上无性能回退。
+
+---
+
+## False Sharing
+
+### 问题本质
+
+不同核心上的线程修改**同一条 cache line 上的不同变量**时，MESI 协议不断使该 cache line 在核心间失效——即使变量逻辑上完全独立。
+
+### 仓库示例
+
+`examples/02-memory-cache/src/false_sharing.cpp`：
+
+```cpp
+// 问题：4 个 atomic 挤在同一条 cache line
+struct PackedCounters {
+    std::atomic<int64_t> counter1{0};
+    std::atomic<int64_t> counter2{0};
+    std::atomic<int64_t> counter3{0};
+    std::atomic<int64_t> counter4{0};
+};
+// sizeof == 32 bytes → 全部共享一条 cache line
+
+// 修复：alignas(64) 隔离每个计数器
+struct alignas(hpc::core::CACHE_LINE_SIZE) PaddedCounter {
+    std::atomic<int64_t> value{0};
+};
+
+struct PaddedCounters {
+    PaddedCounter counter1;
+    PaddedCounter counter2;
+    PaddedCounter counter3;
+    PaddedCounter counter4;
+};
+// sizeof == 256 bytes → 每个计数器独立 cache line
+```
+
+### 通用工具
+
+对任意类型使用 `CacheLinePadded<T>`：
+
+```cpp
+// 每个线程的计数器自动隔离到独立 cache line
+std::vector<CacheLinePadded<std::atomic<int64_t>>> per_thread_counters(num_threads);
+```
+
+### 为什么这很重要
+
+False sharing 可以将多线程加速比从接近线性降到**负加速**。典型场景：per-thread 累加器、无锁队列 head/tail 指针、内存池 per-thread free list。
+
+### 运行验证
+
+```bash
+./build/release/examples/02-memory-cache/src/false_sharing
+./build/release/examples/02-memory-cache/bench/false_sharing_bench
+```
+
+在 4 线程、每线程 10M 次原子递增下，padded 版本通常比 packed 版本快数倍。
+
+---
+
+## 软件预取
+
+### 何时需要
+
+硬件预取器能识别顺序和 stride 模式，但对随机访问、指针追踪无能为力。此时用 `__builtin_prefetch` 显式提示 CPU：
+
+```cpp
+__builtin_prefetch(addr, rw, locality);
+// rw: 0=读, 1=写; locality: 0=NTA, 3=T0(留在所有层级)
+```
+
+### 仓库示例
+
+`examples/02-memory-cache/src/prefetch.cpp` 展示三种场景：
+
+**随机访问（收益明显）：**
+
+```cpp
+int64_t sum_random_with_prefetch(const int64_t* data, const size_t* indices, size_t n) {
+    constexpr size_t PREFETCH_DISTANCE = 8;
+    int64_t sum = 0;
+    for (size_t i = 0; i < n; ++i) {
+        if (i + PREFETCH_DISTANCE < n) {
+            __builtin_prefetch(&data[indices[i + PREFETCH_DISTANCE]], 0, 3);
         }
-
-        // Process current element
-        process(data[i]);
+        sum += data[indices[i]];
     }
+    return sum;
 }
 ```
 
-### 预取指南
+**指针追踪（链表）：**
 
-1. **距离**：通常提前 8-32 个元素
-2. **时机**：过早 = 缓存驱逐，过晚 = 无收益
-3. **模式**：对可预测的访问模式效果最佳
+```cpp
+int64_t sum_list_with_prefetch(const Node* head) {
+    int64_t sum = 0;
+    for (const Node* node = head; node != nullptr; node = node->next) {
+        if (node->next != nullptr) {
+            __builtin_prefetch(node->next, 0, 3);
+        }
+        sum += node->value;
+    }
+    return sum;
+}
+```
 
-## 实践指南
+### 预取距离调优
 
-### 何时使用 SOA
+- **太小**：数据未到就要用，预取无效
+- **太大**：数据到了就被驱逐，浪费带宽
+- **经验值**：8–32 个元素，取决于循环体计算量和缓存延迟
 
-✅ **使用 SOA 的场景：**
-- 只处理部分字段（例如仅位置）
-- SIMD 向量化很重要
-- 内存带宽是瓶颈
-- 数据以可预测模式访问
+| 场景 | 硬件预取器 | 软件预取 |
+|------|-----------|----------|
+| 顺序遍历 | 非常有效 | 通常无额外收益 |
+| 随机/间接访问 | 无效 | **有效** |
+| 指针追踪 | 无效 | **有效** |
 
-❌ **保留 AOS 的场景：**
-- 所有字段总是被一起访问
-- 面向对象设计更清晰
-- 随机访问模式占主导
-- SOA 的内存开销不可接受
+### 运行验证
 
-### 对齐规则
+```bash
+./build/release/examples/02-memory-cache/src/prefetch
+./build/release/examples/02-memory-cache/bench/prefetch_bench
+```
 
-1. **热数据**：将频繁访问的数据对齐到 cache line
-2. **线程局部数据**：填充每线程数据以避免 false sharing
-3. **atomic 变量**：存在竞争时，每个 atomic 独占一个 cache line
-4. **SIMD 数据**：对齐到 16（SSE）、32（AVX）或 64（AVX-512）字节
+---
+
+## 动手验证
+
+本模块所有可运行的 benchmark：
+
+```bash
+# 编译
+cmake --preset=release && cmake --build --preset=release
+
+# AOS vs SOA
+./build/release/examples/02-memory-cache/bench/aos_soa_bench
+
+# 内存对齐
+./build/release/examples/02-memory-cache/bench/alignment_bench
+
+# False Sharing
+./build/release/examples/02-memory-cache/bench/false_sharing_bench
+
+# 软件预取
+./build/release/examples/02-memory-cache/bench/prefetch_bench
+```
+
+支持 Google Benchmark 标准参数：
+
+```bash
+./build/release/examples/02-memory-cache/bench/aos_soa_bench --benchmark_filter="SOA"
+./build/release/examples/02-memory-cache/bench/false_sharing_bench --benchmark_repetitions=5
+```
+
+---
 
 ## 参考文献
 
-<Citation
-  :references="[
-    {
-      id: 'drepper2007',
-      author: 'Drepper, U.',
-      title: 'What Every Programmer Should Know About Memory',
-      year: 2007,
-      source: 'Red Hat, Inc.',
-      url: 'https://people.freebsd.org/~lstewart/articles/cpumemory.pdf'
-    },
-    {
-      id: 'fog2023',
-      author: 'Fog, A.',
-      title: 'Optimizing software in C++',
-      year: 2023,
-      source: 'Copenhagen University',
-      url: 'https://www.agner.org/optimize/optimizing_cpp.pdf'
-    }
-  ]"
-/>
+- Ulrich Drepper, "What Every Programmer Should Know About Memory", 2007. 缓存层次结构基本原理和 false sharing 分析方法的经典参考。
+- Agner Fog, "Optimizing software in C++" / "The microarchitecture of Intel, AMD and VIA CPUs", 2023. 各微架构精确延迟和吞吐量数据。
+- Intel 64 and IA-32 Architectures Optimization Reference Manual. 官方优化指南，含 prefetch 指令使用建议。
+- Travis Downs, "Performance Matters", Strange Loop 2019. 正确进行性能测量的实践指导。

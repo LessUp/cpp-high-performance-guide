@@ -248,5 +248,5 @@ Test your understanding:
 ## Next Steps
 
 - Continue to [Modern C++ Features](../03-modern-cpp/) to learn about compile-time optimization
-- Read the [Optimization Decision Tree](../../docs/zh/guides/optimization-decision-tree.md) for systematic optimization
-- Practice with [Memory Exercises](../../docs/zh/exercises/module-02-memory.md)
+- Read the [Optimization Playbook](../../docs/zh/guides/optimization-playbook.md) for systematic optimization
+- Read the [Memory Layout Deep Dive](../../docs/zh/deep-dives/memory-layout.md) for in-depth analysis

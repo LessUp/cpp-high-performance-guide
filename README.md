@@ -42,7 +42,7 @@
 | `examples/03-modern-cpp/` | constexpr、移动语义、reserve、ranges |
 | `examples/04-simd-vectorization/` | 自动向量化、intrinsics、SIMD 封装 |
 | `examples/05-concurrency/` | 原子操作、无锁队列、OpenMP |
-| `docs/` | VitePress 文档站，覆盖学院 / 架构 / 实践手册 / 参考 / 研究 |
+| `docs/` | VitePress 文档站，覆盖深度专题 / 实战指南 / API 参考 |
 
 ## 快速开始
 
@@ -74,8 +74,8 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 ## 文档入口
 
 - **文档站：** <https://lessup.github.io/cpp-high-performance-guide/>
-- **实践手册：** [`docs/zh/playbook/index.md`](docs/zh/playbook/index.md)
-- **参考：** [`docs/zh/reference/index.md`](docs/zh/reference/index.md)
+- **深度专题：** [`docs/zh/deep-dives/`](docs/zh/deep-dives/)
+- **API 参考：** [`docs/zh/reference/api.md`](docs/zh/reference/api.md)
 
 ## 技术栈
 

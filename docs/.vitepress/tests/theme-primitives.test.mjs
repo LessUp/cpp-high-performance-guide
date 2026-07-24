@@ -11,57 +11,33 @@ function read(relativePath) {
   return fs.readFileSync(path.join(themeDir, relativePath), 'utf8')
 }
 
-function readAllCss() {
-  const mainCss = read('style.css')
-  const tokensDir = path.join(themeDir, 'tokens')
-  let allCss = mainCss
-
-  if (fs.existsSync(tokensDir)) {
-    const tokenFiles = fs.readdirSync(tokensDir).filter(file => file.endsWith('.css'))
-    for (const file of tokenFiles) {
-      allCss += `\n${fs.readFileSync(path.join(tokensDir, file), 'utf8')}`
-    }
-  }
-
-  return allCss
-}
-
-test('style.css keeps tokenized selectors for Mermaid and SVG surfaces', () => {
-  const css = readAllCss()
+test('style.css defines VitePress brand variables', () => {
+  const css = read('style.css')
 
   for (const token of [
-    '--wp-paper-1',
-    '--wp-ink-1',
-    '--wp-surface-figure',
-    '--wp-surface-meta',
-    '--wp-surface-section-index',
-    '--wp-surface-reference',
-    '--wp-line-1',
-    '--wp-surface-1',
-    '--wp-surface-2',
-    '--wp-pill-bg',
-    '--wp-diagram-stroke',
-    '--wp-icon-muted',
+    '--vp-c-brand-1',
+    '--vp-c-brand-2',
+    '--vp-c-brand-3',
+    '--vp-c-brand-soft',
+    '--vp-c-bg',
+    '--vp-c-text-1',
+    '--vp-c-border',
   ]) {
     assert.match(css, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
-
-  for (const selector of [
-    '.wp-section-index',
-    '.wp-figure-shell',
-    '.wp-meta-strip',
-    '.wp-reference-list',
-    '.vp-doc .mermaid',
-    ".vp-doc :where(svg [stroke='currentColor']",
-  ]) {
-    assert.match(css, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
-  }
 })
 
-test('theme index registers the active custom components', () => {
-  const themeIndex = read('index.ts')
+test('style.css provides dark mode overrides', () => {
+  const css = read('style.css')
+  assert.match(css, /\.dark/)
+})
 
-  for (const componentName of ['BaseAwareLink', 'SectionIndex', 'Citation', 'ComplexityBadge', 'DiagramCanvas']) {
-    assert.match(themeIndex, new RegExp(componentName))
-  }
+test('theme index extends DefaultTheme without custom components', () => {
+  const themeIndex = read('index.ts')
+  assert.match(themeIndex, /DefaultTheme/)
+  assert.doesNotMatch(themeIndex, /Citation/)
+  assert.doesNotMatch(themeIndex, /ComplexityBadge/)
+  assert.doesNotMatch(themeIndex, /DiagramCanvas/)
+  assert.doesNotMatch(themeIndex, /SectionIndex/)
+  assert.doesNotMatch(themeIndex, /BaseAwareLink/)
 })

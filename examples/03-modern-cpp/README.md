@@ -208,4 +208,4 @@ Test your understanding:
 ## Next Steps
 
 - Continue to [SIMD Vectorization](../04-simd-vectorization/) to learn about CPU vector units
-- Practice with [Modern C++ Exercises](../../docs/zh/exercises/module-03-modern-cpp.md)
+- Read the [C++20 Performance Deep Dive](../../docs/zh/deep-dives/modern-cpp-perf.md) for in-depth analysis

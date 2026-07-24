@@ -3,36 +3,23 @@ layout: home
 
 hero:
   name: C++ 高性能指南
-  text: 可运行的性能工程文档
-  tagline: 通过可运行示例、基准测试和验证路径，学习现代 C++20 性能实践。
+  text: 可验证的性能工程
+  tagline: 每个专题都附带可运行代码与基准测试——不靠直觉，靠数据。
   actions:
     - theme: brand
       text: 快速开始
-      link: /zh/getting-started/quickstart
-    - theme: alt
-      text: 学习路径
-      link: /zh/guides/learning-path
+      link: /zh/getting-started
     - theme: alt
       text: GitHub
       link: https://github.com/LessUp/cpp-high-performance-guide
 
 features:
-  - title: 入门
-    details: 先决条件、安装与首次构建验证。
-    link: /zh/getting-started/quickstart
-  - title: 指南
-    details: 学习路径、性能分析、sanitizer 验证、优化决策树与最佳实践。
-    link: /zh/guides/learning-path
   - title: 深度专题
-    details: 内存布局、无锁队列、SIMD 内部机制。
-    link: /zh/deep-dives/memory-layout
-  - title: 算法
-    details: 排序与哈希的高性能实现，附带复杂度分析与基准。
-    link: /zh/algorithms/sorting
-  - title: 练习
-    details: 内存、SIMD 与并发的动手练习与解答。
-    link: /zh/exercises/module-02-memory
-  - title: 参考
-    details: API 细节、常见问题与故障排查。
-    link: /zh/reference/faq
+    details: 内存布局、SIMD、无锁并发、CMake、C++20，每个专题都从仓库代码出发。
+  - title: 可运行示例
+    details: 5 个模块、14 个测试文件、Google Benchmark 基准测试，克隆即可验证。
+  - title: 性能分析实战
+    details: perf、FlameGraph、Valgrind、VTune 的真实工作流。
+  - title: 预设驱动构建
+    details: CMake Presets 覆盖 release/debug/asan/tsan/ubsan/coverage，一条命令切换。
 ---

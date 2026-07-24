@@ -314,5 +314,5 @@ Test your understanding:
 ## Next Steps
 
 - Continue to [Concurrency](../05-concurrency/) to learn about multi-threaded optimization
-- Read the [SIMD API Reference](../../docs/zh/reference/api/simd-wrapper.md) for detailed wrapper documentation
-- Practice with [SIMD Exercises](../../docs/zh/exercises/module-04-simd.md)
+- Read the [SIMD API Reference](../../docs/zh/reference/api.md) for detailed wrapper documentation
+- Read the [SIMD Deep Dive](../../docs/zh/deep-dives/simd-internals.md) for in-depth analysis
