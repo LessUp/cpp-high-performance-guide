@@ -301,5 +301,5 @@ cmake --build build/release --target auto_vectorize
 ## 相关资源
 
 - [最佳实践](best-practices.md) - 工业级测试模式
-- [API参考](../reference/api-reference.md) - 工具函数
+- [内存工具 API](../reference/api/memory-utils.md) - 工具函数
 - [常见问题](../reference/faq.md) - 常见问题解答

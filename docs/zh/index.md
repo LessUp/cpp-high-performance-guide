@@ -17,22 +17,22 @@ hero:
       link: https://github.com/LessUp/cpp-high-performance-guide
 
 features:
-  - title: 学院
-    details: 理解教学模块如何映射到代码，以及什么证据才算合格。
-    link: /zh/academy/
-  - title: 架构
-    details: 仓库拓扑、preset 驱动验证与性能方法论。
-    link: /zh/architecture/
-  - title: 算法
-    details: 高性能算法实现，附带复杂度分析与可复现基准测试。
-    link: /zh/algorithms/
-  - title: 实践手册
-    details: 配置、学习、性能分析与加固路线的操作手册。
-    link: /zh/playbook/
+  - title: 入门
+    details: 先决条件、安装与首次构建验证。
+    link: /zh/getting-started/quickstart
+  - title: 指南
+    details: 学习路径、性能分析、sanitizer 验证、优化决策树与最佳实践。
+    link: /zh/guides/learning-path
   - title: 深度专题
     details: 内存布局、无锁队列、SIMD 内部机制。
-    link: /zh/deep-dives/
+    link: /zh/deep-dives/memory-layout
+  - title: 算法
+    details: 排序与哈希的高性能实现，附带复杂度分析与基准。
+    link: /zh/algorithms/sorting
+  - title: 练习
+    details: 内存、SIMD 与并发的动手练习与解答。
+    link: /zh/exercises/module-02-memory
   - title: 参考
-    details: API 入口、常见问题与故障排查。
-    link: /zh/reference/
+    details: API 细节、常见问题与故障排查。
+    link: /zh/reference/faq
 ---

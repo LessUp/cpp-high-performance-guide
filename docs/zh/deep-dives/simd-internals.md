@@ -1,9 +1,6 @@
 ---
 type: deep-dive
 difficulty: advanced
-prerequisites:
-  - /zh/academy/module-atlas
-  - /zh/architecture/repository-topology
 description: 深入探讨 SIMD 向量化内部机制，涵盖自动向量化条件、intrinsic 封装、运行时分发机制。
 ---
 

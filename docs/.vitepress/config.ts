@@ -10,7 +10,7 @@ const base = rawBase
   : '/'
 
 const siteTitle = 'C++ 高性能指南'
-const siteDescription = '可运行的 C++ 性能工程文档，覆盖学院、架构、实践手册、参考资料与研究内容。'
+const siteDescription = '可运行的 C++ 性能工程文档，覆盖入门、指南、深度专题、算法、练习与参考。'
 const siteUrl = 'https://lessup.github.io'
 const canonicalBase = '/cpp-high-performance-guide/'
 const currentYear = new Date().getFullYear()
@@ -25,23 +25,13 @@ function canonicalAssetUrl(path: string): string {
   return new URL(`${canonicalBase.replace(/^\/+/, '')}${normalizedPath}`, `${siteUrl}/`).toString()
 }
 
-const zhAcademyItems = [
-  { text: '学院概览', link: '/zh/academy/' },
-  { text: '模块总览', link: '/zh/academy/module-atlas' },
-  { text: '验证原则', link: '/zh/academy/validation-doctrine' },
-]
-
-const zhArchitectureItems = [
-  { text: '架构概览', link: '/zh/architecture/' },
-  { text: '仓库拓扑', link: '/zh/architecture/repository-topology' },
-  { text: '性能方法论', link: '/zh/architecture/performance-methodology' },
-]
-
-const zhPlaybookItems = [
-  { text: '实践手册概览', link: '/zh/playbook/' },
-  { text: '快速开始', link: '/zh/getting-started/quickstart' },
-  { text: '安装指南', link: '/zh/getting-started/installation' },
+const zhGettingStartedItems = [
   { text: '先决条件', link: '/zh/getting-started/prerequisites' },
+  { text: '安装指南', link: '/zh/getting-started/installation' },
+  { text: '快速开始', link: '/zh/getting-started/quickstart' },
+]
+
+const zhGuidesItems = [
   { text: '学习路径', link: '/zh/guides/learning-path' },
   { text: '性能分析指南', link: '/zh/guides/profiling-guide' },
   { text: '验证与 Sanitizer', link: '/zh/guides/validation' },
@@ -49,46 +39,30 @@ const zhPlaybookItems = [
   { text: '最佳实践', link: '/zh/guides/best-practices' },
 ]
 
-const zhReferenceItems = [
-  { text: '参考概览', link: '/zh/reference/' },
-  { text: 'API 入口', link: '/zh/reference/api-reference' },
-  { text: '内存工具', link: '/zh/reference/api/memory-utils' },
-  { text: 'SIMD Wrapper', link: '/zh/reference/api/simd-wrapper' },
-  { text: 'Benchmark 工具', link: '/zh/reference/api/benchmark-utils' },
-  { text: '常见问题', link: '/zh/reference/faq' },
-  { text: '故障排查', link: '/zh/reference/troubleshooting' },
-]
-
-const zhResearchItems = [
-  { text: '研究概览', link: '/zh/research/' },
-  { text: '相关工作', link: '/zh/research/related-work' },
-  { text: '参考资料', link: '/zh/research/references' },
-  { text: '演进记录', link: '/zh/research/evolution' },
-]
-
-const zhContributingItems = [
-  { text: 'AI 开发流程', link: '/zh/contributing/ai-workflow' },
-]
-
-const zhAlgorithmsItems = [
-  { text: '算法概览', link: '/zh/algorithms/' },
-  { text: '排序算法', link: '/zh/algorithms/sorting' },
-  { text: '哈希算法', link: '/zh/algorithms/hashing' },
-]
-
 const zhDeepDivesItems = [
-  { text: '深度专题概览', link: '/zh/deep-dives/' },
   { text: '内存布局', link: '/zh/deep-dives/memory-layout' },
   { text: '无锁队列', link: '/zh/deep-dives/lock-free-queue' },
   { text: 'SIMD 内部机制', link: '/zh/deep-dives/simd-internals' },
 ]
 
+const zhAlgorithmsItems = [
+  { text: '排序算法', link: '/zh/algorithms/sorting' },
+  { text: '哈希算法', link: '/zh/algorithms/hashing' },
+]
+
 const zhExerciseItems = [
-  { text: '练习总览', link: '/zh/exercises/' },
   { text: '内存练习', link: '/zh/exercises/module-02-memory' },
   { text: 'SIMD 练习', link: '/zh/exercises/module-04-simd' },
   { text: '并发练习', link: '/zh/exercises/module-05-concurrency' },
   { text: '解答', link: '/zh/exercises/solutions' },
+]
+
+const zhReferenceItems = [
+  { text: '内存工具', link: '/zh/reference/api/memory-utils' },
+  { text: 'SIMD Wrapper', link: '/zh/reference/api/simd-wrapper' },
+  { text: 'Benchmark 工具', link: '/zh/reference/api/benchmark-utils' },
+  { text: '常见问题', link: '/zh/reference/faq' },
+  { text: '故障排查', link: '/zh/reference/troubleshooting' },
 ]
 
 export default withMermaid(defineConfig({
@@ -123,7 +97,7 @@ export default withMermaid(defineConfig({
     ['meta', { name: 'twitter:image', content: canonicalAssetUrl('/og-card.png') }],
     ['meta', { name: 'twitter:title', content: siteTitle }],
     ['meta', { name: 'twitter:description', content: siteDescription }],
-    ['meta', { name: 'keywords', content: 'C++, 性能, 学院, 架构, 实践手册, 参考, 研究, SIMD, 并发, CMake, 基准测试' }],
+    ['meta', { name: 'keywords', content: 'C++, 性能, SIMD, 并发, CMake, 基准测试, 内存布局, 无锁队列' }],
   ],
   locales: {
     zh: {
@@ -142,14 +116,12 @@ export default withMermaid(defineConfig({
           copyright: `版权所有 © ${currentYear} C++ HPC Guide 贡献者`,
         },
         nav: [
-          { text: '学院', link: '/zh/academy/', activeMatch: '/zh/academy/' },
-          { text: '架构', link: '/zh/architecture/', activeMatch: '/zh/architecture/' },
-          { text: '算法', link: '/zh/algorithms/', activeMatch: '/zh/algorithms/' },
-          { text: '实践手册', link: '/zh/playbook/', activeMatch: '/zh/playbook/|/zh/getting-started/|/zh/guides/' },
-          { text: '深度专题', link: '/zh/deep-dives/', activeMatch: '/zh/deep-dives/' },
-          { text: '参考', link: '/zh/reference/', activeMatch: '/zh/reference/' },
-          { text: '研究', link: '/zh/research/', activeMatch: '/zh/research/' },
-          { text: '贡献', link: '/zh/contributing/ai-workflow', activeMatch: '/zh/contributing/' },
+          { text: '入门', link: '/zh/getting-started/quickstart', activeMatch: '/zh/getting-started/' },
+          { text: '指南', link: '/zh/guides/learning-path', activeMatch: '/zh/guides/' },
+          { text: '深度专题', link: '/zh/deep-dives/memory-layout', activeMatch: '/zh/deep-dives/' },
+          { text: '算法', link: '/zh/algorithms/sorting', activeMatch: '/zh/algorithms/' },
+          { text: '练习', link: '/zh/exercises/module-02-memory', activeMatch: '/zh/exercises/' },
+          { text: '参考', link: '/zh/reference/faq', activeMatch: '/zh/reference/' },
         ],
         sidebar: {
           '/zh/': [
@@ -160,40 +132,28 @@ export default withMermaid(defineConfig({
               ],
             },
             {
-              text: '学院',
-              items: zhAcademyItems,
+              text: '入门',
+              items: zhGettingStartedItems,
             },
             {
-              text: '架构',
-              items: zhArchitectureItems,
-            },
-            {
-              text: '算法',
-              items: zhAlgorithmsItems,
-            },
-            {
-              text: '实践手册',
-              items: zhPlaybookItems,
+              text: '指南',
+              items: zhGuidesItems,
             },
             {
               text: '深度专题',
               items: zhDeepDivesItems,
             },
             {
-              text: '参考',
-              items: zhReferenceItems,
-            },
-            {
-              text: '研究',
-              items: zhResearchItems,
-            },
-            {
-              text: '贡献',
-              items: zhContributingItems,
+              text: '算法',
+              items: zhAlgorithmsItems,
             },
             {
               text: '练习',
               items: zhExerciseItems,
+            },
+            {
+              text: '参考',
+              items: zhReferenceItems,
             },
           ],
         },

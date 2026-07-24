@@ -1,9 +1,6 @@
 ---
 type: deep-dive
 difficulty: advanced
-prerequisites:
-  - /zh/academy/module-atlas
-  - /zh/architecture/repository-topology
 description: 深入探讨内存布局优化技术，涵盖 AOS 与 SOA、cache line 对齐以及 false sharing 消除。
 ---
 

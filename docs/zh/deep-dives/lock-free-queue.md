@@ -1,9 +1,6 @@
 ---
 type: deep-dive
 difficulty: advanced
-prerequisites:
-  - /zh/academy/module-atlas
-  - /zh/architecture/repository-topology
 description: 深入探讨无锁队列的实现，涵盖 SPSC、MPMC 模式与内存序考量。
 ---
 
