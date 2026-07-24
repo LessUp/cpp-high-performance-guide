@@ -303,6 +303,6 @@ Test your understanding:
 
 ## Next Steps
 
-- Review the [Optimization Decision Tree](../../docs/en/guides/optimization-decision-tree.md) for systematic optimization
-- Practice with [Concurrency Exercises](../../docs/en/exercises/module-05-concurrency.md)
-- Read the [Profiling Guide](../../docs/en/guides/profiling-guide.md) to analyze multi-threaded performance
+- Review the [Optimization Decision Tree](../../docs/zh/guides/optimization-decision-tree.md) for systematic optimization
+- Practice with [Concurrency Exercises](../../docs/zh/exercises/module-05-concurrency.md)
+- Read the [Profiling Guide](../../docs/zh/guides/profiling-guide.md) to analyze multi-threaded performance

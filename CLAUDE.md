@@ -25,7 +25,7 @@ cpp-high-performance-guide/
 ├── benchmarks/
 ├── tools/
 ├── scripts/
-├── docs/                  # VitePress site and bilingual learning docs
+├── docs/                  # VitePress site (Chinese only)
 ├── .githooks/             # Project-managed Git hooks
 └── .github/
 ```
@@ -56,7 +56,7 @@ cmake --preset=release && cmake --build build/release
 - Prefer **deleting or archiving stale content** instead of preserving redundant surfaces.
 - Keep **README** focused on repository entry and onboarding; use the docs site for the richer narrative.
 - Treat **GitHub Pages** as a project landing page, not a thin README mirror.
-- Keep user-facing documentation **English + Chinese** where the surface is meant to be bilingual.
+- Documentation is **Chinese only**. Do not reintroduce English documentation surfaces.
 - Use **CMake presets** as the default build and test entry points.
 - Keep workflows **preset-driven, low-noise, and meaningful**.
 - Avoid over-engineering with extra plugins, MCP servers, or automation layers unless they clearly reduce maintenance cost.
@@ -76,4 +76,4 @@ The `.vscode/` directory is **gitignored**. Use `.clangd`, `.editorconfig`, and 
 - non-blocking CI steps that hide real failures
 - per-example shim headers that only re-export a canonical `include/hpc/` header
 - wrapper scripts that duplicate `cmake --preset` commands
-- English-only documentation surfaces (all bilingual surfaces must have zh parity)
+- English documentation surfaces or bilingual parity machinery

@@ -1,4 +1,4 @@
-# C++ High Performance Guide
+# C++ 高性能指南
 
 <p align="center">
   <a href="https://github.com/LessUp/cpp-high-performance-guide/stargazers">
@@ -13,38 +13,38 @@
 </p>
 
 <p align="center">
-  <b>English</b> | <a href="README.zh-CN.md">简体中文</a> | <a href="https://lessup.github.io/cpp-high-performance-guide/">GitHub Pages</a> | <a href="https://github.com/LessUp/cpp-high-performance-guide/discussions">Discussions</a>
+  <a href="https://lessup.github.io/cpp-high-performance-guide/">文档站</a> | <a href="https://github.com/LessUp/cpp-high-performance-guide/discussions">讨论</a>
 </p>
 
 <p align="center">
-  Learn measurable C++20 performance engineering through runnable examples, benchmarks, and a VitePress-powered learning site.
+  通过可运行示例、基准测试和 VitePress 文档站，学习可验证的现代 C++20 性能工程。
 </p>
 
-## Why this repository exists
+## 这个仓库解决什么问题
 
-This project is a practical guide to common C++ performance topics that are easy to talk about but harder to validate:
+关注那些"很容易被谈论、但不容易被验证"的 C++ 性能主题：
 
-- modern CMake and preset-driven builds
-- memory and cache layout decisions
-- modern C++ performance patterns
-- SIMD and vectorization
-- concurrency and lock-free basics
-- profiling and benchmark-driven reasoning
+- 现代 CMake 与 preset 驱动的构建流程
+- 内存与缓存布局取舍
+- 现代 C++ 的性能实践
+- SIMD 与向量化
+- 并发与无锁基础
+- 基于 benchmark 与 profiling 的性能分析
 
-Every major topic is meant to be **readable, buildable, and measurable**.
+每个主题都尽量做到 **可阅读、可构建、可测量**。
 
-## What you can explore
+## 你可以从哪里开始
 
-| Area | What it covers |
+| 区域 | 内容 |
 | --- | --- |
-| `examples/01-cmake-modern/` | modern CMake structure and best practices |
-| `examples/02-memory-cache/` | AOS vs SOA, false sharing, alignment, prefetch |
-| `examples/03-modern-cpp/` | constexpr, move semantics, reserve, ranges |
-| `examples/04-simd-vectorization/` | auto-vectorization, intrinsics, SIMD wrappers |
-| `examples/05-concurrency/` | atomics, lock-free queue, OpenMP |
-| `docs/` | bilingual Pages whitepaper covering academy, architecture, playbook, reference, research |
+| `examples/01-cmake-modern/` | 现代 CMake 结构与反模式 |
+| `examples/02-memory-cache/` | AOS vs SOA、伪共享、对齐、预取 |
+| `examples/03-modern-cpp/` | constexpr、移动语义、reserve、ranges |
+| `examples/04-simd-vectorization/` | 自动向量化、intrinsics、SIMD 封装 |
+| `examples/05-concurrency/` | 原子操作、无锁队列、OpenMP |
+| `docs/` | VitePress 文档站，覆盖学院 / 架构 / 实践手册 / 参考 / 研究 |
 
-## Quick start
+## 快速开始
 
 ```bash
 git clone https://github.com/LessUp/cpp-high-performance-guide.git
@@ -54,17 +54,13 @@ cmake --preset=release
 cmake --build build/release
 ```
 
-Run one benchmark:
+运行一个 benchmark：
 
 ```bash
 ./build/release/examples/02-memory-cache/aos_soa_bench
 ```
 
-Need the redesigned docs route after the quick start? Start with
-[`docs/en/playbook/index.md`](docs/en/playbook/index.md), then continue to
-[`docs/en/guides/validation.md`](docs/en/guides/validation.md) for sanitizer-specific guidance.
-
-## Validation commands
+## 常用验证命令
 
 ```bash
 cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
@@ -75,22 +71,21 @@ cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
 cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 ```
 
-## Documentation entry points
+## 文档入口
 
-- **Docs site:** <https://lessup.github.io/cpp-high-performance-guide/>
-- **Playbook:** [`docs/en/playbook/index.md`](docs/en/playbook/index.md)
-- **Reference:** [`docs/en/reference/index.md`](docs/en/reference/index.md)
-- **Chinese entry:** `README.zh-CN.md` and `docs/zh/`
+- **文档站：** <https://lessup.github.io/cpp-high-performance-guide/>
+- **实践手册：** [`docs/zh/playbook/index.md`](docs/zh/playbook/index.md)
+- **参考：** [`docs/zh/reference/index.md`](docs/zh/reference/index.md)
 
-## Tech stack
+## 技术栈
 
-- **Language:** C++20
-- **Build:** CMake 3.20+, Ninja
-- **Testing:** Google Test, RapidCheck
-- **Benchmarking:** Google Benchmark
-- **Docs:** VitePress + GitHub Pages
-- **Profiling:** perf, FlameGraph, Valgrind, VTune
+- **语言：** C++20
+- **构建：** CMake 3.20+、Ninja
+- **测试：** Google Test、RapidCheck
+- **基准测试：** Google Benchmark
+- **文档：** VitePress + GitHub Pages
+- **性能分析：** perf、FlameGraph、Valgrind、VTune
 
-## Contributing
+## 贡献
 
-See `CONTRIBUTING.md` for the contributor workflow and hooks setup.
+贡献流程与 hooks 配置见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。

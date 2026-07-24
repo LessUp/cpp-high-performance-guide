@@ -24,7 +24,6 @@ Brief description of what this PR adds or fixes.
   - [ ] ThreadSanitizer (for concurrency code): `cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan`
   - [ ] UndefinedBehaviorSanitizer: `cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan`
 - [ ] I have updated the documentation accordingly (if applicable)
-- [ ] Both English and Chinese documentation are updated (if applicable)
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works (if applicable)
 - [ ] I ran `/review` or an equivalent review pass for this non-trivial change

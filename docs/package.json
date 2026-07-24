@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "cpp-hpc-guide-docs",
-  "description": "Modern C++ High Performance Computing Guide Documentation",
+  "description": "C++ 高性能指南文档",
   "type": "module",
   "engines": {
     "node": ">=20"

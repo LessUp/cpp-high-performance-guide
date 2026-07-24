@@ -294,7 +294,7 @@ cmake --build build/release --target auto_vectorize
 1. 分析你自己的代码以定位瓶颈
 2. 应用相关优化
 3. 度量改进效果
-4. [为本项目贡献新的示例！](https://github.com/LessUp/cpp-high-performance-guide/blob/master/CONTRIBUTING.zh.md)
+4. [为本项目贡献新的示例！](https://github.com/LessUp/cpp-high-performance-guide/blob/master/CONTRIBUTING.md)
 
 ---
 

@@ -1,8 +1,8 @@
-# Contributing
+# 参与贡献
 
-Thanks for contributing. This repository prefers **spec-driven, low-noise changes** over broad, loosely scoped edits.
+感谢你的贡献。这个仓库更偏好 **规格驱动、低噪声** 的修改，而不是范围松散的大改。
 
-## First-time setup
+## 首次配置
 
 ```bash
 git clone https://github.com/<your-username>/cpp-high-performance-guide.git
@@ -14,15 +14,15 @@ cmake --build build/debug
 ctest --preset=debug
 ```
 
-`./scripts/setup.sh` checks the local toolchain and configures repository-managed Git hooks through `.githooks/`.
+`./scripts/setup.sh` 会检查本地工具链，并通过 `.githooks/` 配置仓库自带的 Git hooks。
 
-## Default workflow
+## 默认开发流程
 
-1. Keep docs and code in sync.
-2. Run the required validation commands.
-3. Use `/review` before merge for non-trivial work.
+1. 保持文档与代码同步。
+2. 运行要求的验证命令。
+3. 对非 trivial 修改在合并前使用 `/review`。
 
-## Validation commands
+## 验证命令
 
 ```bash
 cmake --preset=debug && cmake --build build/debug && ctest --preset=debug
@@ -33,9 +33,9 @@ cmake --preset=tsan && cmake --build build/tsan && ctest --preset=tsan
 cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 ```
 
-The `tsan` preset is standardized on **Clang** because it is the most reliable ThreadSanitizer path for this repository.
+`tsan` preset 默认走 **Clang**，这是当前仓库里最稳定的 ThreadSanitizer 路径。
 
-## Formatting and hooks
+## 格式化与 hooks
 
 ```bash
 ./scripts/format.sh
@@ -43,26 +43,25 @@ The `tsan` preset is standardized on **Clang** because it is the most reliable T
 ./scripts/setup-hooks.sh
 ```
 
-The repository hooks currently enforce:
+当前 hooks 会做这些事情：
 
-- no generated build or docs artifacts in commits
-- formatting checks for staged C++ files
-- a debug build/test pass on push
+- 拒绝提交生成的构建产物或 docs 产物
+- 对 staged C++ 文件做格式检查
+- push 前执行一次 debug build/test
 
-## Documentation rules
+## 文档规则
 
-- Keep root README files concise and entry-focused.
-- Treat `docs/` as the richer narrative surface.
-- Keep user-facing English and Chinese entry points aligned.
-- Do not reintroduce GitBook / HonKit / `.kiro` references.
+- 根 README 保持简洁，专注仓库入口。
+- `docs/` 承担更完整的叙事与学习路径。
+- 不要重新引入 GitBook / HonKit / `.kiro` 引用。
 
-## Process rules
+## 流程规则
 
-- Prefer deleting or archiving stale content over preserving it in active paths.
-- Keep workflow additions justified and repository-specific.
-- Avoid long-lived branch sprawl; one focused branch or PR per change is preferred.
-- Do not merge non-trivial structural work without review.
+- 对过时内容，优先删除或归档，而不是继续留在主路径。
+- 新增 workflow 或工程化配置前，要能说明其项目特定价值。
+- 避免同时维护大量长期分支；一个 change 对应一个聚焦分支或 PR 更合适。
+- 非 trivial 的结构性修改不要跳过 review。
 
-## Need the AI workflow?
+## 如果你需要 AI 开发流程
 
-See `CLAUDE.md` for Claude Code specific guidance.
+参见 `CLAUDE.md`。
