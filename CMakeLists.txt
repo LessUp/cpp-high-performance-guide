@@ -53,12 +53,16 @@ if(HPC_BUILD_TESTS)
     hpc_fetch_rapidcheck()
 endif()
 
+# Enable testing before add_subdirectory() so that add_test() calls issued
+# inside examples/ (benchmark tests via hpc_add_example) are registered.
+# enable_testing() must precede every add_test().
+enable_testing()
+
 # Add subdirectories
 add_subdirectory(benchmarks)
 add_subdirectory(examples)
 
 if(HPC_BUILD_TESTS)
-    enable_testing()
     add_subdirectory(tests)
 endif()
 

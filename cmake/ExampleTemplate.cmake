@@ -3,6 +3,55 @@
 # Ensures consistent structure across all examples
 
 #------------------------------------------------------------------------------
+# _hpc_configure_target(target
+#     [ENABLE_OPENMP]
+#     [INCLUDE_DIRS <dirs...>]
+#     [LIBRARIES <libs...>]
+#     [ENABLE_SIMD <SSE|AVX|AVX2|AVX512>...]
+# )
+#
+# Internal helper: applies the configuration shared by an example executable
+# and its benchmark counterpart (compiler options, sanitizers, canonical
+# headers, include dirs, link libs, OpenMP, SIMD). Centralizing this keeps the
+# demo and benchmark targets in lockstep so a new wiring change only needs to
+# be made once.
+#------------------------------------------------------------------------------
+function(_hpc_configure_target target)
+    cmake_parse_arguments(
+        ARG
+        "ENABLE_OPENMP"
+        ""
+        "INCLUDE_DIRS;LIBRARIES;ENABLE_SIMD"
+        ${ARGN}
+    )
+
+    hpc_set_compiler_options(${target})
+    hpc_enable_sanitizers(${target})
+    target_link_libraries(${target} PRIVATE hpc_headers)
+
+    if(ARG_INCLUDE_DIRS)
+        target_include_directories(${target} PRIVATE ${ARG_INCLUDE_DIRS})
+    endif()
+
+    if(ARG_LIBRARIES)
+        target_link_libraries(${target} PRIVATE ${ARG_LIBRARIES})
+    endif()
+
+    if(ARG_ENABLE_OPENMP AND OpenMP_CXX_FOUND)
+        target_link_libraries(${target} PRIVATE OpenMP::OpenMP_CXX)
+    endif()
+
+    # hpc_enable_simd handles the ARM/x86/MSVC split internally, so no
+    # HPC_IS_ARM guard is needed here. This keeps demo and benchmark targets
+    # consistent (previously only the demo path guarded on HPC_IS_ARM).
+    if(ARG_ENABLE_SIMD)
+        foreach(simd_level ${ARG_ENABLE_SIMD})
+            hpc_enable_simd(${target} ${simd_level})
+        endforeach()
+    endif()
+endfunction()
+
+#------------------------------------------------------------------------------
 # hpc_add_example(
 #     NAME <name>
 #     SOURCES <source files...>
@@ -13,7 +62,9 @@
 #     [ENABLE_SIMD <SSE|AVX|AVX2|AVX512>]
 # )
 #
-# Creates an example executable with optional benchmark
+# Creates an example executable with an optional benchmark. The benchmark is
+# registered as a CTest test carrying the "benchmark" label so CI can exclude
+# it (ctest -LE benchmark) and run only correctness tests.
 #------------------------------------------------------------------------------
 function(hpc_add_example)
     cmake_parse_arguments(
@@ -23,120 +74,51 @@ function(hpc_add_example)
         "SOURCES;BENCHMARK_SOURCES;INCLUDE_DIRS;LIBRARIES;ENABLE_SIMD"
         ${ARGN}
     )
-    
+
     if(NOT ARG_NAME)
         message(FATAL_ERROR "hpc_add_example: NAME is required")
     endif()
-    
+
     if(NOT ARG_SOURCES)
         message(FATAL_ERROR "hpc_add_example: SOURCES is required")
     endif()
-    
+
+    # Forward ENABLE_OPENMP to _hpc_configure_target. CMake has no shell-style
+    # ${VAR:+word} expansion, so build the flag list explicitly.
+    set(openmp_arg "")
+    if(ARG_ENABLE_OPENMP)
+        set(openmp_arg ENABLE_OPENMP)
+    endif()
+
     # Create the example executable
     add_executable(${ARG_NAME} ${ARG_SOURCES})
-    
-    # Set compiler options
-    hpc_set_compiler_options(${ARG_NAME})
-    
-    # Enable sanitizers if configured
-    hpc_enable_sanitizers(${ARG_NAME})
+    _hpc_configure_target(${ARG_NAME}
+        INCLUDE_DIRS ${ARG_INCLUDE_DIRS}
+        LIBRARIES ${ARG_LIBRARIES}
+        ${openmp_arg}
+        ENABLE_SIMD ${ARG_ENABLE_SIMD}
+    )
 
-    # Canonical headers (include/hpc/)
-    target_link_libraries(${ARG_NAME} PRIVATE hpc_headers)
-    
-    # Add include directories (target-based, not directory-based!)
-    if(ARG_INCLUDE_DIRS)
-        target_include_directories(${ARG_NAME} PRIVATE ${ARG_INCLUDE_DIRS})
-    endif()
-    
-    # Link libraries
-    if(ARG_LIBRARIES)
-        target_link_libraries(${ARG_NAME} PRIVATE ${ARG_LIBRARIES})
-    endif()
-    
-    # Enable OpenMP if requested
-    if(ARG_ENABLE_OPENMP AND OpenMP_CXX_FOUND)
-        target_link_libraries(${ARG_NAME} PRIVATE OpenMP::OpenMP_CXX)
-    endif()
-    
-    # Enable SIMD if requested (only on x86/x64)
-    if(ARG_ENABLE_SIMD AND NOT HPC_IS_ARM)
-        foreach(simd_level ${ARG_ENABLE_SIMD})
-            hpc_enable_simd(${ARG_NAME} ${simd_level})
-        endforeach()
-    endif()
-    
     # Create benchmark if sources provided
     if(ARG_BENCHMARK_SOURCES AND HPC_BUILD_BENCHMARKS)
         set(bench_name "${ARG_NAME}_bench")
         add_executable(${bench_name} ${ARG_BENCHMARK_SOURCES})
-        
-        hpc_set_compiler_options(${bench_name})
-        hpc_enable_sanitizers(${bench_name})
-        
+        _hpc_configure_target(${bench_name}
+            INCLUDE_DIRS ${ARG_INCLUDE_DIRS}
+            LIBRARIES ${ARG_LIBRARIES}
+            ${openmp_arg}
+            ENABLE_SIMD ${ARG_ENABLE_SIMD}
+        )
         target_link_libraries(${bench_name} PRIVATE
             benchmark::benchmark
             benchmark::benchmark_main
-            hpc_headers
         )
-        
-        if(ARG_INCLUDE_DIRS)
-            target_include_directories(${bench_name} PRIVATE ${ARG_INCLUDE_DIRS})
-        endif()
-        
-        if(ARG_LIBRARIES)
-            target_link_libraries(${bench_name} PRIVATE ${ARG_LIBRARIES})
-        endif()
-        
-        if(ARG_ENABLE_OPENMP AND OpenMP_CXX_FOUND)
-            target_link_libraries(${bench_name} PRIVATE OpenMP::OpenMP_CXX)
-        endif()
-        
-        if(ARG_ENABLE_SIMD)
-            foreach(simd_level ${ARG_ENABLE_SIMD})
-                hpc_enable_simd(${bench_name} ${simd_level})
-            endforeach()
-        endif()
-        
-        # Add to run_all_benchmarks target
         add_dependencies(run_all_benchmarks ${bench_name})
-        
-        # Register benchmark as a test (optional, for CI)
         add_test(NAME ${bench_name} COMMAND ${bench_name} --benchmark_min_time=0.1)
+        set_tests_properties(${bench_name} PROPERTIES LABELS "benchmark")
     endif()
-    
-    message(STATUS "Added example: ${ARG_NAME}")
-endfunction()
 
-#------------------------------------------------------------------------------
-# hpc_add_header_only_library(
-#     NAME <name>
-#     INCLUDE_DIR <include directory>
-# )
-#
-# Creates a header-only interface library
-#------------------------------------------------------------------------------
-function(hpc_add_header_only_library)
-    cmake_parse_arguments(
-        ARG
-        ""
-        "NAME;INCLUDE_DIR"
-        ""
-        ${ARGN}
-    )
-    
-    if(NOT ARG_NAME)
-        message(FATAL_ERROR "hpc_add_header_only_library: NAME is required")
-    endif()
-    
-    if(NOT ARG_INCLUDE_DIR)
-        message(FATAL_ERROR "hpc_add_header_only_library: INCLUDE_DIR is required")
-    endif()
-    
-    add_library(${ARG_NAME} INTERFACE)
-    target_include_directories(${ARG_NAME} INTERFACE ${ARG_INCLUDE_DIR})
-    
-    message(STATUS "Added header-only library: ${ARG_NAME}")
+    message(STATUS "Added example: ${ARG_NAME}")
 endfunction()
 
 #------------------------------------------------------------------------------
@@ -147,7 +129,9 @@ endfunction()
 #     [LIBRARIES <libraries to link...>]
 # )
 #
-# Creates a standalone benchmark executable
+# Creates a standalone benchmark executable. Deliberately does NOT apply
+# sanitizers (they distort timing) and does not accept ENABLE_OPENMP/ENABLE_SIMD
+# (use hpc_add_example with BENCHMARK_SOURCES if those are needed).
 #------------------------------------------------------------------------------
 function(hpc_add_benchmark)
     cmake_parse_arguments(
@@ -157,38 +141,38 @@ function(hpc_add_benchmark)
         "SOURCES;INCLUDE_DIRS;LIBRARIES"
         ${ARGN}
     )
-    
+
     if(NOT ARG_NAME)
         message(FATAL_ERROR "hpc_add_benchmark: NAME is required")
     endif()
-    
+
     if(NOT ARG_SOURCES)
         message(FATAL_ERROR "hpc_add_benchmark: SOURCES is required")
     endif()
-    
+
     if(NOT HPC_BUILD_BENCHMARKS)
         return()
     endif()
-    
+
     add_executable(${ARG_NAME} ${ARG_SOURCES})
-    
+
     hpc_set_compiler_options(${ARG_NAME})
-    
+
     target_link_libraries(${ARG_NAME} PRIVATE
         benchmark::benchmark
         benchmark::benchmark_main
         hpc_headers
     )
-    
+
     if(ARG_INCLUDE_DIRS)
         target_include_directories(${ARG_NAME} PRIVATE ${ARG_INCLUDE_DIRS})
     endif()
-    
+
     if(ARG_LIBRARIES)
         target_link_libraries(${ARG_NAME} PRIVATE ${ARG_LIBRARIES})
     endif()
-    
+
     add_dependencies(run_all_benchmarks ${ARG_NAME})
-    
+
     message(STATUS "Added benchmark: ${ARG_NAME}")
 endfunction()

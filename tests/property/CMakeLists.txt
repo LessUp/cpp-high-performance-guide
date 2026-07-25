@@ -7,8 +7,6 @@ add_executable(memory_properties_test
 )
 
 target_include_directories(memory_properties_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/examples/02-memory-cache/include
-    ${CMAKE_SOURCE_DIR}/examples/05-concurrency/include
     ${CMAKE_SOURCE_DIR}/benchmarks/common
 )
 
@@ -54,10 +52,6 @@ gtest_add_tests(TARGET simd_properties_test)
 # Concurrency properties test
 add_executable(concurrency_properties_test
     concurrency_properties.cpp
-)
-
-target_include_directories(concurrency_properties_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/examples/05-concurrency/include
 )
 
 target_link_libraries(concurrency_properties_test PRIVATE

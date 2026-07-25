@@ -19,13 +19,13 @@
 #include <atomic>
 #include <cmath>
 #include <cstdlib>
+#include <hpc/concurrency_utils.hpp>
 #include <hpc/core.hpp>
+#include <hpc/particle_types.hpp>
 #include <thread>
 #include <vector>
 
 #include "benchmark_utils.hpp"
-#include "concurrency_utils.hpp"
-#include "particle_types.hpp"
 
 namespace {
 

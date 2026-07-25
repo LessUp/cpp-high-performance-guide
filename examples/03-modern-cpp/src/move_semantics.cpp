@@ -13,12 +13,11 @@
  */
 
 #include <chrono>
+#include <hpc/buffer.hpp>
+#include <hpc/instrumentation.hpp>
 #include <iostream>
 #include <utility>
 #include <vector>
-
-#include "buffer.hpp"
-#include "instrumentation.hpp"
 
 namespace hpc::move_semantics {
 

@@ -13,13 +13,12 @@
 
 #include <algorithm>
 #include <atomic>
+#include <hpc/concurrency_utils.hpp>
+#include <hpc/lock_free_queue.hpp>
 #include <mutex>  // for std::lock_guard
 #include <numeric>
 #include <thread>
 #include <vector>
-
-#include "concurrency_utils.hpp"
-#include "lock_free_queue.hpp"
 
 namespace {
 

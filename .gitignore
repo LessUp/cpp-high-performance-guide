@@ -218,3 +218,11 @@ build_errors.txt
 # Claude Code / OMC
 .claude/
 .omc/
+
+# AI assistant intermediate artifacts (analysis/planning scratch files)
+findings.md
+progress.md
+proposals.md
+task_plan.md
+.qwen/
+.qoder/

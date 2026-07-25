@@ -17,12 +17,11 @@
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
+#include <hpc/memory_utils.hpp>
 #include <iostream>
 #include <memory>
 #include <utility>
 #include <vector>
-
-#include "memory_utils.hpp"
 
 #ifdef __AVX2__
 #include <immintrin.h>

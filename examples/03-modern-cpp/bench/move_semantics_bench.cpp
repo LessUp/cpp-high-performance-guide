@@ -8,9 +8,8 @@
 
 #include <benchmark/benchmark.h>
 
+#include <hpc/buffer.hpp>
 #include <vector>
-
-#include "buffer.hpp"
 
 namespace {
 

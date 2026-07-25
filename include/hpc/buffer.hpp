@@ -16,7 +16,7 @@
 #include <cstring>
 #include <utility>
 
-#include "instrumentation.hpp"
+#include <hpc/instrumentation.hpp>
 
 namespace hpc::move_semantics {
 

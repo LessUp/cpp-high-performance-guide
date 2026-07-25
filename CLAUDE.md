@@ -2,7 +2,7 @@
 
 ## Project position
 
-This repository is in **closure and hardening mode** (archive-ready for low-frequency maintenance). Prefer normalization, defect fixing, and removal of stale or low-signal surfaces over adding new features.
+This repository is under **active development**. The canonical header-only library lives in `include/hpc/` (consumed via the `hpc_headers` INTERFACE target); example and demo code lives in `examples/` and depends only on the canonical library, never the reverse. Prefer normalization, defect fixing, and removal of stale or low-signal surfaces over accumulating redundant surfaces.
 
 ## C++ Standards and Style
 
@@ -11,7 +11,7 @@ This repository is in **closure and hardening mode** (archive-ready for low-freq
 - **Memory safety**: prefer RAII, smart pointers, avoid raw `new/delete`
 - **Performance**: always measure with benchmarks before claiming improvement
 - **Concurrency**: use `std::atomic` with explicit memory ordering
-- **Header-only design**: all library code in `include/hpc/` and `examples/*/include/` is header-only. Platform-specific code is hidden behind preprocessor conditionals within headers.
+- **Header-only design**: all library code lives in `include/hpc/` (consumed via the `hpc_headers` INTERFACE target). Platform-specific code is hidden behind preprocessor conditionals within headers.
 
 ## Repository layout
 

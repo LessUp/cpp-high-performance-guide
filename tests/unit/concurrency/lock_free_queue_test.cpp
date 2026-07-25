@@ -6,12 +6,11 @@
  * The queue implementations are now in lock_free_queue.hpp for reuse.
  */
 
-#include "lock_free_queue.hpp"
-
 #include <gtest/gtest.h>
 
 #include <atomic>
 #include <chrono>
+#include <hpc/lock_free_queue.hpp>
 #include <random>
 #include <thread>
 #include <vector>

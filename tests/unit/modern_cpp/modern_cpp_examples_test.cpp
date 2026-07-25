@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
-#include "buffer.hpp"
-#include "compile_time.hpp"
-#include "instrumentation.hpp"
-#include "ranges_utils.hpp"
-#include "vector_reserve.hpp"
+#include <hpc/buffer.hpp>
+#include <hpc/compile_time.hpp>
+#include <hpc/instrumentation.hpp>
+#include <hpc/ranges_utils.hpp>
+#include <hpc/vector_reserve.hpp>
 
 using hpc::instrumentation::OperationMetrics;
 

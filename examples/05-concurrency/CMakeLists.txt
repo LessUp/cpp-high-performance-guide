@@ -5,7 +5,6 @@ hpc_add_example(
     NAME atomic_ordering
     SOURCES src/atomic_ordering.cpp
     BENCHMARK_SOURCES bench/atomic_bench.cpp
-    INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
     LIBRARIES Threads::Threads
 )
 
@@ -13,7 +12,6 @@ hpc_add_example(
 hpc_add_example(
     NAME lock_free_queue
     SOURCES src/lock_free_queue.cpp
-    INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
     LIBRARIES Threads::Threads
 )
 
@@ -23,7 +21,6 @@ if(OpenMP_CXX_FOUND)
         NAME openmp_basics
         SOURCES src/openmp_basics.cpp
         BENCHMARK_SOURCES bench/openmp_bench.cpp
-        INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
         ENABLE_OPENMP
     )
 endif()

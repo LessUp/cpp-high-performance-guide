@@ -15,11 +15,10 @@
 
 #include <atomic>
 #include <chrono>
+#include <hpc/memory_utils.hpp>
 #include <iostream>
 #include <thread>
 #include <vector>
-
-#include "memory_utils.hpp"
 
 namespace hpc::memory {
 

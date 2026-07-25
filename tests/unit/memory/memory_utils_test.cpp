@@ -3,9 +3,9 @@
  * @brief Unit tests for memory_utils.hpp
  */
 
-#include "memory_utils.hpp"
-
 #include <gtest/gtest.h>
+
+#include <hpc/memory_utils.hpp>
 
 using hpc::core::CACHE_LINE_SIZE;
 using hpc::core::PAGE_SIZE;

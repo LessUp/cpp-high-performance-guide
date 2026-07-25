@@ -77,7 +77,7 @@ examples/
   03-modern-cpp/         # C++20 特性与性能
   04-simd-vectorization/ # SIMD 手动向量化
   05-concurrency/        # 无锁并发与线程池
-include/hpc/             # 公共头文件 (core.hpp, simd.hpp)
+include/hpc/             # 规范头文件库 (core, simd, memory, concurrency, modern-cpp 等)
 tests/
   unit/                  # 单元测试 (Google Test)
   property/              # 属性测试

@@ -8,9 +8,8 @@
  * 3. Cache-friendly queue design
  */
 
-#include "lock_free_queue.hpp"
-
 #include <cassert>
+#include <hpc/lock_free_queue.hpp>
 #include <iostream>
 #include <memory>
 #include <optional>

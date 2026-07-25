@@ -105,7 +105,7 @@ seq_cst 提供全局单一修改顺序。经典的 store buffering litmus test�
 
 ### 环形缓冲区设计
 
-`examples/05-concurrency/include/lock_free_queue.hpp` 中的 `SPSCQueue<T, Capacity>`：
+`include/hpc/lock_free_queue.hpp` 中的 `SPSCQueue<T, Capacity>`：
 
 ```cpp
 template <typename T, size_t Capacity>

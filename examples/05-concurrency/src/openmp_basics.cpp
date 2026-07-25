@@ -13,11 +13,10 @@
 
 #include <chrono>
 #include <cmath>
+#include <hpc/concurrency_utils.hpp>
 #include <iostream>
 #include <numeric>
 #include <vector>
-
-#include "concurrency_utils.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>

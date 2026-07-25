@@ -17,9 +17,8 @@
  */
 
 #include <chrono>
+#include <hpc/particle_types.hpp>
 #include <iostream>
-
-#include "particle_types.hpp"
 
 namespace {
 

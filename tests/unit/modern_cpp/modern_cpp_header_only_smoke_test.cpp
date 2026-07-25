@@ -1,7 +1,6 @@
+#include <hpc/compile_time.hpp>
+#include <hpc/ranges_utils.hpp>
 #include <vector>
-
-#include "compile_time.hpp"
-#include "ranges_utils.hpp"
 
 int modern_cpp_header_only_helper();
 

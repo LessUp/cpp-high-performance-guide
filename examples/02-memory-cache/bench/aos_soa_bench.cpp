@@ -8,10 +8,9 @@
 
 #include <benchmark/benchmark.h>
 
+#include <hpc/particle_types.hpp>
 #include <random>
 #include <vector>
-
-#include "particle_types.hpp"
 
 namespace {
 

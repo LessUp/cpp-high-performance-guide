@@ -12,12 +12,11 @@
  */
 
 #include <chrono>
+#include <hpc/ranges_utils.hpp>
 #include <iostream>
 #include <numeric>
 #include <random>
 #include <vector>
-
-#include "ranges_utils.hpp"
 
 namespace hpc::ranges {
 

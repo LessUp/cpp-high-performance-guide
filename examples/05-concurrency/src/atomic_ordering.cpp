@@ -13,9 +13,8 @@
 
 #include <array>
 #include <cassert>
+#include <hpc/concurrency_utils.hpp>
 #include <iostream>
-
-#include "concurrency_utils.hpp"
 
 namespace hpc::concurrency {
 

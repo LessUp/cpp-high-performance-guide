@@ -11,9 +11,8 @@
  * - Counting allocations with custom allocator
  */
 
-#include "vector_reserve.hpp"
-
 #include <chrono>
+#include <hpc/vector_reserve.hpp>
 #include <iostream>
 #include <vector>
 

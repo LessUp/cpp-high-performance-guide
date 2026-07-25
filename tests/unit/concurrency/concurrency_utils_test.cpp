@@ -3,10 +3,9 @@
  * @brief Unit tests for concurrency_utils.hpp
  */
 
-#include "concurrency_utils.hpp"
-
 #include <gtest/gtest.h>
 
+#include <hpc/concurrency_utils.hpp>
 #include <numeric>
 
 using hpc::core::CACHE_LINE_SIZE;

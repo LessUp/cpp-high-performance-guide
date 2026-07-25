@@ -21,7 +21,7 @@
 #include <thread>
 #include <utility>
 
-#include "concurrency_utils.hpp"
+#include <hpc/concurrency_utils.hpp>
 
 namespace hpc::concurrency {
 

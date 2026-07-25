@@ -6,7 +6,7 @@
 
 ### constexpr vs consteval
 
-`examples/03-modern-cpp/include/compile_time.hpp`：
+`include/hpc/compile_time.hpp`：
 
 ```cpp
 // 可在编译期求值（如果参数是编译期常量）
@@ -118,7 +118,7 @@ for (int i = 0; i < NUM_BUFFERS; ++i) {
 }
 ```
 
-代码通过 `OperationMetrics`（`examples/03-modern-cpp/include/instrumentation.hpp`）精确计数 copy/move 操作次数：
+代码通过 `OperationMetrics`（`include/hpc/instrumentation.hpp`）精确计数 copy/move 操作次数：
 
 ```cpp
 class OperationMetrics {
@@ -177,7 +177,7 @@ void demonstrate_growth_pattern() {
 
 ### 用 CountingAllocator 量化开销
 
-`examples/03-modern-cpp/include/vector_reserve.hpp` 提供了注入式分配器：
+`include/hpc/vector_reserve.hpp` 提供了注入式分配器：
 
 ```cpp
 template <typename T>
@@ -228,7 +228,7 @@ Ranges 的核心性能优势不在于单个算法的速度，而在于**惰性�
 
 ### 三种实现对比
 
-`examples/03-modern-cpp/include/ranges_utils.hpp`：
+`include/hpc/ranges_utils.hpp`：
 
 ```cpp
 // 裸循环：手动管理输出容器

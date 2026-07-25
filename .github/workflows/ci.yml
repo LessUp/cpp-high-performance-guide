@@ -61,8 +61,8 @@ jobs:
       - name: Build
         run: cmake --build --preset debug
 
-      - name: Test
-        run: ctest --preset=debug
+      - name: Test (exclude non-deterministic benchmarks)
+        run: ctest --preset=debug -LE benchmark
 
   docs:
     name: Docs build & tests

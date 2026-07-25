@@ -18,7 +18,7 @@
 #include <memory>
 #include <vector>
 
-#include "instrumentation.hpp"
+#include <hpc/instrumentation.hpp>
 
 namespace hpc::vector_reserve {
 

@@ -42,7 +42,7 @@ inline std::size_t cache_line_size() {       // 运行时检测
 粒子系统中每个粒子有位置 `(x, y, z)` 和速度 `(vx, vy, vz)`。AOS 是最自然的写法：
 
 ```cpp
-// examples/02-memory-cache/include/particle_types.hpp
+// include/hpc/particle_types.hpp
 struct ParticleAOS {
     float x, y, z;     // Position
     float vx, vy, vz;  // Velocity
@@ -55,7 +55,7 @@ struct ParticleAOS {
 ### SOA 方案
 
 ```cpp
-// examples/02-memory-cache/include/particle_types.hpp
+// include/hpc/particle_types.hpp
 struct ParticleSOA {
     std::vector<float> x, y, z;     // Positions
     std::vector<float> vx, vy, vz;  // Velocities
@@ -127,7 +127,7 @@ void add_avx_unaligned(const float* a, const float* b, float* c, size_t n) {
 
 ### 对齐工具
 
-`examples/02-memory-cache/include/memory_utils.hpp` 提供跨平台对齐分配和 cache line padding：
+`include/hpc/memory_utils.hpp` 提供跨平台对齐分配和 cache line padding：
 
 ```cpp
 inline void* aligned_alloc(std::size_t size, std::size_t alignment) {

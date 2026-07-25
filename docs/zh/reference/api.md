@@ -241,7 +241,7 @@ hpc::simd::clamp_array_wrapped(arr.data(), 0.0f, 1.0f, n);
 
 ---
 
-## hpc::memory (`examples/02-memory-cache/include/memory_utils.hpp`)
+## hpc::memory (`include/hpc/memory_utils.hpp`)
 
 内存对齐与缓存友好数据结构工具。
 
