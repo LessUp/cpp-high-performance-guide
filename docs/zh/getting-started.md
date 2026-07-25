@@ -81,7 +81,6 @@ include/hpc/             # 公共头文件 (core.hpp, simd.hpp)
 tests/
   unit/                  # 单元测试 (Google Test)
   property/              # 属性测试
-  integration/           # 集成测试 (Python)
 benchmarks/common/       # 基准测试公共工具
 docs/                    # VitePress 文档站
 scripts/                 # 辅助脚本 (format, setup)

@@ -44,7 +44,8 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 
 # Benchmarks
 cmake --preset=release && cmake --build build/release
-./build/release/benchmarks/<benchmark_name> --benchmark_time_unit=us
+./build/release/examples/<module-dir>/<benchmark_name> --benchmark_time_unit=us
+# 例: ./build/release/examples/02-memory-cache/aos_vs_soa_bench --benchmark_time_unit=us
 
 # Utilities
 ./scripts/format.sh
