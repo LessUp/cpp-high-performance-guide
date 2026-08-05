@@ -140,19 +140,3 @@ function(hpc_enable_simd target)
         endif()
     endif()
 endfunction()
-
-#------------------------------------------------------------------------------
-# hpc_enable_lto(target)
-# Enables Link-Time Optimization
-#------------------------------------------------------------------------------
-function(hpc_enable_lto target)
-    include(CheckIPOSupported)
-    check_ipo_supported(RESULT lto_supported OUTPUT lto_error)
-    
-    if(lto_supported)
-        set_property(TARGET ${target} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-        message(STATUS "LTO enabled for ${target}")
-    else()
-        message(WARNING "LTO not supported: ${lto_error}")
-    endif()
-endfunction()

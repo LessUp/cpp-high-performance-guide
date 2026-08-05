@@ -70,14 +70,18 @@ inline std::string format_time(double nanoseconds) {
 /**
  * @brief Simple timer for manual benchmarking
  *
+ * Uses steady_clock: monotonic and immune to system-clock adjustments.
+ * high_resolution_clock aliases system_clock on some standard libraries
+ * and can jump backwards (observed: negative elapsed times under NTP slew).
+ *
  * Note: For most benchmarks, prefer Google Benchmark's built-in timing
  * via the benchmark::State parameter.
  */
 class Timer {
 public:
-    void start() { start_ = std::chrono::high_resolution_clock::now(); }
+    void start() { start_ = std::chrono::steady_clock::now(); }
 
-    void stop() { end_ = std::chrono::high_resolution_clock::now(); }
+    void stop() { end_ = std::chrono::steady_clock::now(); }
 
     double elapsed_ns() const {
         return std::chrono::duration<double, std::nano>(end_ - start_).count();
@@ -94,8 +98,8 @@ public:
     double elapsed_s() const { return std::chrono::duration<double>(end_ - start_).count(); }
 
 private:
-    std::chrono::high_resolution_clock::time_point start_;
-    std::chrono::high_resolution_clock::time_point end_;
+    std::chrono::steady_clock::time_point start_;
+    std::chrono::steady_clock::time_point end_;
 };
 
 }  // namespace hpc::bench

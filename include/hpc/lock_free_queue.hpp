@@ -16,9 +16,11 @@
 
 #pragma once
 
+#include <algorithm>
 #include <atomic>
 #include <optional>
 #include <thread>
+#include <type_traits>
 #include <utility>
 
 #include <hpc/concurrency_utils.hpp>
@@ -144,10 +146,17 @@ private:
  * @tparam Capacity Queue capacity (must be power of 2)
  *
  * @note Thread-safe for multiple producer and consumer threads
+ * @note T must be nothrow move constructible. A slot is globally claimed
+ *       (enqueue position advanced) before the element is constructed, so a
+ *       throwing constructor would leave the slot permanently corrupted.
+ *       push(const T&) additionally requires nothrow copy construction.
  */
 template <typename T, size_t Capacity>
 class MPMCQueue {
     static_assert((Capacity & (Capacity - 1)) == 0, "Capacity must be power of 2");
+    static_assert(std::is_nothrow_move_constructible_v<T>,
+                  "MPMCQueue requires a nothrow move constructible T: slots are claimed "
+                  "before construction, so a throwing move would corrupt the queue");
 
     struct Cell {
         std::atomic<size_t> sequence;
@@ -213,6 +222,10 @@ public:
 private:
     template <typename U>
     bool push_impl(U&& value) {
+        static_assert(std::is_nothrow_constructible_v<T, U&&>,
+                      "MPMCQueue::push requires T to be nothrow constructible from the "
+                      "argument: the slot is claimed before construction, and a throwing "
+                      "constructor would permanently corrupt the queue");
         Cell* cell;
         size_t pos = enqueue_pos_.load(std::memory_order_relaxed);
         int backoff = 1;

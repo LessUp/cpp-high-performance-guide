@@ -19,9 +19,9 @@
 #include <utility>
 #include <vector>
 
-namespace hpc::move_semantics {
-
-using hpc::instrumentation::OperationMetrics;
+// Example code lives in an anonymous namespace: the hpc::move_semantics namespace is
+// reserved for the canonical library (include/hpc/buffer.hpp).
+namespace {
 
 //------------------------------------------------------------------------------
 // Functions demonstrating copy vs move
@@ -31,18 +31,10 @@ using hpc::instrumentation::OperationMetrics;
 /**
  * @brief Returns a buffer by value (may use RVO)
  */
-Buffer create_buffer(size_t size, OperationMetrics* metrics = nullptr) {
-    Buffer buf(size, metrics);
+hpc::move_semantics::Buffer create_buffer(
+    size_t size, hpc::instrumentation::OperationMetrics* metrics = nullptr) {
+    hpc::move_semantics::Buffer buf(size, metrics);
     return buf;  // NRVO may elide the copy/move
-}
-
-/**
- * @brief Process buffer by move (cheap)
- */
-void process_by_move(Buffer&& buf) {
-    Buffer local = std::move(buf);  // Move into local
-    volatile char c = local.data()[0];
-    (void)c;
 }
 
 //------------------------------------------------------------------------------
@@ -57,17 +49,17 @@ void demonstrate_vector_push_back() {
 
     // Push by copy
     {
-        OperationMetrics metrics;
-        OperationMetrics::Scope scope(metrics);
-        std::vector<Buffer> vec;
+        hpc::instrumentation::OperationMetrics metrics;
+        hpc::instrumentation::OperationMetrics::Scope scope(metrics);
+        std::vector<hpc::move_semantics::Buffer> vec;
         vec.reserve(NUM_BUFFERS);  // Prevent reallocation
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < NUM_BUFFERS; ++i) {
-            Buffer buf(BUFFER_SIZE, &metrics);
+            hpc::move_semantics::Buffer buf(BUFFER_SIZE, &metrics);
             vec.push_back(buf);  // Copy
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
         std::cout << "push_back (copy): " << ms << " ms" << " (copies: " << metrics.copy_count
@@ -76,17 +68,17 @@ void demonstrate_vector_push_back() {
 
     // Push by move
     {
-        OperationMetrics metrics;
-        OperationMetrics::Scope scope(metrics);
-        std::vector<Buffer> vec;
+        hpc::instrumentation::OperationMetrics metrics;
+        hpc::instrumentation::OperationMetrics::Scope scope(metrics);
+        std::vector<hpc::move_semantics::Buffer> vec;
         vec.reserve(NUM_BUFFERS);
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < NUM_BUFFERS; ++i) {
-            Buffer buf(BUFFER_SIZE, &metrics);
+            hpc::move_semantics::Buffer buf(BUFFER_SIZE, &metrics);
             vec.push_back(std::move(buf));  // Move
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
         std::cout << "push_back (move): " << ms << " ms" << " (copies: " << metrics.copy_count
@@ -95,16 +87,16 @@ void demonstrate_vector_push_back() {
 
     // emplace_back (construct in place)
     {
-        OperationMetrics metrics;
-        OperationMetrics::Scope scope(metrics);
-        std::vector<Buffer> vec;
+        hpc::instrumentation::OperationMetrics metrics;
+        hpc::instrumentation::OperationMetrics::Scope scope(metrics);
+        std::vector<hpc::move_semantics::Buffer> vec;
         vec.reserve(NUM_BUFFERS);
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < NUM_BUFFERS; ++i) {
             vec.emplace_back(BUFFER_SIZE, &metrics);  // Construct in place
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
         std::cout << "emplace_back:     " << ms << " ms" << " (copies: " << metrics.copy_count
@@ -120,15 +112,15 @@ void demonstrate_function_calls() {
 
     // By copy
     {
-        OperationMetrics metrics;
-        OperationMetrics::Scope scope(metrics);
-        Buffer buf(BUFFER_SIZE, &metrics);
+        hpc::instrumentation::OperationMetrics metrics;
+        hpc::instrumentation::OperationMetrics::Scope scope(metrics);
+        hpc::move_semantics::Buffer buf(BUFFER_SIZE, &metrics);
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            process_by_copy(buf);  // Copies each time
+            hpc::move_semantics::process_by_copy(buf);  // Copies each time
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
         std::cout << "By copy:      " << ms << " ms" << " (copies: " << metrics.copy_count << ")\n";
@@ -136,15 +128,15 @@ void demonstrate_function_calls() {
 
     // By reference
     {
-        OperationMetrics metrics;
-        OperationMetrics::Scope scope(metrics);
-        Buffer buf(BUFFER_SIZE, &metrics);
+        hpc::instrumentation::OperationMetrics metrics;
+        hpc::instrumentation::OperationMetrics::Scope scope(metrics);
+        hpc::move_semantics::Buffer buf(BUFFER_SIZE, &metrics);
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            process_by_ref(buf);  // No copy
+            hpc::move_semantics::process_by_ref(buf);  // No copy
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
         std::cout << "By reference: " << ms << " ms" << " (copies: " << metrics.copy_count << ")\n";
@@ -157,16 +149,16 @@ void demonstrate_return_value() {
     constexpr size_t BUFFER_SIZE = 1024 * 1024;
     constexpr int ITERATIONS = 100;
 
-    OperationMetrics metrics;
-    OperationMetrics::Scope scope(metrics);
+    hpc::instrumentation::OperationMetrics metrics;
+    hpc::instrumentation::OperationMetrics::Scope scope(metrics);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::steady_clock::now();
     for (int i = 0; i < ITERATIONS; ++i) {
-        Buffer buf = create_buffer(BUFFER_SIZE, &metrics);
+        hpc::move_semantics::Buffer buf = create_buffer(BUFFER_SIZE, &metrics);
         volatile char c = buf.data()[0];
         (void)c;
     }
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     std::cout << "Return by value: " << ms << " ms" << " (copies: " << metrics.copy_count
@@ -174,15 +166,14 @@ void demonstrate_return_value() {
     std::cout << "Note: With RVO/NRVO, copies and moves should be 0\n";
 }
 
-}  // namespace hpc::move_semantics
+}  // namespace
 
-#ifndef HPC_TEST_MODE
 int main() {
     std::cout << "=== Move Semantics Performance Demo ===\n";
 
-    hpc::move_semantics::demonstrate_vector_push_back();
-    hpc::move_semantics::demonstrate_function_calls();
-    hpc::move_semantics::demonstrate_return_value();
+    demonstrate_vector_push_back();
+    demonstrate_function_calls();
+    demonstrate_return_value();
 
     std::cout << "\nKey takeaways:\n";
     std::cout << "1. Use std::move when you no longer need the source object\n";
@@ -192,4 +183,3 @@ int main() {
 
     return 0;
 }
-#endif

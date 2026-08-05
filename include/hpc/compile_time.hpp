@@ -14,8 +14,10 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 
 namespace hpc::compile_time {
 
@@ -25,6 +27,7 @@ namespace hpc::compile_time {
 
 /**
  * @brief Runtime factorial (for comparison)
+ * @pre n <= 20 (21! overflows int64_t, which is UB at runtime)
  */
 inline int64_t factorial_runtime(int n) {
     int64_t result = 1;
@@ -38,6 +41,7 @@ inline int64_t factorial_runtime(int n) {
  * @brief Compile-time factorial using constexpr
  *
  * Can be evaluated at compile time if argument is known at compile time.
+ * @pre n <= 20 (21! overflows int64_t; a constexpr evaluation would fail)
  */
 constexpr int64_t factorial_constexpr(int n) {
     int64_t result = 1;
@@ -52,6 +56,7 @@ constexpr int64_t factorial_constexpr(int n) {
  *
  * MUST be evaluated at compile time. Compiler error if called with
  * runtime value.
+ * @pre n <= 20 (21! overflows int64_t; a constexpr evaluation would fail)
  */
 consteval int64_t factorial_consteval(int n) {
     int64_t result = 1;
@@ -95,20 +100,29 @@ constexpr std::array<double, N> generate_sin_table() {
     return table;
 }
 
-// Compile-time generated lookup table
-constexpr auto SIN_TABLE = generate_sin_table<1024>();
+// Compile-time generated lookup table (inline: one copy program-wide, not per TU)
+inline constexpr auto SIN_TABLE = generate_sin_table<1024>();
 
 /**
  * @brief Fast sine using compile-time lookup table
+ *
+ * @note Not constexpr: std::fmod-based range reduction is a runtime operation.
  */
 inline double fast_sin(double angle) {
     constexpr double PI = 3.14159265358979323846;
     constexpr double TWO_PI = 2.0 * PI;
     constexpr size_t TABLE_SIZE = SIN_TABLE.size();
 
-    // Normalize angle to [0, 2*PI) using std::fmod (not constexpr)
-    // Note: This function is not constexpr, so it must be defined separately
-    angle = angle - static_cast<int64_t>(angle / TWO_PI) * TWO_PI;
+    // Match std::sin semantics for non-finite input. Without this guard the
+    // index computation below would cast NaN to size_t, which is UB.
+    if (!std::isfinite(angle)) {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    // Normalize angle to [0, 2*PI) with std::fmod. The previous reduction
+    // (static_cast<int64_t>(angle / TWO_PI)) is UB once |angle| exceeds the
+    // int64_t range, e.g. fast_sin(1e308).
+    angle = std::fmod(angle, TWO_PI);
     if (angle < 0)
         angle += TWO_PI;
 
@@ -157,7 +171,10 @@ constexpr bool is_prime(int n) {
         return true;
     if (n % 2 == 0)
         return false;
-    for (int i = 3; i * i <= n; i += 2) {
+    // i <= n / i instead of i * i <= n: the multiplication overflows signed
+    // int for n near INT_MAX (UB at runtime, hard error in constexpr), and
+    // made is_prime(2147483647) wrongly report "not prime".
+    for (int i = 3; i <= n / i; i += 2) {
         if (n % i == 0)
             return false;
     }
@@ -181,7 +198,7 @@ constexpr std::array<int, N> generate_primes() {
     return primes;
 }
 
-// First 100 primes computed at compile time
-constexpr auto FIRST_100_PRIMES = generate_primes<100>();
+// First 100 primes computed at compile time (inline: one copy program-wide)
+inline constexpr auto FIRST_100_PRIMES = generate_primes<100>();
 
 }  // namespace hpc::compile_time

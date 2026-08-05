@@ -58,20 +58,25 @@ static void BM_Transform_Ranges(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * static_cast<int64_t>(n));
 }
 
+// Filter pair: both sides must do the SAME work. The raw loop sums the
+// filtered elements (lazy, no materialization), matching the ranges view side
+// below. An earlier version materialized the raw-loop output into a vector
+// while the view side only summed — measuring "materialize vs sum" instead of
+// "raw loop vs ranges", which is misleading. (See the Chain pair for the
+// filter+transform variant of the same pattern.)
 static void BM_Filter_RawLoop(benchmark::State& state) {
     const size_t n = static_cast<size_t>(state.range(0));
     std::vector<int> input(n);
     std::iota(input.begin(), input.end(), 0);
 
     for (auto _ : state) {
-        std::vector<int> output;
-        output.reserve(n / 2);
+        int64_t sum = 0;
         for (int x : input) {
             if (x % 2 == 0) {
-                output.push_back(x);
+                sum += x;
             }
         }
-        benchmark::DoNotOptimize(output);
+        benchmark::DoNotOptimize(sum);
     }
 
     state.SetItemsProcessed(state.iterations() * static_cast<int64_t>(n));

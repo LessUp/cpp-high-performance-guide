@@ -1,17 +1,9 @@
 # Benchmarks CMakeLists.txt
-# Common benchmark utilities and aggregated benchmark targets
+# Aggregated benchmark target. Shared benchmark utilities live in
+# common/benchmark_utils.hpp (consumed via a direct include directory).
 
-# Add common benchmark utilities as interface library
-add_library(benchmark_common INTERFACE)
-target_include_directories(benchmark_common INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/common
-)
-target_link_libraries(benchmark_common INTERFACE
-    benchmark::benchmark
-    benchmark::benchmark_main
-)
-
-# Aggregate all benchmarks into a single target
+# Aggregate all benchmarks into a single build target
+# (cmake --build build/release --target run_all_benchmarks)
 add_custom_target(run_all_benchmarks
-    COMMENT "Running all benchmarks..."
+    COMMENT "Building all benchmarks..."
 )

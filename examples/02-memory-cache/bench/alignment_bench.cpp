@@ -9,7 +9,10 @@
 #include <benchmark/benchmark.h>
 
 #include <cstdlib>
+#include <hpc/memory_utils.hpp>
 #include <vector>
+
+#include "scalar_baseline.hpp"
 
 #ifdef __AVX2__
 #include <immintrin.h>
@@ -19,31 +22,11 @@ namespace {
 
 constexpr size_t ALIGNMENT = 32;
 
-void* aligned_alloc_impl(size_t size, size_t alignment) {
-#if defined(_MSC_VER)
-    return _aligned_malloc(size, alignment);
-#else
-    void* ptr = nullptr;
-    if (posix_memalign(&ptr, alignment, size) != 0) {
-        return nullptr;
-    }
-    return ptr;
-#endif
-}
+// Aligned allocation comes from the canonical library (hpc::memory).
 
-void aligned_free_impl(void* ptr) {
-#if defined(_MSC_VER)
-    _aligned_free(ptr);
-#else
-    free(ptr);
-#endif
-}
-
-void add_scalar(const float* a, const float* b, float* c, size_t n) {
-    for (size_t i = 0; i < n; ++i) {
-        c[i] = a[i] + b[i];
-    }
-}
+// add_scalar lives in scalar_baseline.cpp, compiled with the auto-vectorizer
+// disabled — otherwise -O3 -march=native would turn the "scalar" baseline
+// into vectorized code and flatten the comparison against AVX.
 
 #ifdef __AVX2__
 void add_avx_aligned(const float* a, const float* b, float* c, size_t n) {
@@ -74,7 +57,7 @@ static void BM_Scalar(benchmark::State& state) {
     std::vector<float> a(n, 1.0f), b(n, 2.0f), c(n);
 
     for (auto _ : state) {
-        add_scalar(a.data(), b.data(), c.data(), n);
+        scalar_baseline::add_arrays(a.data(), b.data(), c.data(), n);
         benchmark::DoNotOptimize(c.data());
         benchmark::ClobberMemory();
     }
@@ -85,9 +68,9 @@ static void BM_Scalar(benchmark::State& state) {
 #ifdef __AVX2__
 static void BM_AVX_Aligned(benchmark::State& state) {
     const size_t n = static_cast<size_t>(state.range(0));
-    float* a = static_cast<float*>(aligned_alloc_impl(n * sizeof(float), ALIGNMENT));
-    float* b = static_cast<float*>(aligned_alloc_impl(n * sizeof(float), ALIGNMENT));
-    float* c = static_cast<float*>(aligned_alloc_impl(n * sizeof(float), ALIGNMENT));
+    float* a = static_cast<float*>(hpc::memory::aligned_alloc(n * sizeof(float), ALIGNMENT));
+    float* b = static_cast<float*>(hpc::memory::aligned_alloc(n * sizeof(float), ALIGNMENT));
+    float* c = static_cast<float*>(hpc::memory::aligned_alloc(n * sizeof(float), ALIGNMENT));
 
     for (size_t i = 0; i < n; ++i) {
         a[i] = 1.0f;
@@ -102,9 +85,9 @@ static void BM_AVX_Aligned(benchmark::State& state) {
 
     state.SetBytesProcessed(state.iterations() * n * 3 * sizeof(float));
 
-    aligned_free_impl(a);
-    aligned_free_impl(b);
-    aligned_free_impl(c);
+    hpc::memory::aligned_free(a);
+    hpc::memory::aligned_free(b);
+    hpc::memory::aligned_free(c);
 }
 
 static void BM_AVX_Unaligned(benchmark::State& state) {

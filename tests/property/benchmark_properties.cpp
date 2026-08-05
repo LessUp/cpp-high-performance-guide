@@ -1,6 +1,6 @@
 /**
  * @file benchmark_properties.cpp
- * @brief Property-based tests for benchmark utilities
+ * @brief Unit tests for shared benchmark utilities (benchmark_utils.hpp)
  *
  * Feature: hpc-optimization-guide
  * Property 13: Benchmark Utility Functions
@@ -9,19 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include <filesystem>
-#include <fstream>
-
 #include "benchmark_utils.hpp"
-
-namespace {
-
-std::filesystem::path make_temp_benchmark_file(const std::string& prefix) {
-    const auto temp_dir = std::filesystem::temp_directory_path();
-    return temp_dir / (prefix + std::to_string(rand()) + ".json");
-}
-
-}  // anonymous namespace
 
 /**
  * Property 13: Benchmark Utility Functions
@@ -62,18 +50,6 @@ TEST(BenchmarkUtilsTests, TimerBasicUsage) {
 
     EXPECT_GT(timer.elapsed_ns(), 0);
     EXPECT_GT(timer.elapsed_us(), 0);
-}
-
-TEST(BenchmarkUtilsTests, GoogleBenchmarkNativeJSON) {
-    // This test verifies that Google Benchmark's native JSON output works
-    // We no longer maintain our own JSON exporter - use the standard tool
-
-    // Example: benchmark executable can be run with:
-    // ./benchmark --benchmark_out=file.json --benchmark_out_format=json
-
-    // This test documents the standard approach:
-    // Google Benchmark natively supports JSON output via CLI flags
-    EXPECT_TRUE(true) << "Use: --benchmark_out=file.json --benchmark_out_format=json";
 }
 
 int main(int argc, char** argv) {

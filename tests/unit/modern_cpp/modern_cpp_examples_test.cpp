@@ -1,10 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <cmath>
+#include <cstring>
 #include <hpc/buffer.hpp>
 #include <hpc/compile_time.hpp>
 #include <hpc/instrumentation.hpp>
 #include <hpc/ranges_utils.hpp>
 #include <hpc/vector_reserve.hpp>
+#include <limits>
 
 using hpc::instrumentation::OperationMetrics;
 
@@ -24,6 +27,44 @@ TEST(CompileTimeExamplesTest, HashAndPrimeUtilitiesWork) {
     EXPECT_EQ(FIRST_100_PRIMES[24], 97);
 }
 
+TEST(CompileTimeExamplesTest, FastSinMatchesStdSinAtTablePoints) {
+    using hpc::compile_time::fast_sin;
+    constexpr double kPi = 3.14159265358979323846;
+    constexpr double kTolerance = 1e-3;
+
+    // These angles land exactly on 1024-entry table points, so the only
+    // error is the table's Taylor approximation (~1e-10), far below 1e-3.
+    EXPECT_NEAR(fast_sin(0.0), std::sin(0.0), kTolerance);
+    EXPECT_NEAR(fast_sin(kPi / 2), std::sin(kPi / 2), kTolerance);
+    EXPECT_NEAR(fast_sin(-kPi / 2), std::sin(-kPi / 2), kTolerance);
+    EXPECT_NEAR(fast_sin(kPi), std::sin(kPi), kTolerance);
+    EXPECT_NEAR(fast_sin(-kPi), std::sin(-kPi), kTolerance);
+    EXPECT_NEAR(fast_sin(2 * kPi), std::sin(2 * kPi), kTolerance);
+    EXPECT_NEAR(fast_sin(-kPi / 4), std::sin(-kPi / 4), kTolerance);
+    EXPECT_NEAR(fast_sin(-3 * kPi / 4), std::sin(-3 * kPi / 4), kTolerance);
+}
+
+TEST(CompileTimeExamplesTest, FastSinStaysWithinTableResolutionElsewhere) {
+    using hpc::compile_time::fast_sin;
+    constexpr double kPi = 3.14159265358979323846;
+    // The table has 1024 entries and fast_sin truncates to the nearest lower
+    // entry (no interpolation), so for any finite angle
+    // |fast_sin(a) - sin(a)| <= 2*PI/1024. A 1e-3 tolerance would be too
+    // tight here: e.g. fast_sin(1e6) differs from std::sin(1e6) by ~4e-3.
+    constexpr double kMaxError = 2 * kPi / 1024;
+
+    EXPECT_NEAR(fast_sin(-0.7), std::sin(-0.7), kMaxError);
+    EXPECT_NEAR(fast_sin(1e6), std::sin(1e6), kMaxError);
+    EXPECT_NEAR(fast_sin(-1e6), std::sin(-1e6), kMaxError);
+}
+
+TEST(CompileTimeExamplesTest, FastSinNonFiniteInputReturnsNaN) {
+    using hpc::compile_time::fast_sin;
+    EXPECT_TRUE(std::isnan(fast_sin(std::numeric_limits<double>::quiet_NaN())));
+    EXPECT_TRUE(std::isnan(fast_sin(std::numeric_limits<double>::infinity())));
+    EXPECT_TRUE(std::isnan(fast_sin(-std::numeric_limits<double>::infinity())));
+}
+
 TEST(MoveSemanticsExamplesTest, MoveConstructorTransfersOwnership) {
     using hpc::move_semantics::Buffer;
 
@@ -40,6 +81,74 @@ TEST(MoveSemanticsExamplesTest, MoveConstructorTransfersOwnership) {
     EXPECT_EQ(source.data(), nullptr);
     EXPECT_EQ(moved.size(), 128u);
     EXPECT_NE(moved.data(), nullptr);
+}
+
+TEST(MoveSemanticsExamplesTest, CopyAssignmentDuplicatesContentAndLeavesSourceIntact) {
+    using hpc::move_semantics::Buffer;
+
+    OperationMetrics metrics;
+    Buffer source(64, &metrics);
+    std::memset(source.data(), 0x5A, source.size());
+
+    Buffer target(8, &metrics);
+    OperationMetrics::Scope scope(metrics);
+    target = source;
+
+    // Copy-and-swap records the temporary's copy construction plus the
+    // assignment notification, so copy_count grows (by two today) while no
+    // move is recorded.
+    EXPECT_GT(metrics.copy_count, 0u);
+    EXPECT_EQ(metrics.move_count, 0u);
+    ASSERT_EQ(target.size(), source.size());
+    EXPECT_EQ(std::memcmp(target.data(), source.data(), source.size()), 0);
+
+    // The source keeps its own storage and content.
+    ASSERT_NE(source.data(), nullptr);
+    EXPECT_EQ(source.size(), 64u);
+    EXPECT_EQ(static_cast<unsigned char>(source.data()[0]), 0x5Au);
+    EXPECT_EQ(static_cast<unsigned char>(source.data()[63]), 0x5Au);
+}
+
+TEST(MoveSemanticsExamplesTest, MoveAssignmentTransfersOwnershipAndRecordsMove) {
+    using hpc::move_semantics::Buffer;
+
+    OperationMetrics metrics;
+    Buffer source(96, &metrics);
+    Buffer target(16, &metrics);
+
+    OperationMetrics::Scope scope(metrics);
+    char* source_data = source.data();
+    target = std::move(source);
+
+    EXPECT_EQ(metrics.copy_count, 0u);
+    EXPECT_EQ(metrics.move_count, 1u);
+    EXPECT_EQ(target.size(), 96u);
+    EXPECT_EQ(target.data(), source_data);  // pointer transfer, no copy
+    EXPECT_EQ(source.data(), nullptr);
+    EXPECT_EQ(source.size(), 0u);
+}
+
+TEST(MoveSemanticsExamplesTest, SelfAssignmentIsSafeNoOp) {
+    using hpc::move_semantics::Buffer;
+
+    OperationMetrics metrics;
+    Buffer buffer(48, &metrics);
+    std::memset(buffer.data(), 0x7C, buffer.size());
+    char* original_data = buffer.data();
+
+    OperationMetrics::Scope scope(metrics);
+    // Assign through a reference: same self-assignment check, without
+    // tripping Clang's -Wself-assign-overloaded on direct `x = x`.
+    Buffer& self = buffer;
+    buffer = self;  // exercises the self-assignment guard
+
+    EXPECT_EQ(metrics.copy_count, 0u);
+    EXPECT_EQ(metrics.move_count, 0u);
+    EXPECT_EQ(buffer.size(), 48u);
+    EXPECT_EQ(buffer.data(), original_data);
+    for (size_t i = 0; i < buffer.size(); ++i) {
+        ASSERT_EQ(static_cast<unsigned char>(buffer.data()[i]), 0x7Cu);
+    }
 }
 
 TEST(MoveSemanticsExamplesTest, ProcessByCopyAndRefCountDifferently) {

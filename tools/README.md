@@ -1,24 +1,25 @@
-# Tools
+# 工具
 
-This directory contains various tools for development, profiling, and analysis.
+性能分析与剖析工具集。
 
-## Structure
+## 结构
 
-- `performance/` - Performance analysis and profiling tools
-  - `generate_flamegraph.sh` - Generate FlameGraph visualizations from perf data
-  - `benchmark_compare.py` - Compare benchmark results
-- `scripts/` - Development utility scripts
+- `performance/` - 性能分析工具
+  - `generate_flamegraph.sh` - 从 perf 数据生成火焰图
+  - `benchmark_compare.py` - 对比两次基准测试结果（完整工作流见 `benchmarks/README.md`）
 
-## Usage
+开发辅助脚本（格式化、环境准备等）位于仓库根的 `scripts/` 目录，不在本目录下。
 
-### FlameGraph Generation
+## 用法
+
+### 火焰图生成
 
 ```bash
-./tools/performance/generate_flamegraph.sh ./build/release/your_benchmark
+./tools/performance/generate_flamegraph.sh ./build/release/examples/02-memory-cache/aos_vs_soa_bench
 ```
 
-### Benchmark Comparison
+### 基准对比
 
 ```bash
-python3 tools/performance/benchmark_compare.py baseline.json current.json
+python3 tools/performance/benchmark_compare.py baseline.json current.json --threshold 0.1
 ```

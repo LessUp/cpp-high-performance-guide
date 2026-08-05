@@ -16,10 +16,8 @@
 
 #include <atomic>
 #include <chrono>
-#include <concepts>  // C++20 concepts
-#include <functional>
+#include <functional>    // for std::ref in run_parallel
 #include <hpc/core.hpp>  // platform constants
-#include <mutex>         // for std::lock_guard, std::unique_lock
 #include <thread>
 #include <vector>
 
@@ -118,30 +116,54 @@ public:
     bool try_lock() { return !flag_.test_and_set(std::memory_order_acquire); }
 
 private:
-    std::atomic_flag flag_ = ATOMIC_FLAG_INIT;
+    std::atomic_flag flag_;  // C++20: default constructor leaves the flag clear
 };
 
 //------------------------------------------------------------------------------
 // Parallel Execution Helper
 //------------------------------------------------------------------------------
 
-/// Run a function on multiple threads and measure time
+/**
+ * @brief Run a callable concurrently on multiple threads and measure the time
+ *
+ * @param func Callable invoked as func(thread_id) with thread_id in
+ *             [0, num_threads). All invocations run concurrently, so func
+ *             must be safe to call from multiple threads at once.
+ * @param num_threads Number of threads to spawn
+ * @return Elapsed wall-clock time in milliseconds
+ */
 template <typename Func>
 double run_parallel(Func&& func, unsigned int num_threads) {
     std::vector<std::thread> threads;
     threads.reserve(num_threads);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    // Materialize the callable once. Forwarding Func inside the loop would,
+    // for rvalue arguments, move from it on the first iteration and leave the
+    // remaining threads with a moved-from callable. std::ref shares the single
+    // instance instead of copying it into every thread (also works for
+    // move-only callables).
+    auto task = std::forward<Func>(func);
+
+    auto start = std::chrono::steady_clock::now();
 
     for (unsigned int i = 0; i < num_threads; ++i) {
-        threads.emplace_back(std::forward<Func>(func), i);
+        try {
+            threads.emplace_back(std::ref(task), i);
+        } catch (...) {
+            // Join already-started threads before unwinding: destroying a
+            // joinable std::thread would call std::terminate.
+            for (auto& t : threads) {
+                t.join();
+            }
+            throw;
+        }
     }
 
     for (auto& t : threads) {
         t.join();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
     return std::chrono::duration<double, std::milli>(end - start).count();
 }
 

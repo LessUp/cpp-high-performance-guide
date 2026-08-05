@@ -10,134 +10,27 @@
  * - Hardware vs software prefetching
  * - Prefetch distance tuning
  * - When prefetching helps (and when it doesn't)
+ *
+ * The array traversal routines (sum_no_prefetch / sum_with_prefetch /
+ * sum_random_*) live in the canonical library (hpc/memory_utils.hpp) and are
+ * shared with bench/prefetch_bench.cpp. The linked-list (pointer chasing)
+ * demo below is example-specific.
  */
 
 #include <chrono>
 #include <cstdint>
+#include <hpc/memory_utils.hpp>
 #include <iostream>
 #include <random>
 #include <vector>
 
-namespace hpc::memory {
+namespace {
 
 //------------------------------------------------------------------------------
-// Array traversal implementations
+// Demonstration
 //------------------------------------------------------------------------------
 
-/**
- * @brief Simple sequential sum without prefetching
- */
-int64_t sum_no_prefetch(const int64_t* data, size_t n) {
-    int64_t sum = 0;
-    for (size_t i = 0; i < n; ++i) {
-        sum += data[i];
-    }
-    return sum;
-}
-
-/**
- * @brief Sequential sum with software prefetching
- *
- * Prefetch distance is tuned for typical cache latency.
- * Too small: data not ready when needed
- * Too large: data evicted before use
- */
-int64_t sum_with_prefetch(const int64_t* data, size_t n) {
-    constexpr size_t PREFETCH_DISTANCE = 16;  // Prefetch 16 elements ahead
-
-    int64_t sum = 0;
-    for (size_t i = 0; i < n; ++i) {
-        // Prefetch future data (read, high temporal locality)
-        if (i + PREFETCH_DISTANCE < n) {
-#if defined(__GNUC__) || defined(__clang__)
-            __builtin_prefetch(&data[i + PREFETCH_DISTANCE], 0, 3);
-#endif
-        }
-        sum += data[i];
-    }
-    return sum;
-}
-
-/**
- * @brief Random access sum without prefetching
- *
- * Random access patterns are harder to optimize because
- * the CPU can't predict what to prefetch.
- */
-int64_t sum_random_no_prefetch(const int64_t* data, const size_t* indices, size_t n) {
-    int64_t sum = 0;
-    for (size_t i = 0; i < n; ++i) {
-        sum += data[indices[i]];
-    }
-    return sum;
-}
-
-/**
- * @brief Random access sum with software prefetching
- *
- * For random access, we can prefetch the next few indices
- * to hide memory latency.
- */
-int64_t sum_random_with_prefetch(const int64_t* data, const size_t* indices, size_t n) {
-    constexpr size_t PREFETCH_DISTANCE = 8;
-
-    int64_t sum = 0;
-    for (size_t i = 0; i < n; ++i) {
-        // Prefetch data for future iterations
-        if (i + PREFETCH_DISTANCE < n) {
-#if defined(__GNUC__) || defined(__clang__)
-            __builtin_prefetch(&data[indices[i + PREFETCH_DISTANCE]], 0, 3);
-#endif
-        }
-        sum += data[indices[i]];
-    }
-    return sum;
-}
-
-//------------------------------------------------------------------------------
-// Linked list traversal (pointer chasing)
-//------------------------------------------------------------------------------
-
-struct Node {
-    int64_t value;
-    Node* next;
-};
-
-/**
- * @brief Linked list sum without prefetching
- */
-int64_t sum_list_no_prefetch(const Node* head) {
-    int64_t sum = 0;
-    for (const Node* node = head; node != nullptr; node = node->next) {
-        sum += node->value;
-    }
-    return sum;
-}
-
-/**
- * @brief Linked list sum with prefetching
- *
- * Prefetch the next node while processing current node.
- */
-int64_t sum_list_with_prefetch(const Node* head) {
-    int64_t sum = 0;
-    for (const Node* node = head; node != nullptr; node = node->next) {
-        // Prefetch next node
-        if (node->next != nullptr) {
-#if defined(__GNUC__) || defined(__clang__)
-            __builtin_prefetch(node->next, 0, 3);
-#endif
-        }
-        sum += node->value;
-    }
-    return sum;
-}
-
-//------------------------------------------------------------------------------
-// Benchmark
-//------------------------------------------------------------------------------
-
-void run_benchmark() {
+void run_demo() {
     constexpr size_t N = 100'000'000;
     constexpr int ITERATIONS = 5;
 
@@ -155,23 +48,23 @@ void run_benchmark() {
     std::cout << "=== Sequential Access ===\n";
 
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         int64_t sum = 0;
         for (int i = 0; i < ITERATIONS; ++i) {
-            sum += sum_no_prefetch(data.data(), N);
+            sum += hpc::memory::sum_no_prefetch(data.data(), N);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "No prefetch:   " << ms << " ms (sum: " << sum << ")\n";
     }
 
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         int64_t sum = 0;
         for (int i = 0; i < ITERATIONS; ++i) {
-            sum += sum_with_prefetch(data.data(), N);
+            sum += hpc::memory::sum_with_prefetch(data.data(), N);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "With prefetch: " << ms << " ms (sum: " << sum << ")\n";
     }
@@ -192,33 +85,33 @@ void run_benchmark() {
     }
 
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         int64_t sum = 0;
         for (int i = 0; i < ITERATIONS; ++i) {
-            sum += sum_random_no_prefetch(data.data(), indices.data(), N);
+            sum += hpc::memory::sum_random_no_prefetch(data.data(), indices.data(), N);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "No prefetch:   " << ms << " ms (sum: " << sum << ")\n";
     }
 
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         int64_t sum = 0;
         for (int i = 0; i < ITERATIONS; ++i) {
-            sum += sum_random_with_prefetch(data.data(), indices.data(), N);
+            sum += hpc::memory::sum_random_with_prefetch(data.data(), indices.data(), N);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "With prefetch: " << ms << " ms (sum: " << sum << ")\n";
     }
 }
 
-}  // namespace hpc::memory
+}  // namespace
 
 int main() {
     std::cout << "=== Software Prefetching Demonstration ===\n\n";
-    hpc::memory::run_benchmark();
+    run_demo();
 
     std::cout << "\nNotes:\n";
     std::cout << "- Sequential access: Hardware prefetcher is very effective,\n";

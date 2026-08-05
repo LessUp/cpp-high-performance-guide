@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <memory>
+#include <new>
 #include <vector>
 
 #include <hpc/instrumentation.hpp>
@@ -35,6 +36,10 @@ namespace hpc::vector_reserve {
  * with zero observation overhead.
  *
  * @tparam T The type of objects to allocate
+ *
+ * @warning The metrics pointer is non-owning. The pointed-to OperationMetrics
+ *          must outlive every vector using this allocator: allocators propagate
+ *          on copy/move/swap, so a dangling metrics pointer is UB.
  */
 template <typename T>
 class CountingAllocator {
@@ -52,10 +57,22 @@ public:
     CountingAllocator(const CountingAllocator<U>& other) noexcept : metrics_(other.metrics()) {}
 
     T* allocate(std::size_t n) {
-        if (metrics_) {
-            metrics_->record_allocation(n * sizeof(T));
+        // Guard against n * sizeof(T) overflowing size_t: malloc would
+        // otherwise silently allocate a much smaller buffer than requested.
+        if (n > std::size_t(-1) / sizeof(T)) {
+            throw std::bad_alloc();
         }
-        return static_cast<T*>(std::malloc(n * sizeof(T)));
+        const std::size_t bytes = n * sizeof(T);
+        if (metrics_) {
+            metrics_->record_allocation(bytes);
+        }
+        // malloc(0) is implementation-defined; allocate 1 byte so the result
+        // is always a valid non-null pointer that deallocate() can accept.
+        void* ptr = std::malloc(bytes == 0 ? 1 : bytes);
+        if (ptr == nullptr) {
+            throw std::bad_alloc();  // Allocators must never return nullptr
+        }
+        return static_cast<T*>(ptr);
     }
 
     void deallocate(T* ptr, std::size_t n) noexcept {

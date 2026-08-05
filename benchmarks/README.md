@@ -1,20 +1,18 @@
-# Benchmarks
+# 基准测试
 
-This directory holds shared benchmark utilities plus the local workflow for
-capturing and comparing Google Benchmark JSON output.
+本目录存放共享的基准工具，以及捕获/对比 Google Benchmark JSON 输出的本地工作流。
+各模块的基准源码位于 `examples/*/bench/`。
 
----
+## 回归对比工作流
 
-## Regression Comparison
-
-1. Build the optimized benchmark targets:
+1. 构建基准目标：
 
 ```bash
 cmake --preset=release
 cmake --build build/release
 ```
 
-2. Capture a baseline run:
+2. 捕获基线：
 
 ```bash
 ./build/release/examples/04-simd-vectorization/simd_bench \
@@ -22,7 +20,7 @@ cmake --build build/release
   --benchmark_out=simd-baseline.json
 ```
 
-3. Capture a candidate run after your change:
+3. 改动后捕获候选：
 
 ```bash
 ./build/release/examples/04-simd-vectorization/simd_bench \
@@ -30,13 +28,14 @@ cmake --build build/release
   --benchmark_out=simd-candidate.json
 ```
 
-4. Compare the two runs:
+4. 对比两次结果：
 
 ```bash
-python3 tools/performance/benchmark_compare.py simd-baseline.json simd-candidate.json --threshold 10
+python3 tools/performance/benchmark_compare.py \
+  simd-baseline.json simd-candidate.json \
+  --threshold 0.1 --fail-on-regression
 ```
 
-The script prints a per-benchmark table with baseline time, candidate time, and
-delta percentage. It exits with code `1` when any benchmark regresses by more
-than the threshold, which makes it suitable for local smoke checks or future CI
-gating.
+`--threshold` 是**比例**而非百分比（`0.1` 表示 10%）。加上 `--fail-on-regression`
+后，任一基准回归超过阈值时脚本以退出码 1 结束，可用于本地冒烟或未来的 CI 门禁
+（不传该参数时脚本只打印对比表，始终以 0 退出）。

@@ -12,7 +12,10 @@
  * - Injectability: metrics are passed by pointer, not baked into class state
  * - RAII scope: OperationMetrics::Scope resets on construction, no manual cleanup
  * - Zero overhead: nullptr means "do not observe"
- * - Thread-local by default: each scope owns its own counters
+ * - Single-threaded observation: counters are plain (non-atomic) integers and
+ *   are NOT thread-safe. Each Scope owns its own instance; if the same
+ *   OperationMetrics is shared across threads, synchronization is the caller's
+ *   responsibility (e.g. one metrics object per thread, merged afterwards).
  *
  * @example
  *   hpc::instrumentation::OperationMetrics metrics;

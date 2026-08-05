@@ -51,15 +51,12 @@ public:
 
     Buffer& operator=(const Buffer& other) {
         if (this != &other) {
-            delete[] data_;
-            size_ = other.size_;
-            metrics_ = other.metrics_;
-            if (size_ > 0) {
-                data_ = new char[size_];
-                std::memcpy(data_, other.data_, size_);
-            } else {
-                data_ = nullptr;
-            }
+            // Copy-and-swap: the copy is built first, so if its allocation
+            // throws, *this is left completely untouched (strong exception
+            // guarantee). The old "delete first, allocate later" order would
+            // leave data_ dangling on bad_alloc and double-free in ~Buffer.
+            Buffer tmp(other);
+            swap(tmp);
             notify_copy();
         }
         return *this;
@@ -90,6 +87,13 @@ public:
     char* data() { return data_; }
     const char* data() const { return data_; }
 
+    /// Exchange contents with another buffer in O(1); used by copy assignment.
+    void swap(Buffer& other) noexcept {
+        std::swap(data_, other.data_);
+        std::swap(size_, other.size_);
+        std::swap(metrics_, other.metrics_);
+    }
+
 private:
     char* data_;
     size_t size_;
@@ -110,8 +114,17 @@ inline void observe_buffer(const Buffer& buf) {
         return;
     }
 
-    volatile char c = buf.data()[0];
-    (void)c;
+    // Convince the optimizer that the buffer contents are "used" so the call
+    // is not deleted. A compiler fence is the standard DoNotOptimize idiom;
+    // `volatile` would also work but suppresses optimization more broadly and
+    // is not a reliable deoptimization barrier in C++.
+    const char* ptr = buf.data();
+#if defined(__GNUC__) || defined(__clang__)
+    asm volatile("" : : "r,m"(ptr) : "memory");
+#else
+    static volatile const char* escape_sink;
+    escape_sink = ptr;
+#endif
 }
 
 //------------------------------------------------------------------------------

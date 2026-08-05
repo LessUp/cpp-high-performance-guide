@@ -18,7 +18,9 @@
 #include <random>
 #include <vector>
 
-namespace hpc::ranges {
+// Example code lives in an anonymous namespace: the hpc::ranges namespace is
+// reserved for the canonical library (include/hpc/ranges_utils.hpp).
+namespace {
 
 //------------------------------------------------------------------------------
 // Benchmarks
@@ -36,33 +38,33 @@ void benchmark_transform() {
 
     // Raw loop
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            transform_raw_loop(input, output);
+            hpc::ranges::transform_raw_loop(input, output);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "Raw loop:      " << ms << " ms\n";
     }
 
     // std::transform
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            transform_algorithm(input, output);
+            hpc::ranges::transform_algorithm(input, output);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "std::transform: " << ms << " ms\n";
     }
 
     // ranges::transform
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            transform_ranges(input, output);
+            hpc::ranges::transform_ranges(input, output);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "ranges::transform: " << ms << " ms\n";
     }
@@ -79,35 +81,35 @@ void benchmark_filter() {
 
     // Raw loop
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            auto result = filter_raw_loop(input);
+            auto result = hpc::ranges::filter_raw_loop(input);
             volatile size_t s = result.size();
             (void)s;
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "Raw loop:    " << ms << " ms\n";
     }
 
     // std::copy_if
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            auto result = filter_algorithm(input);
+            auto result = hpc::ranges::filter_algorithm(input);
             volatile size_t s = result.size();
             (void)s;
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "std::copy_if: " << ms << " ms\n";
     }
 
     // Ranges view (lazy, just iteration)
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            auto view = filter_ranges_view(input);
+            auto view = hpc::ranges::filter_ranges_view(input);
             int64_t sum = 0;
             for (int x : view) {
                 sum += x;
@@ -115,7 +117,7 @@ void benchmark_filter() {
             volatile int64_t s = sum;
             (void)s;
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "Ranges view (lazy sum): " << ms << " ms\n";
     }
@@ -132,36 +134,36 @@ void benchmark_chain() {
 
     // Raw loop
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            auto result = chain_raw_loop(input);
+            auto result = hpc::ranges::chain_raw_loop(input);
             volatile size_t s = result.size();
             (void)s;
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "Raw loop:    " << ms << " ms\n";
     }
 
     // Ranges (lazy, materialized)
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            auto view = chain_ranges_view(input);
-            auto result = to_vector(view);
+            auto view = hpc::ranges::chain_ranges_view(input);
+            auto result = hpc::ranges::to_vector(view);
             volatile size_t s = result.size();
             (void)s;
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "Ranges (materialized): " << ms << " ms\n";
     }
 
     // Ranges (lazy, just sum)
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
-            auto view = chain_ranges_view(input);
+            auto view = hpc::ranges::chain_ranges_view(input);
             int64_t sum = 0;
             for (int x : view) {
                 sum += x;
@@ -169,21 +171,20 @@ void benchmark_chain() {
             volatile int64_t s = sum;
             (void)s;
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "Ranges (lazy sum): " << ms << " ms\n";
     }
 }
 
-}  // namespace hpc::ranges
+}  // namespace
 
-#ifndef HPC_TEST_MODE
 int main() {
     std::cout << "=== C++20 Ranges vs Raw Loops ===\n\n";
 
-    hpc::ranges::benchmark_transform();
-    hpc::ranges::benchmark_filter();
-    hpc::ranges::benchmark_chain();
+    benchmark_transform();
+    benchmark_filter();
+    benchmark_chain();
 
     std::cout << "\nKey observations:\n";
     std::cout << "1. For simple operations, performance is usually equivalent\n";
@@ -193,4 +194,3 @@ int main() {
 
     return 0;
 }
-#endif

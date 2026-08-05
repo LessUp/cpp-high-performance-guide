@@ -39,11 +39,11 @@ void run_demo() {
         std::vector<ParticleAOS> particles;
         initialize_particles(particles, NUM_PARTICLES);
 
-        auto start = high_resolution_clock::now();
+        auto start = steady_clock::now();
         for (int i = 0; i < NUM_ITERATIONS; ++i) {
             update_particles_aos(particles, DT);
         }
-        auto end = high_resolution_clock::now();
+        auto end = steady_clock::now();
 
         auto duration = duration_cast<milliseconds>(end - start).count();
         std::cout << "AOS update time: " << duration << " ms\n";
@@ -55,11 +55,11 @@ void run_demo() {
         ParticleSOA particles;
         initialize_particles(particles, NUM_PARTICLES);
 
-        auto start = high_resolution_clock::now();
+        auto start = steady_clock::now();
         for (int i = 0; i < NUM_ITERATIONS; ++i) {
             update_particles_soa(particles, DT);
         }
-        auto end = high_resolution_clock::now();
+        auto end = steady_clock::now();
 
         auto duration = duration_cast<milliseconds>(end - start).count();
         std::cout << "SOA update time: " << duration << " ms\n";

@@ -27,7 +27,9 @@
 #include <immintrin.h>
 #endif
 
-namespace hpc::memory {
+// Example code lives in an anonymous namespace: the hpc::memory namespace is
+// reserved for the canonical library (include/hpc/memory_utils.hpp).
+namespace {
 
 constexpr size_t SIMD_ALIGNMENT = 32;  // AVX alignment
 
@@ -38,13 +40,14 @@ template <typename T>
 class AlignedArray {
 public:
     explicit AlignedArray(size_t count, size_t alignment = SIMD_ALIGNMENT)
-        : size_(count), data_(static_cast<T*>(aligned_alloc(count * sizeof(T), alignment))) {
+        : size_(count),
+          data_(static_cast<T*>(hpc::memory::aligned_alloc(count * sizeof(T), alignment))) {
         if (!data_) {
             throw std::bad_alloc();
         }
     }
 
-    ~AlignedArray() { aligned_free(data_); }
+    ~AlignedArray() { hpc::memory::aligned_free(data_); }
 
     // Non-copyable
     AlignedArray(const AlignedArray&) = delete;
@@ -163,11 +166,11 @@ void run_benchmark() {
 
     // Scalar benchmark
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
             add_scalar(a_aligned.data(), b_aligned.data(), c_aligned.data(), N);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "Scalar:        " << ms << " ms\n";
     }
@@ -175,22 +178,22 @@ void run_benchmark() {
 #ifdef __AVX2__
     // AVX aligned benchmark
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
             add_avx_aligned(a_aligned.data(), b_aligned.data(), c_aligned.data(), N);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "AVX aligned:   " << ms << " ms\n";
     }
 
     // AVX unaligned benchmark
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int i = 0; i < ITERATIONS; ++i) {
             add_avx_unaligned(a_unaligned, b_unaligned, c_unaligned, N);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "AVX unaligned: " << ms << " ms\n";
     }
@@ -199,11 +202,11 @@ void run_benchmark() {
 #endif
 }
 
-}  // namespace hpc::memory
+}  // namespace
 
 int main() {
     std::cout << "=== Memory Alignment for SIMD ===\n\n";
-    hpc::memory::run_benchmark();
+    run_benchmark();
 
     std::cout << "\nNote: On modern CPUs, unaligned access penalty is small,\n";
     std::cout << "but aligned access is still preferred for best performance.\n";

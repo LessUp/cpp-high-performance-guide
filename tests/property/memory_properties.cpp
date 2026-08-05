@@ -18,9 +18,11 @@
 #include <algorithm>
 #include <atomic>
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <hpc/concurrency_utils.hpp>
 #include <hpc/core.hpp>
+#include <hpc/memory_utils.hpp>
 #include <hpc/particle_types.hpp>
 #include <thread>
 #include <vector>
@@ -103,14 +105,20 @@ RC_GTEST_PROP(MemoryProperties, SOAPerformanceAdvantage, ()) {
 }
 
 //------------------------------------------------------------------------------
-// Property 4: Cache-Line Aligned Counters Eliminate False Sharing
+// Property 4: Concurrent Counter Correctness (packed vs cache-line-aligned)
 // Validates: Requirements 2.2, 5.3
+//
+// Both layouts must produce exact counts under concurrent increments.
+// The performance impact of false sharing is deliberately NOT asserted here:
+// timing is too noisy for a property test on shared CI hosts (an earlier
+// version's timing assertions were tautologies). Measurements live in
+// examples/02-memory-cache/bench/false_sharing_bench.cpp.
 //------------------------------------------------------------------------------
 
 // Compare hpc::concurrency::AlignedCounter vs plain std::atomic<int>.
 // For the unaligned case, use std::atomic<int> directly.
 
-RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
+RC_GTEST_PROP(MemoryProperties, ConcurrentCounterCorrectness, ()) {
     // Feature: hpc-optimization-guide, Property 4: Cache-Line Aligned Counters
     // Validates: Requirements 2.2, 5.3
 
@@ -121,8 +129,6 @@ RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
     // Use plain std::atomic<int64_t> to demonstrate the unaligned case
     std::vector<std::atomic<int64_t>> unaligned(static_cast<size_t>(num_threads));
 
-    Timer unaligned_timer;
-    unaligned_timer.start();
     {
         std::vector<std::thread> threads;
         for (int t = 0; t < num_threads; ++t) {
@@ -136,14 +142,10 @@ RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
             thread.join();
         }
     }
-    unaligned_timer.stop();
-    const auto unaligned_time = unaligned_timer.elapsed_us();
 
     // Test with aligned counters (no false sharing)
     std::vector<AlignedCounter> aligned(static_cast<size_t>(num_threads));
 
-    Timer aligned_timer;
-    aligned_timer.start();
     {
         std::vector<std::thread> threads;
         for (int t = 0; t < num_threads; ++t) {
@@ -157,56 +159,52 @@ RC_GTEST_PROP(MemoryProperties, AlignedCountersEliminateFalseSharing, ()) {
             thread.join();
         }
     }
-    aligned_timer.stop();
-    const auto aligned_time = aligned_timer.elapsed_us();
 
-    // Verify correctness
+    // Verify correctness: every counter holds exactly `increments`,
+    // regardless of layout — no lost updates under concurrency.
     for (int t = 0; t < num_threads; ++t) {
         RC_ASSERT(unaligned[static_cast<size_t>(t)].load() == increments);
         RC_ASSERT(aligned[static_cast<size_t>(t)].value.load() == increments);
     }
-
-    // Timing checks should stay resilient to scheduler noise and shared CI hosts.
-    // We only require both paths to produce measurable, non-negative timings.
-    if (num_threads > 1) {
-        RC_ASSERT(unaligned_time >= 0);
-        RC_ASSERT(aligned_time >= 0);
-    }
 }
 
 //------------------------------------------------------------------------------
-// Property 5: Aligned Memory SIMD Performance
+// Property 5: Aligned Storage Correctness
 // Validates: Requirements 2.3
+//
+// For any random array, cache-line-aligned storage from hpc::memory::make_aligned
+// must (a) actually be aligned to CACHE_LINE_SIZE and (b) produce results
+// identical to ordinary storage for the same data and access order.
 //------------------------------------------------------------------------------
 
-void sum_array_unaligned(const float* data, size_t n, float& result) {
-    result = 0.0f;
-    for (size_t i = 0; i < n; ++i) {
-        result += data[i];
-    }
-}
-
-RC_GTEST_PROP(MemoryProperties, AlignedMemorySIMDCorrectness, ()) {
-    // Feature: hpc-optimization-guide, Property 5: Aligned Memory SIMD Performance
+RC_GTEST_PROP(MemoryProperties, AlignedStorageMatchesOrdinaryStorage, ()) {
+    // Feature: hpc-optimization-guide, Property 5: Aligned Memory Correctness
     // Validates: Requirements 2.3
 
-    const size_t n = *rc::gen::inRange<size_t>(256, 10001);
+    const size_t n = *rc::gen::inRange<size_t>(1, 10001);
 
-    // Create aligned and unaligned arrays
-    std::vector<float> unaligned(n);
+    auto aligned = hpc::memory::make_aligned<float>(n);
+    std::vector<float> ordinary(n);
 
-    // Fill with random data
+    // Fill both with identical random data
     for (size_t i = 0; i < n; ++i) {
-        unaligned[i] = static_cast<float>(i % 100) * 0.01f;
+        const float v = static_cast<float>(*rc::gen::inRange(-10000, 10000)) * 0.01f;
+        aligned[i] = v;
+        ordinary[i] = v;
     }
 
-    // Compute sum
-    float sum_unaligned = 0.0f;
-    sum_array_unaligned(unaligned.data(), n, sum_unaligned);
+    // (a) Alignment guarantee
+    RC_ASSERT(reinterpret_cast<std::uintptr_t>(aligned.get()) % CACHE_LINE_SIZE == 0);
 
-    // Verify result is reasonable (not NaN or Inf)
-    RC_ASSERT(std::isfinite(sum_unaligned));
-    RC_ASSERT(sum_unaligned >= 0.0f);
+    // (b) Same data + same reduction order => bit-identical results
+    float sum_aligned = 0.0f;
+    float sum_ordinary = 0.0f;
+    for (size_t i = 0; i < n; ++i) {
+        sum_aligned += aligned[i];
+        sum_ordinary += ordinary[i];
+    }
+    RC_ASSERT(std::isfinite(sum_aligned));
+    RC_ASSERT(sum_aligned == sum_ordinary);
 }
 
 }  // namespace

@@ -3,61 +3,21 @@
  * @brief Benchmark for software prefetching
  *
  * Validates: Requirements 2.4
+ *
+ * The traversal routines under test come from the canonical library
+ * (hpc/memory_utils.hpp) — the same implementations demonstrated by
+ * src/prefetch.cpp, so benchmark numbers and example output describe
+ * identical code.
  */
 
 #include <benchmark/benchmark.h>
 
+#include <cstdint>
+#include <hpc/memory_utils.hpp>
 #include <random>
 #include <vector>
 
 namespace {
-
-template <typename T>
-inline void prefetch_read(const T* ptr) {
-#if defined(__GNUC__) || defined(__clang__)
-    __builtin_prefetch(ptr, 0, 3);
-#endif
-}
-
-int64_t sum_no_prefetch(const int64_t* data, size_t n) {
-    int64_t sum = 0;
-    for (size_t i = 0; i < n; ++i) {
-        sum += data[i];
-    }
-    return sum;
-}
-
-int64_t sum_with_prefetch(const int64_t* data, size_t n) {
-    constexpr size_t PREFETCH_DISTANCE = 16;
-    int64_t sum = 0;
-    for (size_t i = 0; i < n; ++i) {
-        if (i + PREFETCH_DISTANCE < n) {
-            prefetch_read(&data[i + PREFETCH_DISTANCE]);
-        }
-        sum += data[i];
-    }
-    return sum;
-}
-
-int64_t sum_random_no_prefetch(const int64_t* data, const size_t* indices, size_t n) {
-    int64_t sum = 0;
-    for (size_t i = 0; i < n; ++i) {
-        sum += data[indices[i]];
-    }
-    return sum;
-}
-
-int64_t sum_random_with_prefetch(const int64_t* data, const size_t* indices, size_t n) {
-    constexpr size_t PREFETCH_DISTANCE = 8;
-    int64_t sum = 0;
-    for (size_t i = 0; i < n; ++i) {
-        if (i + PREFETCH_DISTANCE < n) {
-            prefetch_read(&data[indices[i + PREFETCH_DISTANCE]]);
-        }
-        sum += data[indices[i]];
-    }
-    return sum;
-}
 
 static void BM_Sequential_NoPrefetch(benchmark::State& state) {
     const size_t n = static_cast<size_t>(state.range(0));
@@ -66,7 +26,7 @@ static void BM_Sequential_NoPrefetch(benchmark::State& state) {
         data[i] = static_cast<int64_t>(i);
 
     for (auto _ : state) {
-        auto result = sum_no_prefetch(data.data(), n);
+        auto result = hpc::memory::sum_no_prefetch(data.data(), n);
         benchmark::DoNotOptimize(result);
     }
 
@@ -80,7 +40,7 @@ static void BM_Sequential_WithPrefetch(benchmark::State& state) {
         data[i] = static_cast<int64_t>(i);
 
     for (auto _ : state) {
-        auto result = sum_with_prefetch(data.data(), n);
+        auto result = hpc::memory::sum_with_prefetch(data.data(), n);
         benchmark::DoNotOptimize(result);
     }
 
@@ -104,7 +64,7 @@ static void BM_Random_NoPrefetch(benchmark::State& state) {
     }
 
     for (auto _ : state) {
-        auto result = sum_random_no_prefetch(data.data(), indices.data(), n);
+        auto result = hpc::memory::sum_random_no_prefetch(data.data(), indices.data(), n);
         benchmark::DoNotOptimize(result);
     }
 
@@ -128,7 +88,7 @@ static void BM_Random_WithPrefetch(benchmark::State& state) {
     }
 
     for (auto _ : state) {
-        auto result = sum_random_with_prefetch(data.data(), indices.data(), n);
+        auto result = hpc::memory::sum_random_with_prefetch(data.data(), indices.data(), n);
         benchmark::DoNotOptimize(result);
     }
 

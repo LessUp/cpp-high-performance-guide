@@ -16,7 +16,9 @@
 #include <hpc/concurrency_utils.hpp>
 #include <iostream>
 
-namespace hpc::concurrency {
+// Example code lives in an anonymous namespace: the hpc::concurrency namespace is
+// reserved for the canonical library (include/hpc/concurrency_utils.hpp).
+namespace {
 
 // ============================================================================
 // Example 1: Relaxed ordering - Only atomicity, no synchronization
@@ -40,7 +42,7 @@ void demonstrate_relaxed_ordering() {
         }
     };
 
-    double time_ms = run_parallel(increment, NUM_THREADS);
+    double time_ms = hpc::concurrency::run_parallel(increment, NUM_THREADS);
 
     std::cout << "Final counter value: " << counter.load() << std::endl;
     std::cout << "Expected value: " << ITERATIONS * NUM_THREADS << std::endl;
@@ -162,7 +164,7 @@ void benchmark_memory_orderings() {
                 counter.fetch_add(1, std::memory_order_relaxed);
             }
         };
-        double time_ms = run_parallel(increment, NUM_THREADS);
+        double time_ms = hpc::concurrency::run_parallel(increment, NUM_THREADS);
         std::cout << "Relaxed:  " << time_ms << " ms" << std::endl;
     }
 
@@ -174,7 +176,7 @@ void benchmark_memory_orderings() {
                 counter.fetch_add(1, std::memory_order_acq_rel);
             }
         };
-        double time_ms = run_parallel(increment, NUM_THREADS);
+        double time_ms = hpc::concurrency::run_parallel(increment, NUM_THREADS);
         std::cout << "Acq-Rel:  " << time_ms << " ms" << std::endl;
     }
 
@@ -186,7 +188,7 @@ void benchmark_memory_orderings() {
                 counter.fetch_add(1, std::memory_order_seq_cst);
             }
         };
-        double time_ms = run_parallel(increment, NUM_THREADS);
+        double time_ms = hpc::concurrency::run_parallel(increment, NUM_THREADS);
         std::cout << "Seq-Cst:  " << time_ms << " ms" << std::endl;
     }
 
@@ -224,7 +226,7 @@ void demonstrate_cas_operations() {
 }
 
 void demonstrate_atomic_ordering() {
-    std::cout << "Hardware threads: " << hardware_concurrency() << std::endl;
+    std::cout << "Hardware threads: " << hpc::concurrency::hardware_concurrency() << std::endl;
     std::cout << std::endl;
 
     demonstrate_relaxed_ordering();
@@ -234,11 +236,9 @@ void demonstrate_atomic_ordering() {
     demonstrate_cas_operations();
 }
 
-}  // namespace hpc::concurrency
+}  // namespace
 
-#ifndef HPC_BENCHMARK_MODE
 int main() {
-    hpc::concurrency::demonstrate_atomic_ordering();
+    demonstrate_atomic_ordering();
     return 0;
 }
-#endif

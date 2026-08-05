@@ -20,7 +20,9 @@
 #include <thread>
 #include <vector>
 
-namespace hpc::memory {
+// Example code lives in an anonymous namespace: the hpc::memory namespace is
+// reserved for the canonical library (include/hpc/memory_utils.hpp).
+namespace {
 
 //------------------------------------------------------------------------------
 // Bad: Counters packed together (false sharing)
@@ -118,7 +120,7 @@ void run_packed_benchmark(int num_threads, int64_t iterations_per_thread) {
     PackedCounters counters;
     std::vector<std::thread> threads;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::steady_clock::now();
 
     for (int t = 0; t < num_threads; ++t) {
         threads.emplace_back(increment_packed, std::ref(counters), t, iterations_per_thread);
@@ -128,7 +130,7 @@ void run_packed_benchmark(int num_threads, int64_t iterations_per_thread) {
         thread.join();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
     int64_t total = counters.counter1.load() + counters.counter2.load() + counters.counter3.load() +
@@ -142,7 +144,7 @@ void run_padded_benchmark(int num_threads, int64_t iterations_per_thread) {
     PaddedCounters counters;
     std::vector<std::thread> threads;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::steady_clock::now();
 
     for (int t = 0; t < num_threads; ++t) {
         threads.emplace_back(increment_padded, std::ref(counters), t, iterations_per_thread);
@@ -152,7 +154,7 @@ void run_padded_benchmark(int num_threads, int64_t iterations_per_thread) {
         thread.join();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
     int64_t total = counters.counter1.value.load() + counters.counter2.value.load() +
@@ -162,11 +164,9 @@ void run_padded_benchmark(int num_threads, int64_t iterations_per_thread) {
               << ")\n";
 }
 
-}  // namespace hpc::memory
+}  // namespace
 
 int main() {
-    using namespace hpc::memory;
-
     std::cout << "=== False Sharing Demonstration ===\n\n";
 
     std::cout << "Cache line size: " << hpc::core::CACHE_LINE_SIZE << " bytes\n";

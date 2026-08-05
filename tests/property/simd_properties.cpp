@@ -356,22 +356,22 @@ TEST(SIMDSpeedupTests, VectorizedFasterThanScalar) {
     }
 
     // Time scalar
-    auto scalar_start = std::chrono::high_resolution_clock::now();
+    auto scalar_start = std::chrono::steady_clock::now();
     for (int i = 0; i < TIMED_RUNS; ++i) {
         scalar_add();
         benchmark::DoNotOptimize(c.data());
     }
-    auto scalar_end = std::chrono::high_resolution_clock::now();
+    auto scalar_end = std::chrono::steady_clock::now();
     auto scalar_time =
         std::chrono::duration_cast<std::chrono::nanoseconds>(scalar_end - scalar_start).count();
 
     // Time SIMD
-    auto simd_start = std::chrono::high_resolution_clock::now();
+    auto simd_start = std::chrono::steady_clock::now();
     for (int i = 0; i < TIMED_RUNS; ++i) {
         simd_add();
         benchmark::DoNotOptimize(c.data());
     }
-    auto simd_end = std::chrono::high_resolution_clock::now();
+    auto simd_end = std::chrono::steady_clock::now();
     auto simd_time =
         std::chrono::duration_cast<std::chrono::nanoseconds>(simd_end - simd_start).count();
 
@@ -428,22 +428,22 @@ TEST(SIMDSpeedupTests, DotProductSpeedup) {
     benchmark::DoNotOptimize(result);
 
     // Time scalar
-    auto scalar_start = std::chrono::high_resolution_clock::now();
+    auto scalar_start = std::chrono::steady_clock::now();
     for (int i = 0; i < TIMED_RUNS; ++i) {
         result = scalar_dot();
         benchmark::DoNotOptimize(result);
     }
-    auto scalar_end = std::chrono::high_resolution_clock::now();
+    auto scalar_end = std::chrono::steady_clock::now();
     auto scalar_time =
         std::chrono::duration_cast<std::chrono::nanoseconds>(scalar_end - scalar_start).count();
 
     // Time SIMD
-    auto simd_start = std::chrono::high_resolution_clock::now();
+    auto simd_start = std::chrono::steady_clock::now();
     for (int i = 0; i < TIMED_RUNS; ++i) {
         result = simd_dot();
         benchmark::DoNotOptimize(result);
     }
-    auto simd_end = std::chrono::high_resolution_clock::now();
+    auto simd_end = std::chrono::steady_clock::now();
     auto simd_time =
         std::chrono::duration_cast<std::chrono::nanoseconds>(simd_end - simd_start).count();
 

@@ -15,7 +15,9 @@
 #include <optional>
 #include <vector>
 
-namespace hpc::concurrency {
+// Example code lives in an anonymous namespace: the hpc::concurrency namespace is
+// reserved for the canonical library (include/hpc/lock_free_queue.hpp).
+namespace {
 
 // ============================================================================
 // Demo and verification
@@ -24,7 +26,7 @@ namespace hpc::concurrency {
 void demonstrate_spsc_queue() {
     std::cout << "=== SPSC Queue Demo ===" << std::endl;
 
-    SPSCQueue<int, 1024> queue;
+    hpc::concurrency::SPSCQueue<int, 1024> queue;
     constexpr int NUM_ITEMS = 100000;
 
     std::atomic<bool> producer_done{false};
@@ -72,7 +74,7 @@ void demonstrate_spsc_queue() {
 void demonstrate_mpmc_queue() {
     std::cout << "=== MPMC Queue Demo ===" << std::endl;
 
-    MPMCQueue<int, 1024> queue;
+    hpc::concurrency::MPMCQueue<int, 1024> queue;
     constexpr int NUM_PRODUCERS = 4;
     constexpr int NUM_CONSUMERS = 4;
     constexpr int ITEMS_PER_PRODUCER = 10000;
@@ -135,11 +137,9 @@ void demonstrate_lock_free_queue() {
     demonstrate_mpmc_queue();
 }
 
-}  // namespace hpc::concurrency
+}  // namespace
 
-#ifndef HPC_BENCHMARK_MODE
 int main() {
-    hpc::concurrency::demonstrate_lock_free_queue();
+    demonstrate_lock_free_queue();
     return 0;
 }
-#endif

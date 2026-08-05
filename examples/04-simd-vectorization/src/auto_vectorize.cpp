@@ -8,6 +8,9 @@
  * 3. How to check if code was vectorized (compiler reports)
  *
  * Compile with: -O3 -march=native -fopt-info-vec (GCC) or -Rpass=loop-vectorize (Clang)
+ *
+ * Most pattern functions are never called at runtime; they exist to be
+ * inspected in the generated assembly (hence [[maybe_unused]]).
  */
 
 #include <cmath>
@@ -16,7 +19,15 @@
 #include <numeric>
 #include <vector>
 
-namespace hpc::simd {
+// External linkage on purpose: a call to a non-inlineable function inside a
+// loop is one of the classic patterns that blocks auto-vectorization. The
+// declaration here + the definition at the bottom of this file (without
+// `inline`) keep the compiler from inlining it into the loops above.
+float external_function(float x);
+
+// Example code lives in an anonymous namespace: the hpc::simd namespace is
+// reserved for the canonical library (include/hpc/simd.hpp).
+namespace {
 
 // ============================================================================
 // GOOD PATTERNS - Easy to vectorize
@@ -51,8 +62,8 @@ void scale_array_vectorizable(float* __restrict arr, float scalar, size_t n) {
  * Fused multiply-add - VECTORIZABLE
  * Modern CPUs have FMA instructions that can be auto-vectorized
  */
-void fma_vectorizable(const float* __restrict a, const float* __restrict b,
-                      const float* __restrict c, float* __restrict d, size_t n) {
+[[maybe_unused]] void fma_vectorizable(const float* __restrict a, const float* __restrict b,
+                                       const float* __restrict c, float* __restrict d, size_t n) {
     for (size_t i = 0; i < n; ++i) {
         d[i] = a[i] * b[i] + c[i];
     }
@@ -74,7 +85,8 @@ float sum_array_vectorizable(const float* arr, size_t n) {
  * Conditional without branches - VECTORIZABLE
  * Using conditional moves instead of branches
  */
-void clamp_array_vectorizable(float* __restrict arr, float min_val, float max_val, size_t n) {
+[[maybe_unused]] void clamp_array_vectorizable(float* __restrict arr, float min_val, float max_val,
+                                               size_t n) {
     for (size_t i = 0; i < n; ++i) {
         arr[i] = arr[i] < min_val ? min_val : (arr[i] > max_val ? max_val : arr[i]);
     }
@@ -88,7 +100,7 @@ void clamp_array_vectorizable(float* __restrict arr, float min_val, float max_va
  * Loop with data dependency - NOT VECTORIZABLE
  * Each iteration depends on the previous one
  */
-void prefix_sum_not_vectorizable(float* arr, size_t n) {
+[[maybe_unused]] void prefix_sum_not_vectorizable(float* arr, size_t n) {
     for (size_t i = 1; i < n; ++i) {
         arr[i] += arr[i - 1];  // Dependency on previous iteration
     }
@@ -98,7 +110,7 @@ void prefix_sum_not_vectorizable(float* arr, size_t n) {
  * Non-contiguous memory access - POORLY VECTORIZABLE
  * Strided access patterns hurt vectorization efficiency
  */
-void strided_access_not_vectorizable(float* arr, size_t n, size_t stride) {
+[[maybe_unused]] void strided_access_not_vectorizable(float* arr, size_t n, size_t stride) {
     for (size_t i = 0; i < n; i += stride) {
         arr[i] *= 2.0f;
     }
@@ -108,8 +120,8 @@ void strided_access_not_vectorizable(float* arr, size_t n, size_t stride) {
  * Indirect indexing - NOT VECTORIZABLE
  * Gather/scatter operations are expensive
  */
-void indirect_access_not_vectorizable(float* __restrict arr, const int* __restrict indices,
-                                      size_t n) {
+[[maybe_unused]] void indirect_access_not_vectorizable(float* __restrict arr,
+                                                       const int* __restrict indices, size_t n) {
     for (size_t i = 0; i < n; ++i) {
         arr[indices[i]] += 1.0f;  // Random access pattern
     }
@@ -118,10 +130,11 @@ void indirect_access_not_vectorizable(float* __restrict arr, const int* __restri
 /**
  * Function call in loop - MAY NOT VECTORIZE
  * Unless the function is inlined and vectorizable
+ * (external_function is declared at the top of this file with external
+ * linkage, so the compiler cannot inline it)
  */
-float external_function(float x);  // Declaration only - prevents inlining
 
-void loop_with_call_not_vectorizable(float* arr, size_t n) {
+[[maybe_unused]] void loop_with_call_not_vectorizable(float* arr, size_t n) {
     for (size_t i = 0; i < n; ++i) {
         arr[i] = external_function(arr[i]);
     }
@@ -131,7 +144,7 @@ void loop_with_call_not_vectorizable(float* arr, size_t n) {
  * Complex control flow - NOT VECTORIZABLE
  * Multiple branches make vectorization difficult
  */
-void complex_branches_not_vectorizable(float* arr, size_t n) {
+[[maybe_unused]] void complex_branches_not_vectorizable(float* arr, size_t n) {
     for (size_t i = 0; i < n; ++i) {
         if (arr[i] > 0) {
             if (arr[i] > 10) {
@@ -149,7 +162,7 @@ void complex_branches_not_vectorizable(float* arr, size_t n) {
  * Pointer aliasing - MAY NOT VECTORIZE
  * Without __restrict, compiler assumes pointers may alias
  */
-void aliased_pointers_not_vectorizable(float* a, float* b, float* c, size_t n) {
+[[maybe_unused]] void aliased_pointers_not_vectorizable(float* a, float* b, float* c, size_t n) {
     // Compiler cannot prove a, b, c don't overlap
     for (size_t i = 0; i < n; ++i) {
         c[i] = a[i] + b[i];
@@ -164,7 +177,7 @@ void aliased_pointers_not_vectorizable(float* a, float* b, float* c, size_t n) {
  * Parallel prefix sum - VECTORIZABLE with different algorithm
  * Using Blelloch scan algorithm (work-efficient parallel prefix)
  */
-void parallel_prefix_sum(float* arr, size_t n) {
+[[maybe_unused]] void parallel_prefix_sum(float* arr, size_t n) {
     if (n <= 1)
         return;
 
@@ -191,7 +204,7 @@ void parallel_prefix_sum(float* arr, size_t n) {
 /**
  * Branchless version of complex control flow - VECTORIZABLE
  */
-void branchless_vectorizable(float* arr, size_t n) {
+[[maybe_unused]] void branchless_vectorizable(float* arr, size_t n) {
     for (size_t i = 0; i < n; ++i) {
         float x = arr[i];
         float abs_x = std::fabs(x);
@@ -212,13 +225,14 @@ void demonstrate_auto_vectorization() {
     constexpr size_t N = 1024 * 1024;
 
     std::cout << "=== Auto-Vectorization Demo ===" << std::endl;
-    std::cout << "Detected SIMD level: " << simd_level_name(detect_simd_level()) << std::endl;
-    std::cout << "Vector width: " << simd_vector_width(detect_simd_level()) << " bytes"
-              << std::endl;
+    std::cout << "Detected SIMD level: "
+              << hpc::simd::simd_level_name(hpc::simd::detect_simd_level()) << std::endl;
+    std::cout << "Vector width: " << hpc::simd::simd_vector_width(hpc::simd::detect_simd_level())
+              << " bytes" << std::endl;
     std::cout << std::endl;
 
     // Allocate aligned memory
-    AlignedBuffer<float> a(N), b(N), c(N);
+    hpc::simd::AlignedBuffer<float> a(N), b(N), c(N);
 
     // Initialize
     for (size_t i = 0; i < N; ++i) {
@@ -243,16 +257,15 @@ void demonstrate_auto_vectorization() {
               << std::endl;
 }
 
-}  // namespace hpc::simd
+}  // namespace
 
-// Provide definition for external_function to avoid linker errors
-float hpc::simd::external_function(float x) {
+// Definition of the deliberately non-inlineable function used by
+// loop_with_call_not_vectorizable above.
+float external_function(float x) {
     return x * x;
 }
 
-#ifndef HPC_BENCHMARK_MODE
 int main() {
-    hpc::simd::demonstrate_auto_vectorization();
+    demonstrate_auto_vectorization();
     return 0;
 }
-#endif

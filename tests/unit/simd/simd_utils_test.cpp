@@ -16,7 +16,7 @@ namespace hpc::simd::test {
 // ---------------------------------------------------------------------------
 
 TEST(SimdUtilsTest, IsAligned) {
-    alignas(64) float data[16];
+    alignas(64) float data[16]{};
     EXPECT_TRUE(is_aligned(data, 16));
     EXPECT_TRUE(is_aligned(data, 32));
     EXPECT_TRUE(is_aligned(data, 64));
@@ -141,5 +141,91 @@ TEST(SimdWrapperTest, NonAlignedSize) {
         EXPECT_FLOAT_EQ(c[i], 3.0f);
     }
 }
+
+// ---------------------------------------------------------------------------
+// make_aligned_vector factory
+// ---------------------------------------------------------------------------
+
+TEST(MakeAlignedVectorTest, DefaultConstructedIsSizedAndAligned) {
+    auto vec = make_aligned_vector<float>(1000);
+    EXPECT_EQ(vec.size(), 1000u);
+    ASSERT_NE(vec.data(), nullptr);
+    EXPECT_TRUE(is_aligned(vec.data(), get_simd_alignment()));
+}
+
+TEST(MakeAlignedVectorTest, ValueConstructorFillsAndAligns) {
+    auto vec = make_aligned_vector<float>(256, 3.5f);
+    EXPECT_EQ(vec.size(), 256u);
+    ASSERT_NE(vec.data(), nullptr);
+    EXPECT_TRUE(is_aligned(vec.data(), get_simd_alignment()));
+    for (float value : vec) {
+        EXPECT_FLOAT_EQ(value, 3.5f);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// SimdVec (FloatVec): sqrt and lane-wise division
+// ---------------------------------------------------------------------------
+
+TEST(SimdVecTest, SqrtOfPerfectSquares) {
+    alignas(64) float in[FLOAT_VEC_WIDTH];
+    for (size_t i = 0; i < FLOAT_VEC_WIDTH; ++i) {
+        const float base = static_cast<float>(i + 1);
+        in[i] = base * base;
+    }
+
+    const FloatVec result = FloatVec(in).sqrt();
+
+    alignas(64) float out[FLOAT_VEC_WIDTH];
+    result.store(out);
+    for (size_t i = 0; i < FLOAT_VEC_WIDTH; ++i) {
+        EXPECT_FLOAT_EQ(out[i], static_cast<float>(i + 1));
+    }
+}
+
+TEST(SimdVecTest, DivisionIsLaneWise) {
+    alignas(64) float num[FLOAT_VEC_WIDTH];
+    alignas(64) float den[FLOAT_VEC_WIDTH];
+    for (size_t i = 0; i < FLOAT_VEC_WIDTH; ++i) {
+        num[i] = static_cast<float>(i + 1) * 6.0f;
+        den[i] = static_cast<float>(i + 1);
+    }
+
+    const FloatVec broadcast_result = FloatVec(8.0f) / FloatVec(2.0f);
+    const FloatVec varying_result = FloatVec(num) / FloatVec(den);
+
+    alignas(64) float broadcast_out[FLOAT_VEC_WIDTH];
+    alignas(64) float varying_out[FLOAT_VEC_WIDTH];
+    broadcast_result.store(broadcast_out);
+    varying_result.store(varying_out);
+    for (size_t i = 0; i < FLOAT_VEC_WIDTH; ++i) {
+        EXPECT_FLOAT_EQ(broadcast_out[i], 4.0f);
+        EXPECT_FLOAT_EQ(varying_out[i], 6.0f);
+    }
+}
+
+// load_aligned/store_aligned only exist on the intrinsic specializations
+// (SSE2/AVX2/AVX512); the scalar fallback exposes plain load/store instead.
+#if defined(HPC_HAS_SSE2) || defined(HPC_HAS_AVX2) || defined(HPC_HAS_AVX512)
+TEST(SimdVecTest, AlignedLoadStoreRoundTrip) {
+    constexpr size_t kLanes = FLOAT_VEC_WIDTH * 4;
+    auto src = make_aligned_vector<float>(kLanes);
+    auto dst = make_aligned_vector<float>(kLanes, 0.0f);
+    ASSERT_TRUE(is_aligned(src.data(), get_simd_alignment()));
+    ASSERT_TRUE(is_aligned(dst.data(), get_simd_alignment()));
+
+    for (size_t i = 0; i < kLanes; ++i) {
+        src[i] = static_cast<float>(i) * 0.25f - 10.0f;
+    }
+
+    for (size_t i = 0; i < kLanes; i += FLOAT_VEC_WIDTH) {
+        FloatVec::load_aligned(src.data() + i).store_aligned(dst.data() + i);
+    }
+
+    for (size_t i = 0; i < kLanes; ++i) {
+        EXPECT_FLOAT_EQ(dst[i], src[i]);
+    }
+}
+#endif
 
 }  // namespace hpc::simd::test

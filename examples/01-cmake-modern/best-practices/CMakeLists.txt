@@ -44,16 +44,19 @@ target_compile_definitions(my_library
 # ============================================================================
 # BEST PRACTICE 4: Use target_compile_options with generator expressions
 # ============================================================================
+# NOTE: multiple flags inside one genex must be a semicolon-separated CMake
+# list. A space-separated string is passed to the compiler as ONE argument
+# ("-Wall -Wextra -Wpedantic"), which GCC/Clang reject as an unknown option.
 target_compile_options(my_library
     PRIVATE
         # Warnings for GCC/Clang
-        $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
+        $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic>
         # Warnings for MSVC
         $<$<CXX_COMPILER_ID:MSVC>:/W4>
         # Debug-only options
-        $<$<CONFIG:Debug>:-g -O0>
+        $<$<CONFIG:Debug>:-g;-O0>
         # Release-only options
-        $<$<CONFIG:Release>:-O3 -DNDEBUG>
+        $<$<CONFIG:Release>:-O3;-DNDEBUG>
 )
 
 # ============================================================================

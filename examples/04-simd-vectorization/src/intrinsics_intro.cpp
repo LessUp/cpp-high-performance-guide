@@ -18,15 +18,13 @@
 #include <emmintrin.h>  // SSE2
 #endif
 
-#ifdef HPC_HAS_SSE4
-#include <smmintrin.h>  // SSE4.1
-#endif
-
 #ifdef HPC_HAS_AVX
 #include <immintrin.h>  // AVX, AVX2, AVX-512
 #endif
 
-namespace hpc::simd {
+// Example code lives in an anonymous namespace: the hpc::simd namespace is
+// reserved for the canonical library (include/hpc/simd.hpp).
+namespace {
 
 // ============================================================================
 // Scalar Implementation (Reference)
@@ -35,12 +33,6 @@ namespace hpc::simd {
 void add_arrays_scalar(const float* a, const float* b, float* c, size_t n) {
     for (size_t i = 0; i < n; ++i) {
         c[i] = a[i] + b[i];
-    }
-}
-
-void multiply_arrays_scalar(const float* a, const float* b, float* c, size_t n) {
-    for (size_t i = 0; i < n; ++i) {
-        c[i] = a[i] * b[i];
     }
 }
 
@@ -72,21 +64,6 @@ void add_arrays_sse(const float* a, const float* b, float* c, size_t n) {
     // Handle remaining elements
     for (; i < n; ++i) {
         c[i] = a[i] + b[i];
-    }
-}
-
-void multiply_arrays_sse(const float* a, const float* b, float* c, size_t n) {
-    size_t i = 0;
-
-    for (; i + 4 <= n; i += 4) {
-        __m128 va = _mm_loadu_ps(&a[i]);
-        __m128 vb = _mm_loadu_ps(&b[i]);
-        __m128 vc = _mm_mul_ps(va, vb);
-        _mm_storeu_ps(&c[i], vc);
-    }
-
-    for (; i < n; ++i) {
-        c[i] = a[i] * b[i];
     }
 }
 
@@ -143,21 +120,6 @@ void add_arrays_avx2(const float* a, const float* b, float* c, size_t n) {
     }
 }
 
-void multiply_arrays_avx2(const float* a, const float* b, float* c, size_t n) {
-    size_t i = 0;
-
-    for (; i + 8 <= n; i += 8) {
-        __m256 va = _mm256_loadu_ps(&a[i]);
-        __m256 vb = _mm256_loadu_ps(&b[i]);
-        __m256 vc = _mm256_mul_ps(va, vb);
-        _mm256_storeu_ps(&c[i], vc);
-    }
-
-    for (; i < n; ++i) {
-        c[i] = a[i] * b[i];
-    }
-}
-
 float dot_product_avx2(const float* a, const float* b, size_t n) {
     __m256 sum = _mm256_setzero_ps();
     size_t i = 0;
@@ -211,21 +173,6 @@ void add_arrays_avx512(const float* a, const float* b, float* c, size_t n) {
     }
 }
 
-void multiply_arrays_avx512(const float* a, const float* b, float* c, size_t n) {
-    size_t i = 0;
-
-    for (; i + 16 <= n; i += 16) {
-        __m512 va = _mm512_loadu_ps(&a[i]);
-        __m512 vb = _mm512_loadu_ps(&b[i]);
-        __m512 vc = _mm512_mul_ps(va, vb);
-        _mm512_storeu_ps(&c[i], vc);
-    }
-
-    for (; i < n; ++i) {
-        c[i] = a[i] * b[i];
-    }
-}
-
 float dot_product_avx512(const float* a, const float* b, size_t n) {
     __m512 sum = _mm512_setzero_ps();
     size_t i = 0;
@@ -252,30 +199,6 @@ float dot_product_avx512(const float* a, const float* b, size_t n) {
 // Unified interface with runtime dispatch
 // ============================================================================
 
-void demo_add_arrays(const float* a, const float* b, float* c, size_t n) {
-#ifdef HPC_HAS_AVX512
-    add_arrays_avx512(a, b, c, n);
-#elif defined(HPC_HAS_AVX2)
-    add_arrays_avx2(a, b, c, n);
-#elif defined(HPC_HAS_SSE2)
-    add_arrays_sse(a, b, c, n);
-#else
-    add_arrays_scalar(a, b, c, n);
-#endif
-}
-
-void demo_multiply_arrays(const float* a, const float* b, float* c, size_t n) {
-#ifdef HPC_HAS_AVX512
-    multiply_arrays_avx512(a, b, c, n);
-#elif defined(HPC_HAS_AVX2)
-    multiply_arrays_avx2(a, b, c, n);
-#elif defined(HPC_HAS_SSE2)
-    multiply_arrays_sse(a, b, c, n);
-#else
-    multiply_arrays_scalar(a, b, c, n);
-#endif
-}
-
 float demo_dot_product(const float* a, const float* b, size_t n) {
 #ifdef HPC_HAS_AVX512
     return dot_product_avx512(a, b, n);
@@ -296,12 +219,13 @@ void demonstrate_intrinsics() {
     constexpr size_t N = 1024 * 1024;
 
     std::cout << "=== SIMD Intrinsics Demo ===" << std::endl;
-    std::cout << "Detected SIMD level: " << simd_level_name(detect_simd_level()) << std::endl;
+    std::cout << "Detected SIMD level: "
+              << hpc::simd::simd_level_name(hpc::simd::detect_simd_level()) << std::endl;
     std::cout << "Array size: " << N << " floats" << std::endl;
     std::cout << std::endl;
 
     // Allocate aligned memory
-    AlignedBuffer<float> a(N), b(N), c(N);
+    hpc::simd::AlignedBuffer<float> a(N), b(N), c(N);
 
     // Initialize
     for (size_t i = 0; i < N; ++i) {
@@ -311,13 +235,14 @@ void demonstrate_intrinsics() {
 
     // Benchmark scalar vs SIMD
     auto benchmark = [&](const char* name, auto func) {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (int iter = 0; iter < 100; ++iter) {
             func();
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << name << ": " << duration.count() / 100.0 << " us/iteration" << std::endl;
+        std::cout << name << ": " << static_cast<double>(duration.count()) / 100.0
+                  << " us/iteration" << std::endl;
     };
 
     std::cout << "--- Array Addition ---" << std::endl;
@@ -353,11 +278,9 @@ void demonstrate_intrinsics() {
     std::cout << "Difference: " << std::fabs(scalar_result - simd_result) << std::endl;
 }
 
-}  // namespace hpc::simd
+}  // namespace
 
-#ifndef HPC_BENCHMARK_MODE
 int main() {
-    hpc::simd::demonstrate_intrinsics();
+    demonstrate_intrinsics();
     return 0;
 }
-#endif

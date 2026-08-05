@@ -22,7 +22,9 @@
 #include <omp.h>
 #endif
 
-namespace hpc::concurrency {
+// Example code lives in an anonymous namespace: the hpc::concurrency namespace is
+// reserved for the canonical library (include/hpc/concurrency_utils.hpp).
+namespace {
 
 // ============================================================================
 // Example 1: Parallel For
@@ -39,20 +41,20 @@ void parallel_for_example() {
     std::vector<double> data(N);
 
     // Sequential version
-    auto seq_start = std::chrono::high_resolution_clock::now();
+    auto seq_start = std::chrono::steady_clock::now();
     for (size_t i = 0; i < N; ++i) {
         data[i] = std::sin(static_cast<double>(i) * 0.001);
     }
-    auto seq_end = std::chrono::high_resolution_clock::now();
+    auto seq_end = std::chrono::steady_clock::now();
     auto seq_time = std::chrono::duration<double, std::milli>(seq_end - seq_start).count();
 
     // Parallel version
-    auto par_start = std::chrono::high_resolution_clock::now();
+    auto par_start = std::chrono::steady_clock::now();
 #pragma omp parallel for
     for (size_t i = 0; i < N; ++i) {
         data[i] = std::sin(static_cast<double>(i) * 0.001);
     }
-    auto par_end = std::chrono::high_resolution_clock::now();
+    auto par_end = std::chrono::steady_clock::now();
     auto par_time = std::chrono::duration<double, std::milli>(par_end - par_start).count();
 
     std::cout << "Array size: " << N << std::endl;
@@ -83,22 +85,22 @@ void reduction_example() {
     }
 
     // Sequential sum
-    auto seq_start = std::chrono::high_resolution_clock::now();
+    auto seq_start = std::chrono::steady_clock::now();
     double seq_sum = 0.0;
     for (size_t i = 0; i < N; ++i) {
         seq_sum += data[i];
     }
-    auto seq_end = std::chrono::high_resolution_clock::now();
+    auto seq_end = std::chrono::steady_clock::now();
     auto seq_time = std::chrono::duration<double, std::milli>(seq_end - seq_start).count();
 
     // Parallel sum with reduction
-    auto par_start = std::chrono::high_resolution_clock::now();
+    auto par_start = std::chrono::steady_clock::now();
     double par_sum = 0.0;
 #pragma omp parallel for reduction(+ : par_sum)
     for (size_t i = 0; i < N; ++i) {
         par_sum += data[i];
     }
-    auto par_end = std::chrono::high_resolution_clock::now();
+    auto par_end = std::chrono::steady_clock::now();
     auto par_time = std::chrono::duration<double, std::milli>(par_end - par_start).count();
 
     std::cout << "Array size: " << N << std::endl;
@@ -124,7 +126,7 @@ void sections_example() {
 
     double result1 = 0.0, result2 = 0.0, result3 = 0.0;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::steady_clock::now();
 
 #pragma omp parallel sections
     {
@@ -162,7 +164,7 @@ void sections_example() {
         }
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
     auto time = std::chrono::duration<double, std::milli>(end - start).count();
 
     std::cout << "Results: " << result1 << ", " << result2 << ", " << result3 << std::endl;
@@ -205,13 +207,13 @@ void scaling_example() {
         omp_set_num_threads(1);
 #endif
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         double sum = 0.0;
 #pragma omp parallel for reduction(+ : sum)
         for (size_t i = 0; i < N; ++i) {
             sum += std::sqrt(data[i]);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         baseline_time = std::chrono::duration<double, std::milli>(end - start).count();
 
         std::cout << "Threads: 1, Time: " << baseline_time
@@ -224,13 +226,13 @@ void scaling_example() {
         omp_set_num_threads(threads);
 #endif
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         double sum = 0.0;
 #pragma omp parallel for reduction(+ : sum)
         for (size_t i = 0; i < N; ++i) {
             sum += std::sqrt(data[i]);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         double time = std::chrono::duration<double, std::milli>(end - start).count();
 
         double speedup = baseline_time / time;
@@ -274,36 +276,36 @@ void schedule_example() {
 
     // Static schedule (default)
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
 #pragma omp parallel for schedule(static)
         for (size_t i = 0; i < N; ++i) {
             data[i] = work(i);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto time = std::chrono::duration<double, std::milli>(end - start).count();
         std::cout << "Static schedule: " << time << " ms" << std::endl;
     }
 
     // Dynamic schedule (better for uneven workloads)
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
 #pragma omp parallel for schedule(dynamic, 1000)
         for (size_t i = 0; i < N; ++i) {
             data[i] = work(i);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto time = std::chrono::duration<double, std::milli>(end - start).count();
         std::cout << "Dynamic schedule (chunk=1000): " << time << " ms" << std::endl;
     }
 
     // Guided schedule (decreasing chunk sizes)
     {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
 #pragma omp parallel for schedule(guided)
         for (size_t i = 0; i < N; ++i) {
             data[i] = work(i);
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto time = std::chrono::duration<double, std::milli>(end - start).count();
         std::cout << "Guided schedule: " << time << " ms" << std::endl;
     }
@@ -327,11 +329,9 @@ void demonstrate_openmp() {
     schedule_example();
 }
 
-}  // namespace hpc::concurrency
+}  // namespace
 
-#ifndef HPC_BENCHMARK_MODE
 int main() {
-    hpc::concurrency::demonstrate_openmp();
+    demonstrate_openmp();
     return 0;
 }
-#endif

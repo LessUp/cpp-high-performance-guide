@@ -15,6 +15,8 @@
 #include <random>
 #include <vector>
 
+#include "scalar_baseline.hpp"
+
 namespace {
 
 // Initialize arrays with random data
@@ -26,26 +28,9 @@ void init_random(float* arr, size_t n) {
     }
 }
 
-// Scalar implementations for comparison
-void add_arrays_scalar(const float* a, const float* b, float* c, size_t n) {
-    for (size_t i = 0; i < n; ++i) {
-        c[i] = a[i] + b[i];
-    }
-}
-
-float dot_product_scalar(const float* a, const float* b, size_t n) {
-    float sum = 0.0f;
-    for (size_t i = 0; i < n; ++i) {
-        sum += a[i] * b[i];
-    }
-    return sum;
-}
-
-void scale_array_scalar(float* arr, float scalar, size_t n) {
-    for (size_t i = 0; i < n; ++i) {
-        arr[i] *= scalar;
-    }
-}
+// Scalar baselines live in scalar_baseline.cpp, a translation unit compiled
+// with the auto-vectorizer disabled — otherwise -O3 -march=native -mavx2
+// would vectorize them here and the "scalar" numbers would actually be SIMD.
 
 }  // anonymous namespace
 
@@ -60,7 +45,7 @@ static void BM_AddArrays_Scalar(benchmark::State& state) {
     init_random(b.data(), n);
 
     for (auto _ : state) {
-        add_arrays_scalar(a.data(), b.data(), c.data(), n);
+        scalar_baseline::add_arrays(a.data(), b.data(), c.data(), n);
         benchmark::DoNotOptimize(c.data());
         benchmark::ClobberMemory();
     }
@@ -107,7 +92,7 @@ static void BM_DotProduct_Scalar(benchmark::State& state) {
     init_random(b.data(), n);
 
     for (auto _ : state) {
-        float result = dot_product_scalar(a.data(), b.data(), n);
+        float result = scalar_baseline::dot_product(a.data(), b.data(), n);
         benchmark::DoNotOptimize(result);
     }
 
@@ -156,7 +141,7 @@ static void BM_ScaleArray_Scalar(benchmark::State& state) {
         init_random(arr.data(), n);
         state.ResumeTiming();
 
-        scale_array_scalar(arr.data(), scalar, n);
+        scalar_baseline::scale_array(arr.data(), scalar, n);
         benchmark::DoNotOptimize(arr.data());
         benchmark::ClobberMemory();
     }
@@ -210,9 +195,7 @@ static void BM_ClampArray_Scalar(benchmark::State& state) {
         init_random(arr.data(), n);
         state.ResumeTiming();
 
-        for (size_t i = 0; i < n; ++i) {
-            arr[i] = std::max(-50.0f, std::min(50.0f, arr[i]));
-        }
+        scalar_baseline::clamp_array(arr.data(), -50.0f, 50.0f, n);
         benchmark::DoNotOptimize(arr.data());
         benchmark::ClobberMemory();
     }

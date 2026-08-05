@@ -14,6 +14,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <hpc/core.hpp>  // platform constants
 #include <memory>
@@ -115,9 +116,10 @@ aligned_unique_ptr<T> make_aligned(std::size_t count,
  * @brief Cache-line aligned allocator for STL containers
  *
  * Uses a compile-time constant alignment (default: CACHE_LINE_SIZE).
- * Designed for false-sharing elimination in multi-threaded code.
+ * Designed for false-sharing elimination in multi-threaded code: padding
+ * each concurrently accessed element to its own cache line keeps threads
+ * from invalidating each other's cache lines on every write.
  *
- * See docs/META.md: cache-line allocator for the domain rationale.
  * For SIMD-width alignment, see hpc::simd::AlignedAllocator in include/hpc/simd.hpp.
  */
 template <typename T, std::size_t Alignment = hpc::core::CACHE_LINE_SIZE>
@@ -191,5 +193,93 @@ struct alignas(hpc::core::CACHE_LINE_SIZE) CacheLinePadded {
     T* operator->() { return &value; }
     const T* operator->() const { return &value; }
 };
+
+//------------------------------------------------------------------------------
+// Prefetch-assisted traversal
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Portable software prefetch hint (read, high temporal locality)
+ *
+ * Compiles to nothing on compilers without __builtin_prefetch support.
+ */
+template <typename T>
+inline void prefetch_read(const T* ptr) {
+#if defined(__GNUC__) || defined(__clang__)
+    __builtin_prefetch(ptr, 0, 3);
+#else
+    (void)ptr;
+#endif
+}
+
+/**
+ * @brief Sequential sum without software prefetching
+ *
+ * Baseline for the prefetch comparison: on sequential access the hardware
+ * prefetcher is usually already effective, so adding software prefetch
+ * hints on top typically changes little.
+ */
+inline int64_t sum_no_prefetch(const int64_t* data, std::size_t n) {
+    int64_t sum = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        sum += data[i];
+    }
+    return sum;
+}
+
+/**
+ * @brief Sequential sum with software prefetching
+ *
+ * The prefetch distance is tuned for typical cache latency: too small and
+ * the data is not ready when needed, too large and it is evicted before use.
+ */
+inline int64_t sum_with_prefetch(const int64_t* data, std::size_t n) {
+    constexpr std::size_t PREFETCH_DISTANCE = 16;  // elements ahead
+
+    int64_t sum = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        if (i + PREFETCH_DISTANCE < n) {
+            prefetch_read(&data[i + PREFETCH_DISTANCE]);
+        }
+        sum += data[i];
+    }
+    return sum;
+}
+
+/**
+ * @brief Random-access (gather) sum without software prefetching
+ *
+ * Random access defeats the hardware prefetcher because the next address
+ * is not predictable from the current one.
+ */
+inline int64_t sum_random_no_prefetch(const int64_t* data, const std::size_t* indices,
+                                      std::size_t n) {
+    int64_t sum = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        sum += data[indices[i]];
+    }
+    return sum;
+}
+
+/**
+ * @brief Random-access (gather) sum with software prefetching
+ *
+ * The index array is traversed sequentially, so future gather addresses
+ * ARE known ahead of time — prefetching them can hide memory latency.
+ * This is the case where software prefetch actually pays off.
+ */
+inline int64_t sum_random_with_prefetch(const int64_t* data, const std::size_t* indices,
+                                        std::size_t n) {
+    constexpr std::size_t PREFETCH_DISTANCE = 8;
+
+    int64_t sum = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        if (i + PREFETCH_DISTANCE < n) {
+            prefetch_read(&data[indices[i + PREFETCH_DISTANCE]]);
+        }
+        sum += data[indices[i]];
+    }
+    return sum;
+}
 
 }  // namespace hpc::memory

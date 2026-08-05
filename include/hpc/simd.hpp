@@ -38,6 +38,15 @@ namespace hpc::simd {
 
 enum class SIMDLevel { Scalar, SSE2, AVX, AVX2, AVX512 };
 
+/**
+ * @brief Detect the highest SIMD level the CPU supports at runtime.
+ *
+ * Reports CPU capability, which may exceed what this binary was compiled
+ * for: FloatVec / FLOAT_VEC_WIDTH are compile-time choices, while
+ * add_arrays() dispatches at runtime across target-attribute variants.
+ * Use this for display/diagnostics; get_simd_alignment() derives from it
+ * and may over-align relative to the compiled width (harmless).
+ */
 inline SIMDLevel detect_simd_level() {
 #if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
     __builtin_cpu_init();

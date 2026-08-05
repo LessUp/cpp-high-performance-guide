@@ -4,6 +4,14 @@
  *
  * Property 10: Atomic Operations Correctness
  * Validates: Requirements 5.1
+ *
+ * Honest-results note: on x86, fetch_add compiles to the same `lock xadd`
+ * instruction for EVERY memory order, so BM_Atomic_SeqCst and BM_Atomic_Relaxed
+ * are expected to measure nearly identical times here. This benchmark is a
+ * baseline for weak-memory-model platforms (ARM/POWER), where relaxed RMW
+ * operations can be cheaper. Do not read an x86 "no difference" result as
+ * "memory order never matters"; it matters for loads/stores (seq_cst store =
+ * `xchg` vs relaxed store = `mov`) and on other ISAs.
  */
 
 #include <benchmark/benchmark.h>

@@ -16,9 +16,9 @@
 #include <iostream>
 #include <vector>
 
-namespace hpc::vector_reserve {
-
-using hpc::instrumentation::OperationMetrics;
+// Example code lives in an anonymous namespace: the hpc::vector_reserve namespace is
+// reserved for the canonical library (include/hpc/vector_reserve.hpp).
+namespace {
 
 //------------------------------------------------------------------------------
 // Demonstrations
@@ -49,16 +49,16 @@ void demonstrate_reserve_benefit() {
 
     // Without reserve
     {
-        OperationMetrics metrics;
-        OperationMetrics::Scope scope(metrics);
-        CountingAllocator<int> alloc(&metrics);
-        std::vector<int, CountingAllocator<int>> vec(alloc);
+        hpc::instrumentation::OperationMetrics metrics;
+        hpc::instrumentation::OperationMetrics::Scope scope(metrics);
+        hpc::vector_reserve::CountingAllocator<int> alloc(&metrics);
+        std::vector<int, hpc::vector_reserve::CountingAllocator<int>> vec(alloc);
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (size_t i = 0; i < N; ++i) {
             vec.push_back(static_cast<int>(i));
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
         std::cout << "Without reserve:\n";
@@ -70,17 +70,17 @@ void demonstrate_reserve_benefit() {
 
     // With reserve
     {
-        OperationMetrics metrics;
-        OperationMetrics::Scope scope(metrics);
-        CountingAllocator<int> alloc(&metrics);
-        std::vector<int, CountingAllocator<int>> vec(alloc);
+        hpc::instrumentation::OperationMetrics metrics;
+        hpc::instrumentation::OperationMetrics::Scope scope(metrics);
+        hpc::vector_reserve::CountingAllocator<int> alloc(&metrics);
+        std::vector<int, hpc::vector_reserve::CountingAllocator<int>> vec(alloc);
         vec.reserve(N);  // Pre-allocate
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         for (size_t i = 0; i < N; ++i) {
             vec.push_back(static_cast<int>(i));
         }
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
         std::cout << "\nWith reserve(" << N << "):\n";
@@ -150,17 +150,16 @@ void demonstrate_clear_vs_shrink() {
     std::cout << "After swap trick: size=" << vec.size() << ", capacity=" << vec.capacity() << "\n";
 }
 
-}  // namespace hpc::vector_reserve
+}  // namespace
 
-#ifndef HPC_TEST_MODE
 int main() {
     std::cout << "=== Vector Capacity Management Demo ===\n\n";
 
-    hpc::vector_reserve::demonstrate_growth_pattern();
-    hpc::vector_reserve::demonstrate_reserve_benefit();
-    hpc::vector_reserve::demonstrate_resize_vs_reserve();
-    hpc::vector_reserve::demonstrate_shrink_to_fit();
-    hpc::vector_reserve::demonstrate_clear_vs_shrink();
+    demonstrate_growth_pattern();
+    demonstrate_reserve_benefit();
+    demonstrate_resize_vs_reserve();
+    demonstrate_shrink_to_fit();
+    demonstrate_clear_vs_shrink();
 
     std::cout << "\nKey takeaways:\n";
     std::cout << "1. Always use reserve() when you know the final size\n";
@@ -170,4 +169,3 @@ int main() {
 
     return 0;
 }
-#endif
