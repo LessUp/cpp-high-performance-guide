@@ -364,19 +364,19 @@ int main() {
 cmake --preset=release && cmake --build --preset=release
 
 # 自动向量化示例
-./build/release/examples/04-simd-vectorization/src/auto_vectorize
+./build/release/examples/04-simd-vectorization/auto_vectorize
 
 # Intrinsics 示例（scalar/SSE/AVX2/AVX-512 对比）
-./build/release/examples/04-simd-vectorization/src/intrinsics_intro
+./build/release/examples/04-simd-vectorization/intrinsics_intro
 
 # 运行时分发示例
-./build/release/examples/04-simd-vectorization/src/dispatch_example
+./build/release/examples/04-simd-vectorization/dispatch_example
 
 # Google Benchmark 基准测试
-./build/release/examples/04-simd-vectorization/bench/simd_bench
+./build/release/examples/04-simd-vectorization/simd_bench
 
 # 过滤特定测试
-./build/release/examples/04-simd-vectorization/bench/simd_bench --benchmark_filter="dot"
+./build/release/examples/04-simd-vectorization/simd_bench --benchmark_filter="dot"
 ```
 
 查看向量化报告：

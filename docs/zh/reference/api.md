@@ -314,17 +314,389 @@ struct alignas(64) ThreadCounter {
 
 ### 软件预取
 
-`memory_utils.hpp` 不提供独立的预取封装函数。示例中直接使用 GCC/Clang 内建函数：
-
 ```cpp
-// 读预取，高时间局部性
-__builtin_prefetch(ptr, 0, 3);
+template <typename T>
+inline void prefetch_read(const T* ptr);  // 读预取，高时间局部性；不支持的编译器上为空操作
 
-// 写预取
-__builtin_prefetch(ptr, 1, 3);
+inline int64_t sum_no_prefetch(const int64_t* data, std::size_t n);
+inline int64_t sum_with_prefetch(const int64_t* data, std::size_t n);
+inline int64_t sum_random_no_prefetch(const int64_t* data, const std::size_t* indices, std::size_t n);
+inline int64_t sum_random_with_prefetch(const int64_t* data, const std::size_t* indices, std::size_t n);
 ```
 
-参见 `examples/02-memory-cache/src/prefetch.cpp` 中的完整用法。
+`prefetch_read()` 是 `__builtin_prefetch(ptr, 0, 3)` 的可移植封装。四个求和函数是
+预取对照实验的共享实现（`examples/02-memory-cache/` 的示例与基准消费同一份代码）：
+顺序访问时硬件预取器通常已足够高效，软件预取收益很小；随机（gather）访问时
+未来的目标地址可从索引数组提前得知，软件预取能掩盖内存延迟——这正是
+`sum_random_with_prefetch` 演示的场景。
+
+完整演示参见 `examples/02-memory-cache/src/prefetch.cpp`。
+
+### Particle 数据布局（`include/hpc/particle_types.hpp`）
+
+用于对比 Array of Structures（AOS）与 Structure of Arrays（SOA）内存布局的教学数据结构，位于 `hpc::memory` 命名空间。
+
+> **注意：** 本模块为教学示例，非生产就绪代码。
+
+#### `ParticleAOS`
+
+```cpp
+struct ParticleAOS {
+    float x, y, z;     // 位置
+    float vx, vy, vz;  // 速度
+};
+```
+
+每个粒子连续存储自身全部字段。更新位置时也会把速度加载进缓存，浪费带宽。
+
+#### `ParticleSOA`
+
+```cpp
+struct ParticleSOA {
+    std::vector<float> x, y, z;     // 位置
+    std::vector<float> vx, vy, vz;  // 速度
+    void resize(size_t n);
+    size_t size() const;
+};
+```
+
+每个字段独立连续存储，更新位置只触碰位置数组，缓存利用率高且易于向量化。
+
+#### 更新与能量计算
+
+```cpp
+inline void update_particles_aos(std::vector<ParticleAOS>& particles, float dt);
+inline float compute_energy_aos(const std::vector<ParticleAOS>& particles);
+
+inline void update_particles_soa(ParticleSOA& particles, float dt);
+inline float compute_energy_soa(const ParticleSOA& particles);
+```
+
+按 `位置 += 速度 * dt` 更新，或计算总动能 `0.5 * Σ(v²)`。
+
+#### `initialize_particles()`
+
+```cpp
+inline void initialize_particles(std::vector<ParticleAOS>& particles, size_t n);
+inline void initialize_particles(ParticleSOA& particles, size_t n);
+```
+
+用确定性值（非随机，避免 `<random>` 依赖）初始化 `n` 个粒子。
+
+```cpp
+hpc::memory::ParticleSOA particles;
+hpc::memory::initialize_particles(particles, 10000);
+hpc::memory::update_particles_soa(particles, 0.016f);
+```
+
+---
+
+## hpc::instrumentation (`include/hpc/instrumentation.hpp`)
+
+可注入的操作计数器，用 RAII 作用域管理，取代散落在 `Buffer`/`CountingAllocator` 中的全局静态计数器。测试或示例创建局部 `OperationMetrics`，按指针传入被观察模块；指针为 `nullptr` 时零开销。
+
+### `OperationMetrics`
+
+```cpp
+class OperationMetrics {
+public:
+    size_t copy_count = 0;
+    size_t move_count = 0;
+    size_t allocation_count = 0;
+    size_t deallocation_count = 0;
+    size_t total_bytes_allocated = 0;
+    size_t total_bytes_deallocated = 0;
+
+    void reset() noexcept;
+    void record_copy() noexcept;
+    void record_move() noexcept;
+    void record_allocation(size_t bytes) noexcept;
+    void record_deallocation(size_t bytes) noexcept;
+};
+```
+
+### `OperationMetrics::Scope`
+
+```cpp
+class OperationMetrics::Scope {
+public:
+    explicit Scope(OperationMetrics& m);  // 构造时调用 reset()
+    OperationMetrics& metrics() noexcept;
+    // 不可拷贝、不可移动
+};
+```
+
+RAII 作用域，构造时重置计数器，保证每个测试块从干净状态开始，无需手动 `reset()`。
+
+```cpp
+hpc::instrumentation::OperationMetrics metrics;
+hpc::instrumentation::OperationMetrics::Scope scope(metrics);
+// 被测代码在此运行，结束后读取 metrics.copy_count 等
+```
+
+---
+
+## hpc::move_semantics (`include/hpc/buffer.hpp`)
+
+演示拷贝（昂贵，O(n) 内存拷贝）与移动（廉价，O(1) 指针转移）差异的缓冲区类。
+
+### `Buffer`
+
+```cpp
+class Buffer {
+public:
+    Buffer();
+    explicit Buffer(size_t size, instrumentation::OperationMetrics* metrics = nullptr);
+    Buffer(const Buffer& other, instrumentation::OperationMetrics* metrics = nullptr);
+    Buffer(Buffer&& other) noexcept;
+    Buffer& operator=(const Buffer& other);
+    Buffer& operator=(Buffer&& other) noexcept;
+
+    size_t size() const;
+    bool empty() const;
+    char* data();
+    const char* data() const;
+};
+```
+
+拥有动态分配缓冲区，RAII 释放。拷贝构造/赋值触发 `memcpy` 并通过可选 `metrics` 记录拷贝事件；移动仅转移指针并记录移动事件。
+
+### 拷贝 vs 引用传递示例函数
+
+```cpp
+inline void process_by_copy(Buffer buf);        // 按值传递，触发拷贝
+inline void process_by_ref(const Buffer& buf);  // 按引用传递，无拷贝
+inline void observe_buffer(const Buffer& buf);  // 读取首字节，避免被优化
+```
+
+```cpp
+hpc::move_semantics::Buffer src(1024, &metrics);
+hpc::move_semantics::process_by_copy(src);           // metrics.copy_count 增加
+hpc::move_semantics::Buffer moved = std::move(src);  // metrics.move_count 增加
+```
+
+---
+
+## hpc::vector_reserve (`include/hpc/vector_reserve.hpp`)
+
+通过自定义分配器追踪 `std::vector` 的容量增长与分配次数。
+
+### `CountingAllocator<T>`
+
+```cpp
+template <typename T>
+class CountingAllocator {
+public:
+    using value_type = T;
+    CountingAllocator() noexcept;
+    explicit CountingAllocator(instrumentation::OperationMetrics* metrics) noexcept;
+    template <typename U> CountingAllocator(const CountingAllocator<U>& other) noexcept;
+
+    T* allocate(std::size_t n);
+    void deallocate(T* ptr, std::size_t n) noexcept;
+    instrumentation::OperationMetrics* metrics() const noexcept;
+};
+```
+
+基于 `std::malloc/free` 的分配器，分配/释放时通过注入的 `metrics` 记录次数与字节数。`metrics` 为 `nullptr` 时退化为普通分配，零观察开销。
+
+### `CountingVector<T>`
+
+```cpp
+template <typename T>
+using CountingVector = std::vector<T, CountingAllocator<T>>;
+```
+
+```cpp
+hpc::instrumentation::OperationMetrics metrics;
+hpc::vector_reserve::CountingAllocator<int> alloc(&metrics);
+hpc::vector_reserve::CountingVector<int> v(alloc);
+v.reserve(1000);  // metrics.allocation_count 增加
+```
+
+---
+
+## hpc::compile_time (`include/hpc/compile_time.hpp`)
+
+C++20 `constexpr`/`consteval` 编译期计算工具：阶乘、查找表、哈希、素数。
+
+### 阶乘
+
+```cpp
+inline int64_t factorial_runtime(int n);      // 运行期
+constexpr int64_t factorial_constexpr(int n); // 可能编译期
+consteval int64_t factorial_consteval(int n); // 必须编译期（C++20）
+```
+
+```cpp
+constexpr auto f = hpc::compile_time::factorial_constexpr(10);  // 编译期求值
+```
+
+### 正弦查找表
+
+```cpp
+template <size_t N>
+constexpr std::array<double, N> generate_sin_table();
+constexpr auto SIN_TABLE = generate_sin_table<1024>();
+inline double fast_sin(double angle);
+```
+
+编译期用泰勒展开生成 1024 项正弦表，`fast_sin` 运行期查表（非 `constexpr`，因含取整归一化）。
+
+```cpp
+double y = hpc::compile_time::fast_sin(1.23);
+```
+
+### FNV-1a 哈希
+
+```cpp
+constexpr uint64_t fnv1a_hash(const char* str);
+consteval uint64_t operator""_hash(const char* str, size_t);
+```
+
+```cpp
+constexpr uint64_t h = "hello"_hash;  // 编译期哈希
+```
+
+### 素数
+
+```cpp
+constexpr bool is_prime(int n);
+template <size_t N> constexpr std::array<int, N> generate_primes();
+constexpr auto FIRST_100_PRIMES = generate_primes<100>();
+```
+
+---
+
+## hpc::ranges (`include/hpc/ranges_utils.hpp`)
+
+C++20 Ranges 对比教学模块，每个操作提供 raw loop / 经典算法 / ranges 三种实现并排对比。
+
+> **注意：** 教学示例，接口刻意暴露实现策略，价值在于并排对比而非抽象深度。
+
+### Transform / Filter / Sum
+
+```cpp
+inline void transform_raw_loop(const std::vector<int>& in, std::vector<int>& out);
+inline void transform_algorithm(const std::vector<int>& in, std::vector<int>& out);
+inline void transform_ranges(const std::vector<int>& in, std::vector<int>& out);
+
+inline std::vector<int> filter_raw_loop(const std::vector<int>& input);
+inline std::vector<int> filter_algorithm(const std::vector<int>& input);
+inline auto filter_ranges_view(const std::vector<int>& input);  // 惰性视图
+
+inline int64_t sum_raw_loop(const std::vector<int>& input);
+inline int64_t sum_algorithm(const std::vector<int>& input);
+inline int64_t sum_ranges(const std::vector<int>& input);
+```
+
+### 链式操作与物化
+
+```cpp
+inline std::vector<int> chain_raw_loop(const std::vector<int>& input);
+inline auto chain_ranges_view(const std::vector<int>& input);  // 惰性、单趟
+
+template <std::ranges::range R>
+std::vector<std::ranges::range_value_t<R>> to_vector(R&& range);
+```
+
+`to_vector` 将惰性视图物化为 `std::vector`。
+
+```cpp
+auto view = hpc::ranges::chain_ranges_view(data);
+auto result = hpc::ranges::to_vector(view);
+```
+
+---
+
+## hpc::concurrency (`include/hpc/concurrency_utils.hpp`, `include/hpc/lock_free_queue.hpp`)
+
+并发与多线程工具：缓存行对齐的原子计数器、自旋锁、并行执行助手，以及无锁 SPSC/MPMC 队列。
+
+### `AlignedCounter`
+
+```cpp
+struct alignas(hpc::core::CACHE_LINE_SIZE) AlignedCounter {
+    std::atomic<int64_t> value{0};
+    void increment(std::memory_order order = std::memory_order_seq_cst);
+    int64_t load(std::memory_order order = std::memory_order_seq_cst) const;
+    void store(int64_t v, std::memory_order order = std::memory_order_seq_cst);
+};
+```
+
+缓存行对齐的原子计数器，避免伪共享。等价于 `CacheLinePadded<std::atomic<int64_t>>`，提供常用原子操作的便捷封装。
+
+### `SpinLock`
+
+```cpp
+class SpinLock {
+public:
+    SpinLock() noexcept;
+    void lock();
+    void unlock();
+    bool try_lock();
+    // 不可拷贝、不可移动
+};
+```
+
+基于 `std::atomic_flag` 的自旋锁，满足 BasicLockable 与 Lockable 要求，可用于 `std::lock_guard`/`std::unique_lock`/`std::scoped_lock`。适用于极短临界区。
+
+```cpp
+hpc::concurrency::SpinLock lock;
+{
+    std::lock_guard guard(lock);
+    // 临界区
+}
+```
+
+### `run_parallel()`
+
+```cpp
+template <typename Func>
+double run_parallel(Func&& func, unsigned int num_threads);
+```
+
+在 `num_threads` 个线程上并发执行 `func`（每个线程以线程索引为参数调用一次），返回总耗时（毫秒）。
+
+### `SPSCQueue<T, Capacity>`
+
+```cpp
+template <typename T, size_t Capacity>
+class SPSCQueue {
+    static_assert((Capacity & (Capacity - 1)) == 0, "Capacity must be power of 2");
+    static_assert(Capacity >= 2, "Capacity must be at least 2");
+public:
+    bool push(const T& value);
+    bool push(T&& value);
+    std::optional<T> pop();
+    bool empty() const;                   // 近似，可能陈旧
+    size_t size() const;                  // 近似
+    constexpr size_t capacity() const;    // == Capacity - 1
+};
+```
+
+无锁有界队列，仅支持单生产者单消费者。环形缓冲区 + 原子 head/tail，acquire-release 序。`Capacity` 必须为 2 的幂且 ≥ 2；恒留一空槽，实际容量为 `Capacity - 1`。
+
+### `MPMCQueue<T, Capacity>`
+
+```cpp
+template <typename T, size_t Capacity>
+class MPMCQueue {
+    static_assert((Capacity & (Capacity - 1)) == 0, "Capacity must be power of 2");
+public:
+    bool push(const T& value);
+    bool push(T&& value);
+    std::optional<T> pop();
+};
+```
+
+支持多生产者多消费者的无锁有界队列，用序列号协调 cell。`Capacity` 必须为 2 的幂。
+
+```cpp
+hpc::concurrency::SPSCQueue<int, 1024> q;
+q.push(42);
+auto v = q.pop();  // std::optional<int>，含 42
+```
 
 ---
 
@@ -382,7 +754,7 @@ public:
 };
 ```
 
-基于 `std::chrono::high_resolution_clock` 的手动计时器。适用于 Google Benchmark 之外的简单计时场景。
+基于 `std::chrono::steady_clock` 的手动计时器。`steady_clock` 保证单调，不受系统时间调整（NTP）影响；`high_resolution_clock` 在部分标准库实现上等价于可回拨的 `system_clock`，不适合测量时间间隔。适用于 Google Benchmark 之外的简单计时场景。
 
 ```cpp
 hpc::bench::Timer timer;

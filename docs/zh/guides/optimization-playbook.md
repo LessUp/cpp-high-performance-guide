@@ -234,7 +234,7 @@ static void BM_Correct(benchmark::State& state) {
 ```cpp
 namespace hpc::memory { /* 内存布局相关 */ }
 namespace hpc::simd { /* SIMD 相关 */ }
-namespace hpc::concurrent { /* 并发相关 */ }
+namespace hpc::concurrency { /* 并发相关 */ }
 namespace hpc::bench { /* benchmark 工具 */ }
 ```
 
@@ -261,10 +261,12 @@ namespace hpc::memory {
 examples/
   02-memory-cache/
     CMakeLists.txt      # 调用 hpc_add_example()
-    include/            # 公共头文件
-    src/                # 示例源码
+    src/                # 示例源码（依赖规范库 include/hpc/）
     bench/              # benchmark 源码
 ```
+
+公共头文件已提升为仓库根的规范库 `include/hpc/`（`hpc_headers` INTERFACE 目标），
+examples 只消费、不持有公共头文件，依赖方向单向。
 
 benchmark 通过 `hpc_add_example()` 的 `BENCHMARK_SOURCES` 参数注册，自动链接 Google Benchmark 并注册为 CTest 测试。
 

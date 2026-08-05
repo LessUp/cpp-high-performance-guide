@@ -81,8 +81,8 @@ inline void update_particles_soa(ParticleSOA& particles, float dt) {
 ### 运行验证
 
 ```bash
-./build/release/examples/02-memory-cache/src/aos_vs_soa
-./build/release/examples/02-memory-cache/bench/aos_soa_bench
+./build/release/examples/02-memory-cache/aos_vs_soa
+./build/release/examples/02-memory-cache/aos_vs_soa_bench
 ```
 
 SOA 的优势在数据量超过 L2 缓存后尤为显著。
@@ -152,8 +152,8 @@ struct alignas(hpc::core::CACHE_LINE_SIZE) CacheLinePadded {
 ### 运行验证
 
 ```bash
-./build/release/examples/02-memory-cache/src/alignment
-./build/release/examples/02-memory-cache/bench/alignment_bench
+./build/release/examples/02-memory-cache/alignment
+./build/release/examples/02-memory-cache/alignment_bench
 ```
 
 在现代 CPU（Skylake+）上对齐与非对齐差距已很小，但对齐仍是最佳实践——确保所有微架构上无性能回退。
@@ -210,8 +210,8 @@ False sharing 可以将多线程加速比从接近线性降到**负加速**。�
 ### 运行验证
 
 ```bash
-./build/release/examples/02-memory-cache/src/false_sharing
-./build/release/examples/02-memory-cache/bench/false_sharing_bench
+./build/release/examples/02-memory-cache/false_sharing
+./build/release/examples/02-memory-cache/false_sharing_bench
 ```
 
 在 4 线程、每线程 10M 次原子递增下，padded 版本通常比 packed 版本快数倍。
@@ -279,8 +279,8 @@ int64_t sum_list_with_prefetch(const Node* head) {
 ### 运行验证
 
 ```bash
-./build/release/examples/02-memory-cache/src/prefetch
-./build/release/examples/02-memory-cache/bench/prefetch_bench
+./build/release/examples/02-memory-cache/prefetch
+./build/release/examples/02-memory-cache/prefetch_bench
 ```
 
 ---
@@ -294,23 +294,23 @@ int64_t sum_list_with_prefetch(const Node* head) {
 cmake --preset=release && cmake --build --preset=release
 
 # AOS vs SOA
-./build/release/examples/02-memory-cache/bench/aos_soa_bench
+./build/release/examples/02-memory-cache/aos_vs_soa_bench
 
 # 内存对齐
-./build/release/examples/02-memory-cache/bench/alignment_bench
+./build/release/examples/02-memory-cache/alignment_bench
 
 # False Sharing
-./build/release/examples/02-memory-cache/bench/false_sharing_bench
+./build/release/examples/02-memory-cache/false_sharing_bench
 
 # 软件预取
-./build/release/examples/02-memory-cache/bench/prefetch_bench
+./build/release/examples/02-memory-cache/prefetch_bench
 ```
 
 支持 Google Benchmark 标准参数：
 
 ```bash
-./build/release/examples/02-memory-cache/bench/aos_soa_bench --benchmark_filter="SOA"
-./build/release/examples/02-memory-cache/bench/false_sharing_bench --benchmark_repetitions=5
+./build/release/examples/02-memory-cache/aos_vs_soa_bench --benchmark_filter="SOA"
+./build/release/examples/02-memory-cache/false_sharing_bench --benchmark_repetitions=5
 ```
 
 ---

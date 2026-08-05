@@ -57,7 +57,7 @@ cmake --build build/release
 运行一个 benchmark：
 
 ```bash
-./build/release/examples/02-memory-cache/aos_soa_bench
+./build/release/examples/02-memory-cache/aos_vs_soa_bench
 ```
 
 ## 常用验证命令

@@ -53,7 +53,7 @@ ctest --preset=asan
 Release 构建包含所有基准测试可执行文件：
 
 ```bash
-./build/release/examples/02-memory-cache/bench/aos_soa_bench
+./build/release/examples/02-memory-cache/aos_vs_soa_bench
 ```
 
 输出类似：

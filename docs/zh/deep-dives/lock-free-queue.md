@@ -88,7 +88,7 @@ seq_cst 提供全局单一修改顺序。经典的 store buffering litmus test�
 运行性能对比：
 
 ```bash
-./build/release/examples/05-concurrency/bench/atomic_bench
+./build/release/examples/05-concurrency/atomic_ordering_bench
 ```
 
 或直接运行 demo 观察三种 ordering 的计时：
@@ -237,7 +237,7 @@ OpenMP 为每个线程维护私有副本，循环结束后合并。无需手动�
 ### 线程扩展效率
 
 ```bash
-./build/release/examples/05-concurrency/bench/openmp_bench
+./build/release/examples/05-concurrency/openmp_basics_bench
 ```
 
 或运行 demo 观察不同线程数下的加速比：

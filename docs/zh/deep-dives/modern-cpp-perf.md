@@ -144,7 +144,7 @@ C++17 起，prvalue 返回保证 copy elision；NRVO（命名返回值优化）�
 ### 验证
 
 ```bash
-./build/release/examples/03-modern-cpp/bench/move_semantics_bench
+./build/release/examples/03-modern-cpp/move_semantics_bench
 ```
 
 Google Benchmark 输出中，move 和 emplace_back 的耗时应比 copy 低 1-2 个数量级（100 × 1MB 拷贝 ≈ 100MB memcpy）。
@@ -217,7 +217,7 @@ vec.resize(10);   // capacity≥10, size=10 — 已值初始化，可下标访�
 ### 验证
 
 ```bash
-./build/release/examples/03-modern-cpp/bench/vector_reserve_bench
+./build/release/examples/03-modern-cpp/vector_reserve_bench
 ```
 
 ---
@@ -290,7 +290,7 @@ inline auto chain_ranges_view(const std::vector<int>& input) {
 ### 验证
 
 ```bash
-./build/release/examples/03-modern-cpp/bench/ranges_bench
+./build/release/examples/03-modern-cpp/ranges_vs_loops_bench
 ```
 
 观察 "Ranges (lazy sum)" 与 "Raw loop" 的耗时对比——对于纯求和场景，惰性 view 无需物化中间结果，性能应持平或略优。
@@ -310,18 +310,18 @@ cmake --build build/release
 ./build/release/examples/03-modern-cpp/compile_time
 
 # 移动语义 benchmark
-./build/release/examples/03-modern-cpp/bench/move_semantics_bench
+./build/release/examples/03-modern-cpp/move_semantics_bench
 
 # 容器容量管理 benchmark
-./build/release/examples/03-modern-cpp/bench/vector_reserve_bench
+./build/release/examples/03-modern-cpp/vector_reserve_bench
 
 # Ranges vs 裸循环 benchmark
-./build/release/examples/03-modern-cpp/bench/ranges_bench
+./build/release/examples/03-modern-cpp/ranges_vs_loops_bench
 
 # 运行所有 benchmark（Google Benchmark 格式，可导出 JSON）
-./build/release/examples/03-modern-cpp/bench/move_semantics_bench --benchmark_format=json
-./build/release/examples/03-modern-cpp/bench/vector_reserve_bench --benchmark_format=json
-./build/release/examples/03-modern-cpp/bench/ranges_bench --benchmark_format=json
+./build/release/examples/03-modern-cpp/move_semantics_bench --benchmark_format=json
+./build/release/examples/03-modern-cpp/vector_reserve_bench --benchmark_format=json
+./build/release/examples/03-modern-cpp/ranges_vs_loops_bench --benchmark_format=json
 ```
 
 所有 benchmark 使用 Google Benchmark 框架，自动处理预热、迭代次数自适应和统计显著性。结果因硬件而异——本仓库的原则是提供可运行的验证手段，而非固定的性能数字。
