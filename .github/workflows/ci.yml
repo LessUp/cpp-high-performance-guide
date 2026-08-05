@@ -61,8 +61,46 @@ jobs:
       - name: Build
         run: cmake --build --preset debug
 
-      - name: Test (exclude non-deterministic benchmarks)
-        run: ctest --preset=debug -LE benchmark
+      - name: Test (benchmark label excluded via test preset)
+        run: ctest --preset=debug
+
+  sanitizers:
+    name: Sanitizers (${{ matrix.preset }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # asan/ubsan use the default system compiler; the tsan preset pins
+        # clang via its preset environment (TSan needs a compiler with full
+        # annotation support, and clang pairs with libomp-dev for OpenMP).
+        preset: [asan, ubsan, tsan]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Cache CMake dependencies
+        uses: actions/cache@v5
+        with:
+          path: build/${{ matrix.preset }}/_deps
+          key: cmake-deps-${{ runner.os }}-${{ matrix.preset }}-${{ hashFiles('cmake/Dependencies.cmake') }}
+          restore-keys: |
+            cmake-deps-${{ runner.os }}-${{ matrix.preset }}-
+            cmake-deps-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build clang libomp-dev
+
+      - name: Configure
+        run: cmake --preset=${{ matrix.preset }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+
+      - name: Test (benchmark label excluded via test preset)
+        run: ctest --preset=${{ matrix.preset }}
 
   docs:
     name: Docs build & tests

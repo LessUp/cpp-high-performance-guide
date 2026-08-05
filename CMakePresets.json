@@ -181,6 +181,11 @@
       "configurePreset": "debug",
       "output": {
         "outputOnFailure": true
+      },
+      "filter": {
+        "exclude": {
+          "label": "benchmark"
+        }
       }
     },
     {
@@ -188,6 +193,11 @@
       "configurePreset": "release",
       "output": {
         "outputOnFailure": true
+      },
+      "filter": {
+        "exclude": {
+          "label": "benchmark"
+        }
       }
     },
     {
@@ -198,6 +208,11 @@
       },
       "environment": {
         "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1"
+      },
+      "filter": {
+        "exclude": {
+          "label": "benchmark"
+        }
       }
     },
     {
@@ -208,6 +223,11 @@
       },
       "environment": {
         "TSAN_OPTIONS": "halt_on_error=1"
+      },
+      "filter": {
+        "exclude": {
+          "label": "benchmark"
+        }
       }
     },
     {
@@ -218,6 +238,11 @@
       },
       "environment": {
         "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+      },
+      "filter": {
+        "exclude": {
+          "label": "benchmark"
+        }
       }
     }
   ]

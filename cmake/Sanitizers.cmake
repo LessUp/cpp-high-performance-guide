@@ -66,20 +66,8 @@ function(hpc_enable_sanitizers target)
     if(SANITIZER_FLAGS)
         target_compile_options(${target} PRIVATE ${SANITIZER_FLAGS})
         target_link_options(${target} PRIVATE ${SANITIZER_LINK_FLAGS})
-    endif()
-endfunction()
-
-#------------------------------------------------------------------------------
-# hpc_add_sanitizer_test(target)
-# Creates a test that runs with sanitizers enabled
-#------------------------------------------------------------------------------
-function(hpc_add_sanitizer_test target)
-    if(ENABLE_ASAN OR ENABLE_TSAN OR ENABLE_UBSAN OR ENABLE_MSAN)
-        add_test(NAME ${target}_sanitizer_test COMMAND ${target})
-        
-        # Set environment variables for better error reporting
-        set_tests_properties(${target}_sanitizer_test PROPERTIES
-            ENVIRONMENT "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1"
-        )
+        # Lets tests scale down workload under sanitizers (5-15x runtime overhead),
+        # keeping stress tests meaningful without tripping timeouts under TSan.
+        target_compile_definitions(${target} PRIVATE HPC_SANITIZER_BUILD)
     endif()
 endfunction()

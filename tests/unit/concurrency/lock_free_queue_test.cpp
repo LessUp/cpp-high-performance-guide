@@ -8,6 +8,7 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <hpc/lock_free_queue.hpp>
@@ -128,8 +129,8 @@ TEST(SPSCQueueTest, ConcurrentProducerConsumer) {
     consumer.join();
 
     EXPECT_EQ(received.size(), NUM_ITEMS);
-    for (int i = 0; i < NUM_ITEMS; ++i) {
-        EXPECT_EQ(received[i], i);
+    for (size_t i = 0; i < static_cast<size_t>(NUM_ITEMS); ++i) {
+        EXPECT_EQ(received[i], static_cast<int>(i));
     }
 }
 
@@ -177,10 +178,15 @@ TEST(MPMCQueueTest, ConcurrentMultipleProducersConsumers) {
     constexpr int NUM_PRODUCERS = 4;
     constexpr int NUM_CONSUMERS = 4;
     constexpr int ITEMS_PER_PRODUCER = 1000;
+    constexpr int EXPECTED_TOTAL = NUM_PRODUCERS * ITEMS_PER_PRODUCER;
 
-    std::atomic<int> items_produced{0};
-    std::atomic<int> items_consumed{0};
     std::atomic<bool> done{false};
+
+    // Each consumer records the values it observes. After joining, we verify
+    // that every value in [0, EXPECTED_TOTAL) was delivered EXACTLY ONCE.
+    // Comparing counts alone cannot catch "one value delivered twice and
+    // another lost" — the counts would still match.
+    std::vector<std::vector<int>> consumed_by(static_cast<size_t>(NUM_CONSUMERS));
 
     std::vector<std::thread> producers;
     std::vector<std::thread> consumers;
@@ -192,22 +198,22 @@ TEST(MPMCQueueTest, ConcurrentMultipleProducersConsumers) {
                 while (!queue.push(value)) {
                     std::this_thread::yield();
                 }
-                items_produced.fetch_add(1, std::memory_order_relaxed);
             }
         });
     }
 
     for (int c = 0; c < NUM_CONSUMERS; ++c) {
-        consumers.emplace_back([&]() {
+        consumers.emplace_back([&, c]() {
+            auto& received = consumed_by[static_cast<size_t>(c)];
             while (!done.load(std::memory_order_acquire)) {
-                if (queue.pop()) {
-                    items_consumed.fetch_add(1, std::memory_order_relaxed);
+                if (auto value = queue.pop()) {
+                    received.push_back(*value);
                 } else {
                     std::this_thread::yield();
                 }
             }
-            while (queue.pop()) {
-                items_consumed.fetch_add(1, std::memory_order_relaxed);
+            while (auto value = queue.pop()) {
+                received.push_back(*value);
             }
         });
     }
@@ -222,9 +228,51 @@ TEST(MPMCQueueTest, ConcurrentMultipleProducersConsumers) {
         t.join();
     }
 
-    int expected = NUM_PRODUCERS * ITEMS_PER_PRODUCER;
-    EXPECT_EQ(items_produced.load(), expected);
-    EXPECT_EQ(items_consumed.load(), expected);
+    // Merge per-consumer records and verify each value exactly once.
+    std::vector<int> all;
+    all.reserve(EXPECTED_TOTAL);
+    for (auto& received : consumed_by) {
+        all.insert(all.end(), received.begin(), received.end());
+    }
+
+    ASSERT_EQ(static_cast<int>(all.size()), EXPECTED_TOTAL);
+    std::sort(all.begin(), all.end());
+    for (int i = 0; i < EXPECTED_TOTAL; ++i) {
+        if (all[static_cast<size_t>(i)] != i) {
+            FAIL() << "Value " << i << " missing or duplicated (got " << all[static_cast<size_t>(i)]
+                   << " at sorted index " << i << ")";
+        }
+    }
+}
+
+TEST(MPMCQueueTest, FullQueueRejectsPush) {
+    MPMCQueue<int, 8> queue;
+
+    // Fill to capacity; push must then fail rather than overwrite.
+    // (Unlike SPSC, the sequence-based MPMC design uses all Capacity slots.)
+    int pushed = 0;
+    while (queue.push(pushed)) {
+        ++pushed;
+    }
+    EXPECT_EQ(pushed, 8);
+    EXPECT_FALSE(queue.push(999));
+
+    // Freeing one slot makes push succeed again.
+    auto value = queue.pop();
+    ASSERT_TRUE(value.has_value());
+    EXPECT_EQ(*value, 0);
+    EXPECT_TRUE(queue.push(pushed));  // pushes 8
+
+    // Drain and verify FIFO order across the rejection boundary:
+    // nothing was lost or duplicated while the queue was full.
+    std::vector<int> drained;
+    while (auto v = queue.pop()) {
+        drained.push_back(*v);
+    }
+    ASSERT_EQ(static_cast<int>(drained.size()), 8);
+    for (int i = 0; i < 8; ++i) {
+        EXPECT_EQ(drained[static_cast<size_t>(i)], i + 1);
+    }
 }
 
 TEST(MPMCQueueTest, SupportsNonDefaultConstructiblePayloads) {
@@ -248,13 +296,19 @@ TEST(MPMCQueueTest, SupportsNonDefaultConstructiblePayloads) {
  */
 TEST(SPSCQueueStressTest, HighThroughputOneMillionOperations) {
     SPSCQueue<int, 4096> queue;
+    // Sanitizers add 5-15x runtime overhead; scale the workload down so the
+    // stress test still exercises wraparound under ASan/TSan without timing out.
+#if defined(HPC_SANITIZER_BUILD)
+    constexpr int NUM_ITEMS = 50000;
+#else
     constexpr int NUM_ITEMS = 1000000;
+#endif
 
     std::atomic<bool> producer_done{false};
     std::vector<int> received;
     received.reserve(NUM_ITEMS);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::steady_clock::now();
 
     std::thread producer([&]() {
         for (int i = 0; i < NUM_ITEMS; ++i) {
@@ -281,19 +335,22 @@ TEST(SPSCQueueStressTest, HighThroughputOneMillionOperations) {
     producer.join();
     consumer.join();
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     EXPECT_EQ(received.size(), NUM_ITEMS);
 
     // Verify FIFO ordering (spot check first and last 100 elements)
-    for (int i = 0; i < 100; ++i) {
-        EXPECT_EQ(received[i], i);
-        EXPECT_EQ(received[NUM_ITEMS - 100 + i], NUM_ITEMS - 100 + i);
+    for (size_t i = 0; i < 100; ++i) {
+        EXPECT_EQ(received[i], static_cast<int>(i));
+        const size_t idx = static_cast<size_t>(NUM_ITEMS) - 100 + i;
+        EXPECT_EQ(received[idx], static_cast<int>(idx));
     }
 
     // Report throughput (guard against division by zero)
-    double throughput = duration_ms > 0 ? static_cast<double>(NUM_ITEMS) / duration_ms * 1000 : 0.0;
+    double throughput =
+        duration_ms > 0 ? static_cast<double>(NUM_ITEMS) / static_cast<double>(duration_ms) * 1000
+                        : 0.0;
     std::cout << "SPSC throughput: " << static_cast<int>(throughput) << " ops/sec (" << duration_ms
               << " ms for " << NUM_ITEMS << " items)" << std::endl;
 }
@@ -307,7 +364,11 @@ TEST(MPMCQueueStressTest, HighContentionMultipleProducersConsumers) {
     MPMCQueue<int, 2048> queue;
     constexpr int NUM_PRODUCERS = 4;
     constexpr int NUM_CONSUMERS = 4;
+#if defined(HPC_SANITIZER_BUILD)
+    constexpr int ITEMS_PER_PRODUCER = 5000;
+#else
     constexpr int ITEMS_PER_PRODUCER = 50000;
+#endif
     constexpr int EXPECTED_TOTAL = NUM_PRODUCERS * ITEMS_PER_PRODUCER;
 
     std::atomic<int> items_produced{0};
@@ -317,7 +378,7 @@ TEST(MPMCQueueStressTest, HighContentionMultipleProducersConsumers) {
     std::vector<std::thread> producers;
     std::vector<std::thread> consumers;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::steady_clock::now();
 
     for (int p = 0; p < NUM_PRODUCERS; ++p) {
         producers.emplace_back([&, p]() {
@@ -331,17 +392,25 @@ TEST(MPMCQueueStressTest, HighContentionMultipleProducersConsumers) {
         });
     }
 
+    // Per-consumer value records for element-level verification (see
+    // ConcurrentMultipleProducersConsumers for rationale); the atomic counter
+    // remains the progress signal for the deadline loop below.
+    std::vector<std::vector<int>> consumed_by(NUM_CONSUMERS);
+
     for (int c = 0; c < NUM_CONSUMERS; ++c) {
-        consumers.emplace_back([&]() {
+        consumers.emplace_back([&, c]() {
+            auto& received = consumed_by[static_cast<size_t>(c)];
             while (!done.load(std::memory_order_acquire)) {
-                if (queue.pop()) {
+                if (auto value = queue.pop()) {
+                    received.push_back(*value);
                     items_consumed.fetch_add(1, std::memory_order_relaxed);
                 } else {
                     std::this_thread::yield();
                 }
             }
             // Drain remaining items
-            while (queue.pop()) {
+            while (auto value = queue.pop()) {
+                received.push_back(*value);
                 items_consumed.fetch_add(1, std::memory_order_relaxed);
             }
         });
@@ -351,8 +420,13 @@ TEST(MPMCQueueStressTest, HighContentionMultipleProducersConsumers) {
         t.join();
     }
 
-    // Wait for all items to be consumed with timeout
+    // Wait for all items to be consumed with timeout (relaxed under sanitizers,
+    // where atomic instrumentation slows the contention loops substantially).
+#if defined(HPC_SANITIZER_BUILD)
+    auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(60);
+#else
     auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+#endif
     while (items_consumed.load() < EXPECTED_TOTAL) {
         if (std::chrono::steady_clock::now() > deadline) {
             done.store(true, std::memory_order_release);
@@ -370,15 +444,30 @@ TEST(MPMCQueueStressTest, HighContentionMultipleProducersConsumers) {
         t.join();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     EXPECT_EQ(items_produced.load(), EXPECTED_TOTAL);
     EXPECT_EQ(items_consumed.load(), EXPECTED_TOTAL);
 
+    // Element-level check: every value in [0, EXPECTED_TOTAL) exactly once.
+    std::vector<int> all;
+    all.reserve(EXPECTED_TOTAL);
+    for (auto& received : consumed_by) {
+        all.insert(all.end(), received.begin(), received.end());
+    }
+    ASSERT_EQ(static_cast<int>(all.size()), EXPECTED_TOTAL);
+    std::sort(all.begin(), all.end());
+    for (int i = 0; i < EXPECTED_TOTAL; ++i) {
+        if (all[static_cast<size_t>(i)] != i) {
+            FAIL() << "Value " << i << " missing or duplicated under contention";
+        }
+    }
+
     // Report throughput (guard against division by zero)
-    double throughput =
-        duration_ms > 0 ? static_cast<double>(EXPECTED_TOTAL) / duration_ms * 1000 : 0.0;
+    double throughput = duration_ms > 0 ? static_cast<double>(EXPECTED_TOTAL) /
+                                              static_cast<double>(duration_ms) * 1000
+                                        : 0.0;
     std::cout << "MPMC throughput: " << static_cast<int>(throughput) << " ops/sec (" << duration_ms
               << " ms for " << EXPECTED_TOTAL << " items)" << std::endl;
 }
@@ -437,8 +526,8 @@ TEST(SPSCQueueStressTest, RandomInterleavingWithDelays) {
     EXPECT_EQ(received.size(), NUM_ITEMS);
 
     // Verify FIFO ordering
-    for (int i = 0; i < NUM_ITEMS; ++i) {
-        EXPECT_EQ(received[i], i) << "FIFO violation at index " << i;
+    for (size_t i = 0; i < static_cast<size_t>(NUM_ITEMS); ++i) {
+        EXPECT_EQ(received[i], static_cast<int>(i)) << "FIFO violation at index " << i;
     }
 }
 
@@ -484,7 +573,7 @@ TEST(SPSCQueueStressTest, NonTrivialTypeStress) {
     EXPECT_EQ(received.size(), NUM_ITEMS);
 
     // Verify correct strings
-    for (int i = 0; i < NUM_ITEMS; ++i) {
+    for (size_t i = 0; i < static_cast<size_t>(NUM_ITEMS); ++i) {
         EXPECT_EQ(received[i], "item_" + std::to_string(i));
     }
 }

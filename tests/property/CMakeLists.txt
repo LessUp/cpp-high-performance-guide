@@ -20,6 +20,7 @@ target_link_libraries(memory_properties_test PRIVATE
 )
 
 hpc_set_compiler_options(memory_properties_test)
+hpc_enable_sanitizers(memory_properties_test)
 
 gtest_add_tests(TARGET memory_properties_test)
 
@@ -37,6 +38,7 @@ target_link_libraries(simd_properties_test PRIVATE
 )
 
 hpc_set_compiler_options(simd_properties_test)
+hpc_enable_sanitizers(simd_properties_test)
 
 # Enable SIMD for the test (only on x86/x64, not ARM)
 if(NOT HPC_IS_ARM)
@@ -69,6 +71,7 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 hpc_set_compiler_options(concurrency_properties_test)
+hpc_enable_sanitizers(concurrency_properties_test)
 
 gtest_add_tests(TARGET concurrency_properties_test)
 
@@ -83,11 +86,10 @@ target_include_directories(benchmark_properties_test PRIVATE
 
 target_link_libraries(benchmark_properties_test PRIVATE
     GTest::gtest
-    rapidcheck
-    rapidcheck_gtest
     benchmark::benchmark
 )
 
 hpc_set_compiler_options(benchmark_properties_test)
+hpc_enable_sanitizers(benchmark_properties_test)
 
 gtest_add_tests(TARGET benchmark_properties_test)
