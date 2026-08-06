@@ -3,6 +3,26 @@
 # Uses target-based approach (modern CMake best practice)
 
 #------------------------------------------------------------------------------
+# Link-time optimization (opt-in)
+#------------------------------------------------------------------------------
+# GCC/Clang need -flto at both compile and link time; the flag is applied in
+# hpc_set_compiler_options() so every example/benchmark/test target opts in
+# consistently. Probed once here so unsupported toolchains warn at configure
+# time instead of failing at link time.
+option(HPC_ENABLE_LTO "Enable link-time optimization for Release/RelWithDebInfo builds" OFF)
+
+set(HPC_LTO_AVAILABLE FALSE)
+if(HPC_ENABLE_LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT _hpc_ipo_supported OUTPUT _hpc_ipo_error LANGUAGES CXX)
+    if(_hpc_ipo_supported)
+        set(HPC_LTO_AVAILABLE TRUE)
+    else()
+        message(WARNING "HPC_ENABLE_LTO=ON but the toolchain does not support IPO: ${_hpc_ipo_error}")
+    endif()
+endif()
+
+#------------------------------------------------------------------------------
 # Detect compiler and architecture
 #------------------------------------------------------------------------------
 set(HPC_IS_GCC FALSE)
@@ -99,6 +119,24 @@ function(hpc_set_compiler_options target)
         
         if(ARG_ENABLE_FAST_MATH)
             _hpc_add_config_options(${target} RELEASE "/fp:fast")
+        endif()
+    endif()
+
+    if(HPC_LTO_AVAILABLE)
+        if(HPC_IS_GCC OR HPC_IS_CLANG)
+            _hpc_add_config_options(${target}
+                RELEASE "-flto=auto"
+                RELWITHDEBINFO "-flto=auto"
+            )
+            target_link_options(${target} PRIVATE
+                "$<$<CONFIG:Release,RelWithDebInfo>:-flto=auto>")
+        elseif(HPC_IS_MSVC)
+            _hpc_add_config_options(${target}
+                RELEASE "/GL"
+                RELWITHDEBINFO "/GL"
+            )
+            target_link_options(${target} PRIVATE
+                "$<$<CONFIG:Release,RelWithDebInfo>:/LTCG>")
         endif()
     endif()
 endfunction()
