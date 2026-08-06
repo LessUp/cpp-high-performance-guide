@@ -222,6 +222,35 @@ vec.resize(10);   // capacity≥10, size=10 — 已值初始化，可下标访�
 
 ---
 
+## 分配策略：new/delete vs arena vs std::pmr
+
+高频小对象分配是隐性性能杀手：每次 `new` 都付出分配器簿记、锁（多线程
+下）与堆碎片成本，而对象零散分布还会拖慢后续遍历的缓存行为。当一批
+对象**同生共死**（解析/构建/渲染阶段、请求作用域临时数据），正确工具是
+arena（单调分配器）：
+
+- `hpc::mem::Arena`（[`include/hpc/arena.hpp`](../../../include/hpc/arena.hpp)）：
+  一次 malloc，分配 = 指针递增，释放 = 一次 `reset()`；
+- `std::pmr::monotonic_buffer_resource`（C++17 标准库）：同样的分配形态，
+  可直接插入标准容器（`std::pmr::polymorphic_allocator`）。
+
+实测（`examples/03-modern-cpp/src/allocators.cpp`，1M 节点 build+遍历+释放）：
+
+| 策略 | 耗时 | 相对 |
+|------|------|------|
+| 逐对象 new/delete | 44.6 ms | 1x |
+| `std::pmr::monotonic_buffer` | 5.9 ms | 7.5x |
+| `hpc::mem::Arena` | 2.25 ms | **20x** |
+
+arena 快于 pmr 的原因：pmr 资源对象要处理上游分配回退与对齐协商，教学版
+arena 只做一次对齐加法。两者都支持"整批回收"，差别只在通用性。
+
+约束要写清楚：arena 没有逐对象释放，`reset()` 不调用析构——用于平凡可
+析构类型或生命周期由阶段管理的数据。对象各自有不同生命周期时，老老实实
+用 RAII 容器。
+
+---
+
 ## C++20 Ranges
 
 Ranges 的核心性能优势不在于单个算法的速度，而在于**惰性求值消除中间分配**。

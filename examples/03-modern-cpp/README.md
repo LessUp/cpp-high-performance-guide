@@ -11,9 +11,15 @@ constexpr/consteval、移动语义、容器容量管理与 C++20 Ranges 的零�
 | `src/move_semantics.cpp` | `move_semantics_bench` | 移动语义避免深拷贝 |
 | `src/vector_reserve.cpp` | `vector_reserve_bench` | reserve 减少重分配 |
 | `src/ranges_vs_loops.cpp` | `ranges_vs_loops_bench` | C++20 Ranges vs 手写循环 |
+| `src/parallel_stl.cpp` | `parallel_stl_bench` | 并行 STL 执行策略（seq/unseq 恒有，par 需 TBB） |
+| `src/allocators.cpp` | `allocators_bench` | 分配策略：new/delete vs arena vs std::pmr |
 
 Buffer 与编译期工具来自规范库 `include/hpc/`
-（`hpc::move_semantics`、`hpc::compile_time`、`hpc::vector_reserve`、`hpc::ranges`）。
+（`hpc::move_semantics`、`hpc::compile_time`、`hpc::vector_reserve`、`hpc::ranges`）；
+arena 分配器见 [`include/hpc/arena.hpp`](../../include/hpc/arena.hpp)。
+
+实测参考（1M 节点 build+traverse+free）：逐对象 new/delete 44.6 ms，
+`hpc::mem::Arena` 2.25 ms（**20x**），`std::pmr::monotonic_buffer` 5.9 ms。
 
 ## 构建与运行
 

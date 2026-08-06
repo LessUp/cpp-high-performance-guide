@@ -11,6 +11,7 @@
 | `src/false_sharing.cpp` | `false_sharing_bench` | 伪共享与缓存行填充 |
 | `src/alignment.cpp` | `alignment_bench` | 内存对齐与 SIMD 加载 |
 | `src/prefetch.cpp` | `prefetch_bench` | 软件预取 |
+| `src/data_structures.cpp` | `data_structures_bench` | std::map vs unordered_map vs 有序 vector 查找 |
 
 所有示例依赖仓库根的规范库 `include/hpc/`（`hpc::memory` 命名空间）。
 

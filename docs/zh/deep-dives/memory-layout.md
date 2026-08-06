@@ -315,6 +315,25 @@ cmake --preset=release && cmake --build --preset=release
 
 ---
 
+## 查找结构的缓存友好性
+
+渐进复杂度不决定真实查找速度，**每次探测花多少缓存缺失**才决定。
+`examples/02-memory-cache/src/data_structures.cpp` 对 10 万条目、100 万次
+探测（50% 命中）实测（Zen 3）：
+
+| 结构 | 耗时 | 每次探测的物理成本 |
+|------|------|--------------------|
+| `std::map`（红黑树） | 198 ms | O(log n) 次指针追逐，每跳大概率缓存缺失 |
+| 有序 vector + `lower_bound` | 92 ms | O(log n) 次探测落在连续内存，预取器友好但分支密集 |
+| `std::unordered_map` | **19.5 ms** | 一次哈希 + 短桶链，本实现平均接近 O(1) 次访存 |
+
+结论：树结构在缓存面前毫无机会；哈希表只要负载因子与桶实现不糟糕就
+稳定最快；有序 vector 的价值在**极小规模**（整体驻留 L1 时连续探测的
+优势才能压过哈希计算）或需要有序遍历的场景。"数组比链表快"的同款逻辑
+在这里以 log n 的形式重演。
+
+---
+
 ## 参考文献
 
 - Ulrich Drepper, "What Every Programmer Should Know About Memory", 2007. 缓存层次结构基本原理和 false sharing 分析方法的经典参考。

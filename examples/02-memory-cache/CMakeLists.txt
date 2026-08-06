@@ -42,3 +42,10 @@ hpc_add_example(
     SOURCES src/prefetch.cpp
     BENCHMARK_SOURCES bench/prefetch_bench.cpp
 )
+
+# Lookup structure cache-friendliness comparison
+hpc_add_example(
+    NAME data_structures
+    SOURCES src/data_structures.cpp
+    BENCHMARK_SOURCES bench/data_structures_bench.cpp
+)

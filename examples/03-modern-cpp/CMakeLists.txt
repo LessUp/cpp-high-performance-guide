@@ -65,3 +65,10 @@ else()
         BENCHMARK_SOURCES bench/parallel_stl_bench.cpp
     )
 endif()
+
+# Allocation strategies: per-object new/delete vs arena vs std::pmr
+hpc_add_example(
+    NAME allocators
+    SOURCES src/allocators.cpp
+    BENCHMARK_SOURCES bench/allocator_bench.cpp
+)

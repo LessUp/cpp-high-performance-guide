@@ -26,3 +26,18 @@ hpc_set_compiler_options(modern_cpp_header_only_smoke_test)
 hpc_enable_sanitizers(modern_cpp_header_only_smoke_test)
 
 add_test(NAME modern_cpp_header_only_smoke_test COMMAND modern_cpp_header_only_smoke_test)
+
+add_executable(arena_test
+    arena_test.cpp
+)
+
+target_link_libraries(arena_test PRIVATE
+    GTest::gtest
+    GTest::gtest_main
+    hpc_headers
+)
+
+hpc_set_compiler_options(arena_test)
+hpc_enable_sanitizers(arena_test)
+
+gtest_add_tests(TARGET arena_test)
