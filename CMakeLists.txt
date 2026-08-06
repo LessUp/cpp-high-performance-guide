@@ -58,6 +58,18 @@ endif()
 # libstdc++. Without it the parallel STL example still builds and covers
 # seq/unseq; par policies are compiled in only when TBB is present.
 find_package(TBB QUIET)
+if(NOT TBB_FOUND)
+    # Fallback probe: conda-distributed CMake does not search the Debian
+    # multiarch cmake-config directory where apt installs TBBConfig.cmake.
+    find_file(HPC_TBB_CONFIG_FILE TBBConfig.cmake PATHS
+        /usr/lib/x86_64-linux-gnu/cmake/TBB
+        /usr/lib64/cmake/TBB
+        /usr/lib/cmake/TBB)
+    if(HPC_TBB_CONFIG_FILE)
+        get_filename_component(TBB_DIR "${HPC_TBB_CONFIG_FILE}" DIRECTORY)
+        find_package(TBB QUIET)
+    endif()
+endif()
 if(TBB_FOUND)
     message(STATUS "TBB found: parallel STL example includes par/par_unseq")
 endif()

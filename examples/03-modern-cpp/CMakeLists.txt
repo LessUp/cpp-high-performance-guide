@@ -30,10 +30,30 @@ hpc_add_example(
 # Parallel STL execution policies. seq/unseq always build; par/par_unseq
 # require Intel TBB (GCC libstdc++ implements them on top of it).
 if(TBB_FOUND)
+    # TBB headers reach the targets through a shim directory, mirroring the
+    # numa pattern: TBB::tbb's /usr/include is silently dropped by CMake on
+    # sysroot toolchains (conda) and would shadow the toolchain's own
+    # headers if forced. Symlinking only the tbb/ and oneapi/ subtrees keeps
+    # the rest of the include resolution untouched.
+    get_target_property(_hpc_tbb_includes TBB::tbb INTERFACE_INCLUDE_DIRECTORIES)
+    set(_hpc_tbb_shim "${CMAKE_BINARY_DIR}/tbb-headers")
+    file(MAKE_DIRECTORY "${_hpc_tbb_shim}")
+    foreach(_hpc_tbb_inc ${_hpc_tbb_includes})
+        foreach(_hpc_tbb_sub tbb oneapi)
+            if(EXISTS "${_hpc_tbb_inc}/${_hpc_tbb_sub}"
+               AND NOT EXISTS "${_hpc_tbb_shim}/${_hpc_tbb_sub}")
+                execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+                    "${_hpc_tbb_inc}/${_hpc_tbb_sub}"
+                    "${_hpc_tbb_shim}/${_hpc_tbb_sub}")
+            endif()
+        endforeach()
+    endforeach()
+
     hpc_add_example(
         NAME parallel_stl
         SOURCES src/parallel_stl.cpp
         BENCHMARK_SOURCES bench/parallel_stl_bench.cpp
+        INCLUDE_DIRS ${_hpc_tbb_shim}
         LIBRARIES TBB::tbb
     )
     target_compile_definitions(parallel_stl PRIVATE HPC_HAS_TBB)
