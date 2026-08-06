@@ -8,6 +8,7 @@ option(HPC_BUILD_EXAMPLE_SIMD_VECTORIZATION "Build 04-simd-vectorization example
 option(HPC_BUILD_EXAMPLE_CONCURRENCY "Build 05-concurrency examples" ON)
 option(HPC_BUILD_EXAMPLE_DISTRIBUTED_MPI "Build 06-distributed-mpi examples (requires HPC_ENABLE_MPI=ON)" ON)
 option(HPC_BUILD_EXAMPLE_IO_PERFORMANCE "Build 07-io-performance examples (Linux only)" ON)
+option(HPC_BUILD_EXAMPLE_CPU_MICROARCH "Build 08-cpu-microarch examples" ON)
 
 if(HPC_BUILD_EXAMPLE_CMAKE_MODERN)
     add_subdirectory(01-cmake-modern)
@@ -38,4 +39,8 @@ endif()
 
 if(HPC_BUILD_EXAMPLE_IO_PERFORMANCE)
     add_subdirectory(07-io-performance)
+endif()
+
+if(HPC_BUILD_EXAMPLE_CPU_MICROARCH)
+    add_subdirectory(08-cpu-microarch)
 endif()
