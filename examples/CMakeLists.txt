@@ -7,6 +7,7 @@ option(HPC_BUILD_EXAMPLE_MODERN_CPP "Build 03-modern-cpp examples" ON)
 option(HPC_BUILD_EXAMPLE_SIMD_VECTORIZATION "Build 04-simd-vectorization examples" ON)
 option(HPC_BUILD_EXAMPLE_CONCURRENCY "Build 05-concurrency examples" ON)
 option(HPC_BUILD_EXAMPLE_DISTRIBUTED_MPI "Build 06-distributed-mpi examples (requires HPC_ENABLE_MPI=ON)" ON)
+option(HPC_BUILD_EXAMPLE_IO_PERFORMANCE "Build 07-io-performance examples (Linux only)" ON)
 
 if(HPC_BUILD_EXAMPLE_CMAKE_MODERN)
     add_subdirectory(01-cmake-modern)
@@ -33,4 +34,8 @@ endif()
 # build (and CI) dependency-free.
 if(HPC_BUILD_EXAMPLE_DISTRIBUTED_MPI AND MPI_CXX_FOUND)
     add_subdirectory(06-distributed-mpi)
+endif()
+
+if(HPC_BUILD_EXAMPLE_IO_PERFORMANCE)
+    add_subdirectory(07-io-performance)
 endif()
