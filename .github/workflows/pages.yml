@@ -6,6 +6,11 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/pages.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -18,12 +23,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build-and-deploy:
     # Only run on the original repository, not on forks
     if: github.repository == 'LessUp/cpp-high-performance-guide'
     runs-on: ubuntu-latest
+    # Bind the github-pages environment only when deploying (push /
+    # workflow_dispatch); skip it on pull requests, which only build+test.
     environment:
-      name: github-pages
+      name: ${{ github.event_name != 'pull_request' && 'github-pages' || '' }}
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: Checkout repository
@@ -38,6 +45,7 @@ jobs:
 
       - name: Configure GitHub Pages
         id: pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
 
       - name: Set VitePress base
@@ -47,7 +55,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -z "${BASE_PATH}" ]]; then
-            base="/"
+            base="/cpp-high-performance-guide/"
           else
             base="${BASE_PATH%/}/"
           fi
@@ -66,13 +74,16 @@ jobs:
         run: npm run build:pages
 
       - name: Add .nojekyll
+        if: github.event_name != 'pull_request'
         run: touch docs/.vitepress/dist/.nojekyll
 
       - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
 
       - name: Deploy to GitHub Pages
+        if: github.event_name != 'pull_request'
         id: deploy
         uses: actions/deploy-pages@v4
