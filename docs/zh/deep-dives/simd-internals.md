@@ -19,6 +19,20 @@ SIMD（Single Instruction, Multiple Data）一条指令同时处理多个数据�
 
 **为什么这很重要：** 从 SSE2 到 AVX2 理论峰值翻倍，到 AVX-512 再翻倍。实际加速取决于内存带宽和代码能否充分利用宽度。
 
+### ARM NEON（AArch64）
+
+ARM 侧的对应物是 NEON（Advanced SIMD）：128-bit 寄存器，float 并行度 4，且是 **AArch64 架构基线的强制部分**——不需要运行时探测，也不需要额外编译开关（x86 则需要 `-mavx2` 之类的显式目标特性）。
+
+| 概念 | x86 (AVX2) | ARM (NEON) |
+|------|-----------|------------|
+| 向量类型 | `__m256` | `float32x4_t` |
+| 加载/存储 | `_mm256_loadu_ps` / `_mm256_storeu_ps` | `vld1q_f32` / `vst1q_f32` |
+| 加/乘 | `_mm256_add_ps` / `_mm256_mul_ps` | `vaddq_f32` / `vmulq_f32` |
+| FMA | `_mm256_fmadd_ps` | `vfmaq_f32`（累加是独立操作数） |
+| 横向求和 | shuffle + 逐级相加 | `vaddvq_f32`（单条内建归约） |
+
+NEON 没有 AVX-512 式的掩码寄存器，条件执行靠 `vbslq_f32`（位选择）或谓词化的 `vaddq_f32` 变体；gather/scatter 也缺失（需标量循环模拟），这是移植 gather 密集型代码时的主要痛点。
+
 ---
 
 ## 自动向量化
@@ -373,6 +387,9 @@ cmake --preset=release && cmake --build --preset=release
 ./build/release/examples/04-simd-vectorization/dispatch_example
 
 # Google Benchmark 基准测试
+# BM_AddArrays_Scalar / BM_AddArrays_SIMD（编译期 FloatVec）/
+# BM_AddArrays_Dispatch（运行时分发：SSE2→AVX2→AVX-512→NEON 自动择优，
+# AVX-512 机器无需单独构建配置即可被实测）
 ./build/release/examples/04-simd-vectorization/simd_bench
 
 # 过滤特定测试
@@ -387,6 +404,17 @@ cmake --build --preset=release 2>&1 | grep -i "vectorized"
 ```
 
 运行基准测试查看你的硬件上的实际数据。加速比取决于 CPU 的 ISA 级别、数组大小（是否超出缓存）、以及内存带宽是否成为瓶颈。
+
+---
+
+## 可移植 SIMD 的方向
+
+手写 intrinsics 的代价是每个 ISA 一份实现（本仓库的 `hpc::simd` 覆盖 SSE2/AVX2/AVX-512/NEON 四套特化）。标准化的可移植 SIMD 一直在推进：
+
+- **`std::experimental::simd`**（Parallelism TS 2，GCC 11+ 的 `<experimental/simd>`）：`native_simd<float>` 自动取当前目标的最宽可用宽度，算法写法与标量几乎一致，编译器负责映射到 SSE/AVX/NEON；
+- **C++26 `std::simd`**：已进入标准库草案，接口大体延续实验版，附带 `simd_abi` 宽度抽象与掩码类型。
+
+取舍很实际：wrapper/TS 路径能拿到 80–90% 的手写性能并省下多份特化，但热点内核（尤其需要 gather、掩码、特殊归约的）仍常常要落到 intrinsics。本仓库维持手写封装，因为它本身就是教学对象——看得到每一条指令的映射。
 
 ---
 

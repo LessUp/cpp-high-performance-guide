@@ -15,9 +15,9 @@ hero:
 
 features:
   - title: 深度专题
-    details: 内存布局、SIMD、无锁并发、CMake、C++20，每个专题都从仓库代码出发。
+    details: 内存布局、SIMD、MPI、无锁并发、I/O、NUMA、GPU 路线，每个专题都从仓库代码出发。
   - title: 可运行示例
-    details: 5 个模块、14 个测试文件、Google Benchmark 基准测试，克隆即可验证。
+    details: 7 个模块、Google Benchmark 与 MPI 通信基准，克隆即可验证。
   - title: 性能分析实战
     details: perf、FlameGraph、Valgrind、VTune 的真实工作流。
   - title: 预设驱动构建

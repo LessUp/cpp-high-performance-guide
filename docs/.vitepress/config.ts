@@ -68,7 +68,11 @@ export default defineConfig({
               items: [
                 { text: '内存布局与缓存', link: '/zh/deep-dives/memory-layout' },
                 { text: 'SIMD 向量化', link: '/zh/deep-dives/simd-internals' },
+                { text: 'MPI 分布式并行', link: '/zh/deep-dives/mpi-distributed' },
                 { text: '无锁并发', link: '/zh/deep-dives/lock-free-queue' },
+                { text: '线程亲和与 NUMA', link: '/zh/deep-dives/thread-affinity-numa' },
+                { text: 'I/O 性能', link: '/zh/deep-dives/io-performance' },
+                { text: 'GPU 卸载加速', link: '/zh/deep-dives/gpu-offloading' },
                 { text: '现代 CMake 构建', link: '/zh/deep-dives/cmake-build-system' },
                 { text: 'C++20 性能实践', link: '/zh/deep-dives/modern-cpp-perf' },
               ],

@@ -26,9 +26,11 @@
 
 - 现代 CMake 与 preset 驱动的构建流程
 - 内存与缓存布局取舍
-- 现代 C++ 的性能实践
-- SIMD 与向量化
-- 并发与无锁基础
+- 现代 C++ 的性能实践（含并行 STL 执行策略）
+- SIMD 与向量化（SSE2/AVX2/AVX-512/NEON）
+- 并发与无锁基础、线程亲和与 NUMA
+- 分布式内存与 MPI（可选模块）
+- 文件 I/O 性能（read/pread/mmap 与写缓冲）
 - 基于 benchmark 与 profiling 的性能分析
 
 每个主题都尽量做到 **可阅读、可构建、可测量**。
@@ -41,7 +43,9 @@
 | `examples/02-memory-cache/` | AOS vs SOA、伪共享、对齐、预取 |
 | `examples/03-modern-cpp/` | constexpr、移动语义、reserve、ranges |
 | `examples/04-simd-vectorization/` | 自动向量化、intrinsics、SIMD 封装 |
-| `examples/05-concurrency/` | 原子操作、无锁队列、OpenMP |
+| `examples/05-concurrency/` | 原子操作、无锁队列、OpenMP、线程亲和、NUMA |
+| `examples/06-distributed-mpi/` | MPI 点对点、集合通信、域分解（可选：`-DHPC_ENABLE_MPI=ON`） |
+| `examples/07-io-performance/` | read/pread/mmap 读路径对照、写缓冲开销（Linux） |
 | `docs/` | VitePress 文档站，覆盖深度专题 / 实战指南 / API 参考 |
 
 ## 快速开始
@@ -82,7 +86,8 @@ cmake --preset=ubsan && cmake --build build/ubsan && ctest --preset=ubsan
 - **语言：** C++20
 - **构建：** CMake 3.20+、Ninja
 - **测试：** Google Test、RapidCheck
-- **基准测试：** Google Benchmark
+- **基准测试：** Google Benchmark（MPI 通信基准为手动计时，避免集合通信死锁）
+- **可选依赖：** MPI（06 模块）、Intel TBB（并行 STL par 策略）、libnuma（NUMA 示例）
 - **文档：** VitePress + GitHub Pages
 - **性能分析：** perf、FlameGraph、Valgrind、VTune
 

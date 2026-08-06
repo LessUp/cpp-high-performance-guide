@@ -76,8 +76,10 @@ examples/
   02-memory-cache/       # 内存布局与缓存友好访问
   03-modern-cpp/         # C++20 特性与性能
   04-simd-vectorization/ # SIMD 手动向量化
-  05-concurrency/        # 无锁并发与线程池
-include/hpc/             # 规范头文件库 (core, simd, memory, concurrency, modern-cpp 等)
+  05-concurrency/        # 无锁并发、OpenMP、线程亲和与 NUMA
+  06-distributed-mpi/    # 分布式内存与 MPI（可选，-DHPC_ENABLE_MPI=ON）
+  07-io-performance/     # 文件 I/O：read/pread/mmap 与写缓冲（Linux）
+include/hpc/             # 规范头文件库 (core, simd, memory, concurrency, io, modern-cpp 等)
 tests/
   unit/                  # 单元测试 (Google Test)
   property/              # 属性测试
@@ -89,7 +91,10 @@ scripts/                 # 辅助脚本 (format, setup)
 ## 下一步
 
 - [内存布局与缓存](/zh/deep-dives/memory-layout) — AOS vs SOA、预取、对齐、false sharing
-- [SIMD 向量化](/zh/deep-dives/simd-internals) — 手动 intrinsics 与编译器自动向量化对比
+- [SIMD 向量化](/zh/deep-dives/simd-internals) — 手动 intrinsics、NEON 与编译器自动向量化对比
+- [MPI 分布式并行](/zh/deep-dives/mpi-distributed) — 点对点、集合通信、域分解与 halo 交换
 - [无锁并发](/zh/deep-dives/lock-free-queue) — lock-free queue 实现与基准
+- [线程亲和与 NUMA](/zh/deep-dives/thread-affinity-numa) — 绑核与节点本地分配
+- [I/O 性能](/zh/deep-dives/io-performance) — read/pread/mmap 对照与写缓冲开销
 - [性能分析实战](/zh/guides/profiling) — perf + FlameGraph 实战
 - [故障排查](/zh/reference/troubleshooting) — 常见构建与运行问题

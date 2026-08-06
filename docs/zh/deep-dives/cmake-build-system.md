@@ -6,7 +6,7 @@
 
 **编译优化标志。** `-O3` 启用激进优化（循环展开、向量化、内联）；`-march=native` 允许编译器使用当前 CPU 的全部指令集（AVX2、FMA）；`-ffast-math` 放松浮点语义以换取向量化机会。缺少这些标志的 Release 构建可能只有峰值性能的 20-30%。
 
-**链接时优化（LTO）。** 跨翻译单元内联、死代码消除、全局常量传播。没有 LTO，编译器只能在单个 `.cpp` 文件内优化。（注意：本仓库当前尚未集成 LTO，扩展方式见文末 preset 工作流一节。）
+**链接时优化（LTO）。** 跨翻译单元内联、死代码消除、全局常量传播。没有 LTO，编译器只能在单个 `.cpp` 文件内优化。本仓库提供可选开关 `-DHPC_ENABLE_LTO=ON`（默认关闭），详见文末 preset 工作流一节。
 
 **调试信息与性能分析。** `-g` 生成调试符号，`RelWithDebInfo` 配置在保持 `-O2` 优化的同时保留符号信息，使 perf/VTune 等工具能将热点映射回源码行。
 
@@ -206,9 +206,12 @@ ctest --preset=tsan
 cat build/release/compile_commands.json | head -20
 ```
 
-> **关于 LTO：** 本仓库目前尚未集成链接时优化（没有 `HPC_ENABLE_LTO` 之类的开关）。
-> 如需启用，可在 `cmake/CompilerOptions.cmake` 中为 Release 配置添加 `-flto=auto`
-> （GCC/Clang）或设置 `CMAKE_INTERPROCEDURAL_OPTIMIZATION`，然后用
-> `cmake --build build/release --verbose 2>&1 | grep -i flto` 验证是否生效。
+> **关于 LTO：** 本仓库已集成链接时优化开关（`cmake/CompilerOptions.cmake`）：
+> `cmake --preset=release -DHPC_ENABLE_LTO=ON` 后，Release/RelWithDebInfo 的
+> 全部示例/基准/测试目标统一附加 `-flto=auto`（GCC/Clang，编译与链接两侧）
+> 或 `/GL`+`/LTCG`（MSVC）。configure 阶段用 `CheckIPOSupported` 探测，
+> 工具链不支持 IPO 时会给出警告而非链接期失败。默认关闭的原因：LTO 显著
+> 拖慢链接、放大跨翻译单元的未定义行为暴露面，性能验证场景应按需开启。
+> 验证方式：`grep -o "\-flto=auto" build/release/build.ninja | head -1`。
 
 构建系统本身也是"可验证的性能工程"的一部分：相同的源码 + 相同的 preset = 相同的二进制行为，任何性能回归都可以定位到具体的代码变更而非构建配置漂移。
