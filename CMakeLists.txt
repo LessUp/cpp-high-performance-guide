@@ -44,6 +44,14 @@ if(HPC_ENABLE_OPENMP)
     endif()
 endif()
 
+# Optional: Intel TBB backs std::execution::par/par_unseq on GCC's
+# libstdc++. Without it the parallel STL example still builds and covers
+# seq/unseq; par policies are compiled in only when TBB is present.
+find_package(TBB QUIET)
+if(TBB_FOUND)
+    message(STATUS "TBB found: parallel STL example includes par/par_unseq")
+endif()
+
 # Find MPI if enabled. MPI is a heavyweight external dependency (separate
 # compiler wrappers / runtime), so it stays opt-in: with the default OFF the
 # whole tree configures and builds without any MPI installation.
@@ -92,5 +100,6 @@ message(STATUS "Build Benchmarks: ${HPC_BUILD_BENCHMARKS}")
 message(STATUS "OpenMP: ${HPC_ENABLE_OPENMP}")
 message(STATUS "MPI: ${HPC_ENABLE_MPI}")
 message(STATUS "LTO: ${HPC_ENABLE_LTO}")
+message(STATUS "TBB: ${TBB_FOUND}")
 message(STATUS "=============================================")
 message(STATUS "")
