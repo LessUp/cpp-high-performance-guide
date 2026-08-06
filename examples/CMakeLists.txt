@@ -6,6 +6,7 @@ option(HPC_BUILD_EXAMPLE_MEMORY_CACHE "Build 02-memory-cache examples" ON)
 option(HPC_BUILD_EXAMPLE_MODERN_CPP "Build 03-modern-cpp examples" ON)
 option(HPC_BUILD_EXAMPLE_SIMD_VECTORIZATION "Build 04-simd-vectorization examples" ON)
 option(HPC_BUILD_EXAMPLE_CONCURRENCY "Build 05-concurrency examples" ON)
+option(HPC_BUILD_EXAMPLE_DISTRIBUTED_MPI "Build 06-distributed-mpi examples (requires HPC_ENABLE_MPI=ON)" ON)
 
 if(HPC_BUILD_EXAMPLE_CMAKE_MODERN)
     add_subdirectory(01-cmake-modern)
@@ -25,4 +26,11 @@ endif()
 
 if(HPC_BUILD_EXAMPLE_CONCURRENCY)
     add_subdirectory(05-concurrency)
+endif()
+
+# MPI examples need both the module switch and a discovered MPI runtime.
+# When MPI is absent the module is skipped silently, keeping the default
+# build (and CI) dependency-free.
+if(HPC_BUILD_EXAMPLE_DISTRIBUTED_MPI AND MPI_CXX_FOUND)
+    add_subdirectory(06-distributed-mpi)
 endif()

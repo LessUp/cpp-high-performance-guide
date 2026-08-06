@@ -61,11 +61,12 @@ endfunction()
 function(hpc_fetch_rapidcheck)
     message(STATUS "Fetching RapidCheck...")
 
+    # No GIT_SHALLOW here: shallow clones cannot resolve a pinned commit SHA
+    # once upstream master moves past it ("reference is not a tree").
     FetchContent_Declare(
         rapidcheck
         GIT_REPOSITORY https://github.com/emil-e/rapidcheck.git
         GIT_TAG        b2d9ed2dddefc4b84318d664b4f221eb792d89c7
-        GIT_SHALLOW    TRUE
     )
     
     # Enable GTest integration

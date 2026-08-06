@@ -31,6 +31,7 @@ include(ExampleTemplate)
 option(HPC_BUILD_TESTS "Build tests" ON)
 option(HPC_BUILD_BENCHMARKS "Build benchmarks" ON)
 option(HPC_ENABLE_OPENMP "Enable OpenMP support" ON)
+option(HPC_ENABLE_MPI "Enable MPI support (distributed-memory examples)" OFF)
 option(HPC_VECTORIZE_REPORT "Enable compiler vectorization reports (noisy)" OFF)
 
 # Find OpenMP if enabled
@@ -40,6 +41,20 @@ if(HPC_ENABLE_OPENMP)
         message(STATUS "OpenMP found: ${OpenMP_CXX_VERSION}")
     else()
         message(WARNING "OpenMP not found, some examples will be disabled")
+    endif()
+endif()
+
+# Find MPI if enabled. MPI is a heavyweight external dependency (separate
+# compiler wrappers / runtime), so it stays opt-in: with the default OFF the
+# whole tree configures and builds without any MPI installation.
+if(HPC_ENABLE_MPI)
+    find_package(MPI COMPONENTS CXX)
+    if(MPI_CXX_FOUND)
+        message(STATUS "MPI found: ${MPI_CXX_COMPILER}")
+    else()
+        message(WARNING
+            "HPC_ENABLE_MPI=ON but no MPI implementation was found; "
+            "06-distributed-mpi examples will be skipped")
     endif()
 endif()
 
@@ -75,5 +90,6 @@ message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}
 message(STATUS "Build Tests: ${HPC_BUILD_TESTS}")
 message(STATUS "Build Benchmarks: ${HPC_BUILD_BENCHMARKS}")
 message(STATUS "OpenMP: ${HPC_ENABLE_OPENMP}")
+message(STATUS "MPI: ${HPC_ENABLE_MPI}")
 message(STATUS "=============================================")
 message(STATUS "")
