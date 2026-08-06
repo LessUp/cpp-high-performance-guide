@@ -10,9 +10,15 @@
 | `src/atomic_ordering.cpp` | `atomic_ordering_bench` | memory order 语义与成本 |
 | `src/lock_free_queue.cpp` | （暂无基准） | SPSC/MPMC 无锁队列正确性演示 |
 | `src/openmp_basics.cpp` | `openmp_basics_bench` | OpenMP 并行模式 |
+| `src/thread_affinity.cpp` | （暂无基准） | pthread_setaffinity_np 线程绑核与掩码校验（Linux） |
+| `src/numa_binding.cpp` | （暂无基准） | libnuma 拓扑发现与节点本地分配（可选依赖） |
 
 队列与并发工具来自规范库 `include/hpc/`
 （`hpc::concurrency::SPSCQueue` / `MPMCQueue` / `SpinLock`）。
+
+`numa_binding` 为可选目标：需要 libnuma 且能通过 configure 期链接探测
+（conda 等 sysroot 工具链链接系统 libnuma 会缺 GLIBC 符号，此时自动跳过）。
+单节点机器上两种分配带宽相同，属于预期结果。
 
 ## 构建与运行
 

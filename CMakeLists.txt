@@ -44,6 +44,16 @@ if(HPC_ENABLE_OPENMP)
     endif()
 endif()
 
+# Optional: libnuma backs the NUMA binding example in 05-concurrency.
+# PATHS hints: conda-distributed CMake/toolchain lacks the Debian multiarch
+# lib dir and /usr/include in its default search lists; harmless on stock
+# toolchains.
+find_library(HPC_NUMA_LIBRARY numa PATHS /usr/lib/x86_64-linux-gnu /usr/lib64)
+find_path(HPC_NUMA_INCLUDE_DIR numa.h PATHS /usr/include)
+if(HPC_NUMA_LIBRARY AND HPC_NUMA_INCLUDE_DIR)
+    message(STATUS "libnuma found: ${HPC_NUMA_LIBRARY}")
+endif()
+
 # Optional: Intel TBB backs std::execution::par/par_unseq on GCC's
 # libstdc++. Without it the parallel STL example still builds and covers
 # seq/unseq; par policies are compiled in only when TBB is present.
