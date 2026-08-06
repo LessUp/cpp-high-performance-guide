@@ -9,7 +9,9 @@ namespace hpc::simd::test {
 namespace {
 
 SIMDLevel expected_runtime_level() {
-#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+#if (defined(__GNUC__) || defined(__clang__)) && defined(__aarch64__)
+    return SIMDLevel::NEON;
+#elif (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
     __builtin_cpu_init();
     if (__builtin_cpu_supports("avx512f")) {
         return SIMDLevel::AVX512;
@@ -35,6 +37,7 @@ size_t expected_alignment(SIMDLevel level) {
         case SIMDLevel::AVX:
             return 32;
         case SIMDLevel::SSE2:
+        case SIMDLevel::NEON:
             return 16;
         case SIMDLevel::Scalar:
         default:

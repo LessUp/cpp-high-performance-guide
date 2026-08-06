@@ -12,6 +12,8 @@
 
 #if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
 #include <immintrin.h>
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(__aarch64__)
+#include <arm_neon.h>
 #endif
 
 namespace hpc::simd {
@@ -36,7 +38,12 @@ namespace hpc::simd {
 #define HPC_HAS_AVX512 1
 #endif
 
-enum class SIMDLevel { Scalar, SSE2, AVX, AVX2, AVX512 };
+#if defined(__aarch64__) && (defined(__GNUC__) || defined(__clang__))
+#define HPC_SIMD_HAS_NEON 1
+#define HPC_HAS_NEON 1
+#endif
+
+enum class SIMDLevel { Scalar, SSE2, AVX, AVX2, AVX512, NEON };
 
 /**
  * @brief Detect the highest SIMD level the CPU supports at runtime.
@@ -48,7 +55,10 @@ enum class SIMDLevel { Scalar, SSE2, AVX, AVX2, AVX512 };
  * and may over-align relative to the compiled width (harmless).
  */
 inline SIMDLevel detect_simd_level() {
-#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+#if (defined(__GNUC__) || defined(__clang__)) && defined(__aarch64__)
+    // NEON is part of the mandatory AArch64 baseline, so no runtime probe.
+    return SIMDLevel::NEON;
+#elif (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
     __builtin_cpu_init();
     if (__builtin_cpu_supports("avx512f")) {
         return SIMDLevel::AVX512;
@@ -86,6 +96,8 @@ inline const char* simd_level_name(SIMDLevel level) {
             return "AVX";
         case SIMDLevel::SSE2:
             return "SSE2";
+        case SIMDLevel::NEON:
+            return "NEON";
         case SIMDLevel::Scalar:
         default:
             return "Scalar";
@@ -100,6 +112,7 @@ inline std::size_t simd_vector_width(SIMDLevel level) {
         case SIMDLevel::AVX:
             return 32;
         case SIMDLevel::SSE2:
+        case SIMDLevel::NEON:
             return 16;
         case SIMDLevel::Scalar:
         default:
@@ -115,6 +128,7 @@ inline std::size_t get_simd_alignment() {
         case SIMDLevel::AVX:
             return 32;
         case SIMDLevel::SSE2:
+        case SIMDLevel::NEON:
             return 16;
         case SIMDLevel::Scalar:
         default:
@@ -413,6 +427,67 @@ public:
 
 #endif
 
+#ifdef HPC_HAS_NEON
+
+template <>
+class SimdVec<float, 4> {
+public:
+    static constexpr std::size_t width = 4;
+    using value_type = float;
+
+    float32x4_t data;
+
+    SimdVec() : data(vdupq_n_f32(0.0f)) {}
+    explicit SimdVec(float32x4_t value) : data(value) {}
+    explicit SimdVec(float value) : data(vdupq_n_f32(value)) {}
+    explicit SimdVec(const float* ptr) : data(vld1q_f32(ptr)) {}
+
+    // AArch64 NEON loads have no separate aligned variant; both compile to
+    // the same instruction. The alias keeps the wrapper interface uniform.
+    static SimdVec load_aligned(const float* ptr) { return SimdVec(vld1q_f32(ptr)); }
+
+    void store(float* ptr) const { vst1q_f32(ptr, data); }
+    void store_aligned(float* ptr) const { vst1q_f32(ptr, data); }
+
+    float operator[](std::size_t i) const {
+        alignas(16) float tmp[4];
+        vst1q_f32(tmp, data);
+        return tmp[i];
+    }
+
+    SimdVec operator+(const SimdVec& other) const { return SimdVec(vaddq_f32(data, other.data)); }
+    SimdVec operator-(const SimdVec& other) const { return SimdVec(vsubq_f32(data, other.data)); }
+    SimdVec operator*(const SimdVec& other) const { return SimdVec(vmulq_f32(data, other.data)); }
+    SimdVec operator/(const SimdVec& other) const { return SimdVec(vdivq_f32(data, other.data)); }
+
+    SimdVec& operator+=(const SimdVec& other) {
+        data = vaddq_f32(data, other.data);
+        return *this;
+    }
+
+    SimdVec& operator-=(const SimdVec& other) {
+        data = vsubq_f32(data, other.data);
+        return *this;
+    }
+
+    SimdVec& operator*=(const SimdVec& other) {
+        data = vmulq_f32(data, other.data);
+        return *this;
+    }
+
+    float horizontal_sum() const { return vaddvq_f32(data); }
+
+    static SimdVec fmadd(const SimdVec& a, const SimdVec& b, const SimdVec& c) {
+        return SimdVec(vfmaq_f32(c.data, a.data, b.data));
+    }
+
+    SimdVec sqrt() const { return SimdVec(vsqrtq_f32(data)); }
+    SimdVec min(const SimdVec& other) const { return SimdVec(vminq_f32(data, other.data)); }
+    SimdVec max(const SimdVec& other) const { return SimdVec(vmaxq_f32(data, other.data)); }
+};
+
+#endif
+
 #ifdef HPC_HAS_AVX2
 
 template <>
@@ -571,6 +646,9 @@ constexpr std::size_t FLOAT_VEC_WIDTH = 8;
 #elif defined(HPC_HAS_SSE2)
 using FloatVec = SimdVec<float, 4>;
 constexpr std::size_t FLOAT_VEC_WIDTH = 4;
+#elif defined(HPC_HAS_NEON)
+using FloatVec = SimdVec<float, 4>;
+constexpr std::size_t FLOAT_VEC_WIDTH = 4;
 #else
 using FloatVec = SimdVecScalar<float, 4>;
 constexpr std::size_t FLOAT_VEC_WIDTH = 4;
@@ -638,6 +716,18 @@ inline Func resolve_best(Func scalar, Func sse2, Func avx2, Func avx512) {
     return scalar;
 }
 
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(__aarch64__)
+
+inline void add_arrays_neon(const float* a, const float* b, float* c, std::size_t n) {
+    std::size_t i = 0;
+    for (; i + 4 <= n; i += 4) {
+        const float32x4_t va = vld1q_f32(a + i);
+        const float32x4_t vb = vld1q_f32(b + i);
+        vst1q_f32(c + i, vaddq_f32(va, vb));
+    }
+    add_arrays_scalar(a + i, b + i, c + i, n - i);
+}
+
 #endif
 
 }  // namespace detail
@@ -649,6 +739,8 @@ inline void add_arrays(const float* a, const float* b, float* c, std::size_t n) 
         detail::resolve_best<Fn>(&detail::add_arrays_scalar, &detail::add_arrays_sse2,
                                  &detail::add_arrays_avx2, &detail::add_arrays_avx512);
     dispatch(a, b, c, n);
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(__aarch64__)
+    detail::add_arrays_neon(a, b, c, n);
 #else
     detail::add_arrays_scalar(a, b, c, n);
 #endif

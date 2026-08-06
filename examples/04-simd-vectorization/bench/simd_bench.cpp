@@ -2,10 +2,16 @@
  * @file simd_bench.cpp
  * @brief Benchmarks comparing scalar vs SIMD implementations
  *
- * This benchmark measures:
- * 1. Scalar vs SSE vs AVX2 vs AVX-512 performance
- * 2. Speedup ratios for different operations
- * 3. Impact of array size on SIMD efficiency
+ * Two SIMD paths are measured:
+ * 1. *_SIMD   — compile-time FloatVec wrappers (width fixed by the build's
+ *               ISA flags, e.g. AVX2 = 8 floats).
+ * 2. *_Dispatch — hpc::simd::add_arrays(), which resolves at runtime to the
+ *               best target-attribute kernel (SSE2/AVX2/AVX-512 on x86, NEON
+ *               on AArch64). On AVX-512 hardware this is where AVX-512 gets
+ *               measured without needing a separate build configuration.
+ *
+ * The scalar baseline lives in a translation unit compiled without
+ * auto-vectorization (see scalar_baseline.cpp).
  */
 
 #include <benchmark/benchmark.h>
@@ -77,6 +83,30 @@ BENCHMARK(BM_AddArrays_Scalar)
     ->Unit(benchmark::kMicrosecond);
 
 BENCHMARK(BM_AddArrays_SIMD)
+    ->RangeMultiplier(4)
+    ->Range(256, 1 << 20)
+    ->Unit(benchmark::kMicrosecond);
+
+// Runtime-dispatched kernel: picks the best ISA at startup, so the same
+// binary is measured on SSE2-only, AVX2 and AVX-512 machines alike.
+static void BM_AddArrays_Dispatch(benchmark::State& state) {
+    const size_t n = static_cast<size_t>(state.range(0));
+    hpc::simd::AlignedBuffer<float> a(n), b(n), c(n);
+    init_random(a.data(), n);
+    init_random(b.data(), n);
+
+    for (auto _ : state) {
+        hpc::simd::add_arrays(a.data(), b.data(), c.data(), n);
+        benchmark::DoNotOptimize(c.data());
+        benchmark::ClobberMemory();
+    }
+
+    state.SetBytesProcessed(state.iterations() * n * sizeof(float) * 3);
+    state.SetItemsProcessed(state.iterations() * n);
+    state.SetLabel(hpc::simd::simd_level_name(hpc::simd::detect_simd_level()));
+}
+
+BENCHMARK(BM_AddArrays_Dispatch)
     ->RangeMultiplier(4)
     ->Range(256, 1 << 20)
     ->Unit(benchmark::kMicrosecond);
