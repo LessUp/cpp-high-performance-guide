@@ -31,7 +31,9 @@
 - 并发与无锁基础、线程亲和与 NUMA
 - 分布式内存与 MPI（可选模块）
 - 文件 I/O 性能（read/pread/mmap 与写缓冲）
-- 基于 benchmark 与 profiling 的性能分析
+- CPU 微架构（分支预测、ILP、PMU 计数器）
+- 端到端优化案例（GEMM：tiling → SIMD → OpenMP）
+- 基于 benchmark 与 profiling 的性能分析与测量方法论
 
 每个主题都尽量做到 **可阅读、可构建、可测量**。
 
@@ -46,6 +48,8 @@
 | `examples/05-concurrency/` | 原子操作、无锁队列、OpenMP、线程亲和、NUMA |
 | `examples/06-distributed-mpi/` | MPI 点对点、集合通信、域分解（可选：`-DHPC_ENABLE_MPI=ON`） |
 | `examples/07-io-performance/` | read/pread/mmap 读路径对照、写缓冲开销（Linux） |
+| `examples/08-cpu-microarch/` | 分支预测、延迟链 vs ILP、perf_event_open PMU 计数器 |
+| `examples/09-matrix-multiply/` | GEMM 四阶段：naive → tiling → SIMD(FMA) → OpenMP |
 | `docs/` | VitePress 文档站，覆盖深度专题 / 实战指南 / API 参考 |
 
 ## 快速开始

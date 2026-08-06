@@ -79,6 +79,8 @@ examples/
   05-concurrency/        # 无锁并发、OpenMP、线程亲和与 NUMA
   06-distributed-mpi/    # 分布式内存与 MPI（可选，-DHPC_ENABLE_MPI=ON）
   07-io-performance/     # 文件 I/O：read/pread/mmap 与写缓冲（Linux）
+  08-cpu-microarch/      # 分支预测、ILP/依赖链、PMU 计数器
+  09-matrix-multiply/    # GEMM 四阶段优化案例（tiling/SIMD/OpenMP）
 include/hpc/             # 规范头文件库 (core, simd, memory, concurrency, io, modern-cpp 等)
 tests/
   unit/                  # 单元测试 (Google Test)
@@ -91,6 +93,9 @@ scripts/                 # 辅助脚本 (format, setup)
 ## 下一步
 
 - [内存布局与缓存](/zh/deep-dives/memory-layout) — AOS vs SOA、预取、对齐、false sharing
+- [CPU 微架构](/zh/deep-dives/cpu-microarch) — 分支预测、延迟 vs 吞吐、Top-Down 方法论
+- [GEMM 案例研究](/zh/deep-dives/gemm-case-study) — naive→tiling→SIMD→OpenMP 四步优化
+- [基准测试方法论](/zh/guides/benchmark-methodology) — 可信测量的纪律与陷阱
 - [SIMD 向量化](/zh/deep-dives/simd-internals) — 手动 intrinsics、NEON 与编译器自动向量化对比
 - [MPI 分布式并行](/zh/deep-dives/mpi-distributed) — 点对点、集合通信、域分解与 halo 交换
 - [无锁并发](/zh/deep-dives/lock-free-queue) — lock-free queue 实现与基准

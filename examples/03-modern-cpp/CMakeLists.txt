@@ -57,7 +57,11 @@ if(TBB_FOUND)
         LIBRARIES TBB::tbb
     )
     target_compile_definitions(parallel_stl PRIVATE HPC_HAS_TBB)
-    target_compile_definitions(parallel_stl_bench PRIVATE HPC_HAS_TBB)
+    # The bench target only exists when HPC_BUILD_BENCHMARKS is ON (the
+    # sanitizer presets disable it — sanitizers distort timing).
+    if(TARGET parallel_stl_bench)
+        target_compile_definitions(parallel_stl_bench PRIVATE HPC_HAS_TBB)
+    endif()
 else()
     hpc_add_example(
         NAME parallel_stl

@@ -229,7 +229,7 @@ vec.resize(10);   // capacity≥10, size=10 — 已值初始化，可下标访�
 对象**同生共死**（解析/构建/渲染阶段、请求作用域临时数据），正确工具是
 arena（单调分配器）：
 
-- `hpc::mem::Arena`（[`include/hpc/arena.hpp`](../../../include/hpc/arena.hpp)）：
+- `hpc::mem::Arena`（`include/hpc/arena.hpp`）：
   一次 malloc，分配 = 指针递增，释放 = 一次 `reset()`；
 - `std::pmr::monotonic_buffer_resource`（C++17 标准库）：同样的分配形态，
   可直接插入标准容器（`std::pmr::polymorphic_allocator`）。

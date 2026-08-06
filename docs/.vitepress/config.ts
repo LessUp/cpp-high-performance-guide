@@ -67,7 +67,9 @@ export default defineConfig({
               text: '深度专题',
               items: [
                 { text: '内存布局与缓存', link: '/zh/deep-dives/memory-layout' },
+                { text: 'CPU 微架构', link: '/zh/deep-dives/cpu-microarch' },
                 { text: 'SIMD 向量化', link: '/zh/deep-dives/simd-internals' },
+                { text: 'GEMM 案例研究', link: '/zh/deep-dives/gemm-case-study' },
                 { text: 'MPI 分布式并行', link: '/zh/deep-dives/mpi-distributed' },
                 { text: '无锁并发', link: '/zh/deep-dives/lock-free-queue' },
                 { text: '线程亲和与 NUMA', link: '/zh/deep-dives/thread-affinity-numa' },
@@ -81,6 +83,7 @@ export default defineConfig({
               text: '实战指南',
               items: [
                 { text: '性能分析实战', link: '/zh/guides/profiling' },
+                { text: '基准测试方法论', link: '/zh/guides/benchmark-methodology' },
                 { text: '优化决策手册', link: '/zh/guides/optimization-playbook' },
               ],
             },
