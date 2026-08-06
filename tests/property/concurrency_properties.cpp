@@ -450,8 +450,14 @@ TEST(LockFreeQueueTests, EmptyQueuePop) {
  * Validates: Requirements 5.4, 5.5
  */
 TEST(OpenMPScalingTests, ParallelForEfficiency) {
-#ifndef _OPENMP
+#if !defined(_OPENMP)
     GTEST_SKIP() << "OpenMP not available";
+#elif (defined(__has_feature) && __has_feature(thread_sanitizer)) || defined(__SANITIZE_THREAD__)
+    // The OpenMP runtime (libomp) is not TSan-instrumented: its internal
+    // pthread_mutex_init/lock during thread-pool fork-join surface as
+    // false-positive data races. The reduction itself is race-free.
+    GTEST_SKIP() << "OpenMP runtime (libomp) is not TSan-instrumented; "
+                    "internal mutex races are false positives under TSan";
 #else
     constexpr size_t N = 10000000;
     std::vector<double> data(N);
