@@ -452,7 +452,7 @@ TEST(LockFreeQueueTests, EmptyQueuePop) {
 TEST(OpenMPScalingTests, ParallelForEfficiency) {
 #if !defined(_OPENMP)
     GTEST_SKIP() << "OpenMP not available";
-#elif (defined(__has_feature) && __has_feature(thread_sanitizer)) || defined(__SANITIZE_THREAD__)
+#elif defined(HPC_TSAN_BUILD)
     // The OpenMP runtime (libomp) is not TSan-instrumented: its internal
     // pthread_mutex_init/lock during thread-pool fork-join surface as
     // false-positive data races. The reduction itself is race-free.

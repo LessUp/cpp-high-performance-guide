@@ -41,9 +41,14 @@ function(hpc_enable_sanitizers target)
     if(ENABLE_TSAN)
         list(APPEND SANITIZER_FLAGS -fsanitize=thread)
         list(APPEND SANITIZER_LINK_FLAGS -fsanitize=thread)
+        # Marks TSan-only builds so tests can skip cases incompatible with
+        # libomp, whose internal pthread_mutex_init/lock races surface as
+        # false positives under ThreadSanitizer. Compiler-agnostic, unlike
+        # __has_feature (Clang) / __SANITIZE_THREAD__ (GCC).
+        target_compile_definitions(${target} PRIVATE HPC_TSAN_BUILD)
         message(STATUS "ThreadSanitizer enabled for ${target}")
     endif()
-    
+
     # UndefinedBehaviorSanitizer
     if(ENABLE_UBSAN)
         list(APPEND SANITIZER_FLAGS -fsanitize=undefined)
